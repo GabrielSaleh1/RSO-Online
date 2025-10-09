@@ -51,10 +51,15 @@
   table.tot{width:100%;border-collapse:separate;border-spacing:0 6px}
   table.tot th,table.tot td{padding:10px 12px;border:1px solid var(--line)}
   table.tot th{background:#0c1422;text-align:left}
+  /* área de gráficos */
+  .charts{display:grid;gap:14px;margin-top:12px}
+  .charts canvas{background:#0c1422;border:1px solid var(--line);border-radius:12px;padding:10px}
 </style>
 
 <!-- Supabase JS v2 (CDN) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="wrap">
@@ -157,7 +162,17 @@
 
       <div id="totalsPanel" class="panel" style="display:none">
         <h3 style="margin:0 0 10px">Totais por policial (últimos 7 dias)</h3>
-        <div id="totalsContent"></div>
+
+        <!-- gráficos -->
+        <div class="charts">
+          <canvas id="chartByOfficer" height="220"></canvas>
+          <canvas id="chartByItem" height="220"></canvas>
+          <canvas id="chartByDay" height="220"></canvas>
+        </div>
+
+        <!-- tabela -->
+        <div id="totalsContent" style="margin-top:10px"></div>
+
         <div style="margin-top:10px;display:flex;gap:8px">
           <button class="btn btn-sec" id="exportCsvBtn" type="button">Exportar CSV</button>
           <button class="btn btn-sec" type="button" onclick="document.getElementById('totalsPanel').style.display='none'">Fechar</button>
@@ -196,14 +211,13 @@
   const pad2 = n => String(n).padStart(2,'0');
   const esc = s => (s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 
-  /* ===== Supabase (sua URL e anon key) ===== */
+  /* ===== Supabase ===== */
   const SUPABASE_URL = 'https://ilonwkgtdszmpcjwlezc.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlsb253a2d0ZHN6bXBjandsZXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NzQxMDIsImV4cCI6MjA3NTU1MDEwMn0.Cc-BtnHlXaGVCY6T6iXe0QA1tsfc17aX8lswEICvtw0';
   const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // ===== Roster & Ranks =====
-  let RANKS = [];           // [{id,name,sort_order}]
-  let OFFICERS = [];        // [{id,name,current_rank_id}]
+  /* ===== Roster & Ranks ===== */
+  let RANKS = []; let OFFICERS = [];
   const NAME_SELECTS = ['motorista_sel','encarregado_sel','seguranca_sel','auxiliares_sel'];
   const RANK_SELECTS = ['motorista_rank','encarregado_rank','seguranca_rank','auxiliares_rank'];
 
@@ -211,52 +225,40 @@
     const { data, error } = await supa.from('ranks').select('id,name,sort_order').order('sort_order', { ascending: true });
     if(error){ console.error(error); alert('Erro ao carregar patentes.'); return; }
     RANKS = data || [];
-    RANK_SELECTS.forEach(id => fillRankSelect(id));
-  }
-  function fillRankSelect(id){
-    const sel = $(id);
-    sel.innerHTML = `<option value="">Selecione a patente…</option>` + RANKS.map(r => `<option value="${r.id}">${esc(r.name)}</option>`).join('');
+    RANK_SELECTS.forEach(id => {
+      const sel = $(id);
+      sel.innerHTML = `<option value="">Selecione a patente…</option>` + RANKS.map(r => `<option value="${r.id}">${esc(r.name)}</option>`).join('');
+    });
   }
 
   async function loadOfficers(){
     const { data, error } = await supa.from('officers').select('id,name,current_rank_id').eq('active', true).order('name');
     if(error){ console.error(error); alert('Erro ao carregar policiais.'); return; }
     OFFICERS = data || [];
-    NAME_SELECTS.forEach(id => fillOfficerSelect(id));
-  }
-  function fillOfficerSelect(id){
-    const sel = $(id);
-    sel.innerHTML =
-      `<option value="">Selecione…</option>` +
-      OFFICERS.map(o => `<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');
+    NAME_SELECTS.forEach(id => {
+      const sel = $(id);
+      sel.innerHTML = `<option value="">Selecione…</option>` + OFFICERS.map(o => `<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');
+    });
   }
 
-  // Ao trocar o nome, auto-preenche a patente com a "current_rank_id" do officer (sem opção de adicionar)
   function linkNameToRank(){
     NAME_SELECTS.forEach((nameId, idx) => {
       const rankId = RANK_SELECTS[idx];
       $(nameId).addEventListener('change', (e) => {
-        const val = e.target.value;
-        const off = OFFICERS.find(o => o.id === val);
+        const off = OFFICERS.find(o => o.id === e.target.value);
         $(rankId).value = off?.current_rank_id || '';
       });
     });
   }
 
-  // Início: carrega listas
   (async function initRoster(){
-    await loadRanks();
-    await loadOfficers();
-    linkNameToRank();
-  })();
-
-  // data/hora default
-  (function(){
+    // data/hora default
     const d=new Date(), z=n=>String(n).padStart(2,'0');
     $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
+    await loadRanks(); await loadOfficers(); linkNameToRank();
   })();
 
-  // campos dinâmicos
+  /* ===== Campos dinâmicos ===== */
   function addIlicito(v=''){mkItem('list-ilicitos',v,'ex.: 02x Maconha');}
   function addVeiculo(v=''){mkItem('list-veiculos',v,'ex.: BMW R1250 HP - Branca - 57URU265 - Apreendida');}
   function addAbordado(v=''){mkItem('list-abordados',v,'ex.: Renato Cruz – 4910 – BOPM – Cb Ducati 20:14');}
@@ -271,7 +273,7 @@
   if(!$('list-ocorrencias').children.length) addOcorrencia();
   if(!$('list-abordados').children.length) addAbordado();
 
-  // coleta para impressão
+  /* ===== Impressão ===== */
   function collect(){
     const L=id=>[...$(id).querySelectorAll('input')].map(i=>i.value).filter(Boolean);
     const O=[...$('list-ocorrencias').children].map(d=>{const [h,t]=d.querySelectorAll('input');return{h:h.value,t:t.value}}).filter(o=>o.t);
@@ -296,19 +298,8 @@
       ilicitos:L('list-ilicitos'),veiculos:L('list-veiculos'),
       ocorrencias:O,abordados:L('list-abordados'),
       resOc:+($('res-oc').value||0),resAp:+($('res-ap').value||0),resAc:+($('res-ac').value||0),
-
-      _ids: {
-        motorista: $('motorista_sel').value, encarregado: $('encarregado_sel').value,
-        seguranca: $('seguranca_sel').value, auxiliares: $('auxiliares_sel').value
-      },
-      _rank_ids: {
-        motorista: $('motorista_rank').value, encarregado: $('encarregado_rank').value,
-        seguranca: $('seguranca_rank').value, auxiliares: $('auxiliares_rank').value
-      }
     };
   }
-
-  // PDF preenchido
   function fillSheet(d){
     const dt=d.datahora?new Date(d.datahora):new Date();
     const dd=`${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
@@ -341,25 +332,24 @@
     return out;
   }
 
-  /* ==== Monta lista de {nome + patente} ==== */
+  /* ===== Salvar ilícitos no Supabase ===== */
   function selectedOfficerAndRankPairs(){
     const pairs = [];
-    const make = (selId, rankId) => {
-      const officerId = $(selId).value || '';
-      const rankSel = $(rankId).value || '';
-      if(!officerId || !rankSel) return;
-      const officer = OFFICERS.find(o => o.id === officerId);
-      const rankObj = RANKS.find(r => String(r.id) === String(rankSel));
-      pairs.push({ name: officer?.name || '', rank_name: rankObj?.name || '' });
+    const pick = (selId, rankId) => {
+      const oid = $(selId).value || '';
+      const rid = $(rankId).value || '';
+      if(!oid || !rid) return;
+      const o = OFFICERS.find(x=>x.id===oid);
+      const r = RANKS.find(x=>String(x.id)===String(rid));
+      if(o && r) pairs.push({ name:o.name, rank_name:r.name });
     };
-    make('motorista_sel','motorista_rank');
-    make('encarregado_sel','encarregado_rank');
-    make('seguranca_sel','seguranca_rank');
-    make('auxiliares_sel','auxiliares_rank');
-    return pairs.filter(p => p.name && p.rank_name);
+    pick('motorista_sel','motorista_rank');
+    pick('encarregado_sel','encarregado_rank');
+    pick('seguranca_sel','seguranca_rank');
+    pick('auxiliares_sel','auxiliares_rank');
+    return pairs;
   }
 
-  /* ==== Salvar ilícitos ==== */
   async function saveIllicitsToSupabase(){
     const rota = ($('rota').value || '').trim() || null;
     const lines = [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value).filter(Boolean).join('\n');
@@ -393,7 +383,58 @@
   }
   $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
 
-  /* ==== Totais 7 dias ==== */
+  /* ====== Gráficos (Chart.js) + Totais 7 dias ====== */
+  let chartByOfficer, chartByItem, chartByDay;
+
+  function destroyCharts(){
+    [chartByOfficer, chartByItem, chartByDay].forEach(ch=>{
+      if(ch){ ch.destroy(); }
+    });
+    chartByOfficer = chartByItem = chartByDay = null;
+  }
+
+  function niceColors(n){
+    const base = [
+      '#60a5fa','#f472b6','#34d399','#f59e0b','#a78bfa',
+      '#22d3ee','#fb7185','#4ade80','#eab308','#c084fc'
+    ];
+    const out=[]; for(let i=0;i<n;i++) out.push(base[i%base.length]);
+    return out;
+  }
+
+  function renderCharts(aggByOfficer, aggByItem, seriesByDay){
+    destroyCharts();
+
+    // 1) Barras por policial
+    const offNames = Object.keys(aggByOfficer);
+    const offTotals = offNames.map(n=>{
+      const obj = aggByOfficer[n]; return Object.values(obj).reduce((a,b)=>a+b,0);
+    });
+    chartByOfficer = new Chart($('#chartByOfficer'), {
+      type:'bar',
+      data:{ labels: offNames, datasets:[{ label:'Total por policial (7 dias)', data: offTotals, backgroundColor:niceColors(offTotals.length) }]},
+      options:{ responsive:true, plugins:{legend:{labels:{color:'#e5e7eb'}}}, scales:{x:{ticks:{color:'#e5e7eb'}}, y:{beginAtZero:true,ticks:{color:'#e5e7eb'}}}}
+    });
+
+    // 2) Rosca por tipo
+    const itemNames = Object.keys(aggByItem);
+    const itemTotals = itemNames.map(k=>aggByItem[k]);
+    chartByItem = new Chart($('#chartByItem'), {
+      type:'doughnut',
+      data:{ labels:itemNames, datasets:[{ label:'Por tipo de ilícito', data:itemTotals, backgroundColor:niceColors(itemTotals.length)}]},
+      options:{ plugins:{legend:{labels:{color:'#e5e7eb'}}}}
+    });
+
+    // 3) Linha por dia
+    const dayLabels = Object.keys(seriesByDay).sort();
+    const dayTotals = dayLabels.map(k=>seriesByDay[k]);
+    chartByDay = new Chart($('#chartByDay'), {
+      type:'line',
+      data:{ labels:dayLabels, datasets:[{ label:'Total por dia', data:dayTotals, borderColor:'#60a5fa', backgroundColor:'rgba(96,165,250,.25)', tension:.2, fill:true }]},
+      options:{ plugins:{legend:{labels:{color:'#e5e7eb'}}}, scales:{x:{ticks:{color:'#e5e7eb'}}, y:{beginAtZero:true,ticks:{color:'#e5e7eb'}}}}
+    });
+  }
+
   async function showTotals7d(){
     const cutoff = new Date(Date.now()-7*24*60*60*1000).toISOString();
     const { data, error } = await supa
@@ -403,17 +444,36 @@
 
     if(error){ console.error(error); alert('Erro ao buscar totais. Veja o console.'); return; }
 
-    const agg = {};
+    // agrega
+    const aggByOfficer = {}; // { officer: {item: total} }
+    const aggByItem    = {}; // { item: total }
+    const seriesByDay  = {}; // { 'dd/mm': total }
     data.forEach(r=>{
       const off = r.officer || '—';
-      if(!agg[off]) agg[off] = {};
-      agg[off][r.item_type] = (agg[off][r.item_type] || 0) + Number(r.quantity || 0);
+      const it  = r.item_type || '—';
+      const q   = Number(r.quantity || 0);
+      if(!aggByOfficer[off]) aggByOfficer[off] = {};
+      aggByOfficer[off][it] = (aggByOfficer[off][it] || 0) + q;
+
+      aggByItem[it] = (aggByItem[it] || 0) + q;
+
+      const d = new Date(r.recorded_at);
+      const key = `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}`;
+      seriesByDay[key] = (seriesByDay[key] || 0) + q;
     });
-    renderTotals(agg);
+
+    // tabela
+    renderTotals(aggByOfficer);
+    // gráficos
+    renderCharts(aggByOfficer, aggByItem, seriesByDay);
+
+    $('totalsPanel').style.display = 'block';
+    $('exportCsvBtn').onclick = ()=> exportTotalsCSV(aggByOfficer);
   }
+
   function renderTotals(agg){
     const c = $('totalsContent');
-    if(!agg || !Object.keys(agg).length){ c.innerHTML='<div class="muted">Sem dados nos últimos 7 dias.</div>'; $('totalsPanel').style.display='block'; return; }
+    if(!agg || !Object.keys(agg).length){ c.innerHTML='<div class="muted">Sem dados nos últimos 7 dias.</div>'; return; }
     let html = '';
     Object.keys(agg).sort().forEach(off=>{
       html += `<h4 style="margin:10px 0 6px">${esc(off)}</h4>`;
@@ -425,9 +485,8 @@
       html += `</tbody></table>`;
     });
     c.innerHTML = html;
-    $('totalsPanel').style.display = 'block';
-    $('exportCsvBtn').onclick = ()=> exportTotalsCSV(agg);
   }
+
   function exportTotalsCSV(agg){
     const rows = [['policial','item','total']];
     Object.entries(agg).forEach(([off, items])=>{
