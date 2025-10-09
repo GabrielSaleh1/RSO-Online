@@ -5,10 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>RSO Online</title>
 <style>
-  :root{
-    --bg:#0f172a; --panel:#111827; --muted:#9ca3af; --text:#e5e7eb; --line:#2a3647;
-    --brand:#4f9cf9; --btn:#2563eb; --btnH:#1e40af; --field:#0b1220;
-  }
+  :root{ --bg:#0f172a; --panel:#111827; --muted:#9ca3af; --text:#e5e7eb; --line:#2a3647; --brand:#4f9cf9; --btn:#2563eb; --btnH:#1e40af; --field:#0b1220; }
   body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
   .wrap{max-width:980px;margin:24px auto;padding:0 16px}
   h1{margin:0 0 16px;text-align:center;color:var(--brand);font-weight:800;letter-spacing:.3px}
@@ -16,7 +13,7 @@
   .row{display:flex;flex-wrap:wrap;gap:12px}
   .row>div{flex:1 1 260px;min-width:220px}
   label{display:block;font-weight:700;font-size:.92rem;margin:6px 0}
-  input,textarea{width:100%;box-sizing:border-box;background:var(--field);border:1px solid var(--line);color:var(--text);padding:10px 12px;border-radius:10px;display:block}
+  input,textarea,select{width:100%;box-sizing:border-box;background:var(--field);border:1px solid var(--line);color:var(--text);padding:10px 12px;border-radius:10px;display:block}
   textarea{min-height:72px;resize:vertical}
   .list{display:grid;gap:10px}
   .item,.item-2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -75,13 +72,46 @@
 
       <div class="panel">
         <div class="row">
-          <div><label>Motorista</label><input id="motorista" placeholder="CB PM Ducati"></div>
-          <div><label>Encarregado</label><input id="encarregado" placeholder="2º SGT Rangel"></div>
+          <div>
+            <label>Motorista (Nome)</label>
+            <select id="motorista_sel"></select>
+          </div>
+          <div>
+            <label>Motorista (Patente)</label>
+            <select id="motorista_rank"></select>
+          </div>
         </div>
         <div class="row">
-          <div><label>Segurança</label><input id="seguranca" placeholder="EST SD PM Jhonny"></div>
-          <div><label>Auxiliar (1)</label><input id="auxiliares" placeholder="EST SD PM João"></div>
+          <div>
+            <label>Encarregado (Nome)</label>
+            <select id="encarregado_sel"></select>
+          </div>
+          <div>
+            <label>Encarregado (Patente)</label>
+            <select id="encarregado_rank"></select>
+          </div>
         </div>
+        <div class="row">
+          <div>
+            <label>Segurança (Nome)</label>
+            <select id="seguranca_sel"></select>
+          </div>
+          <div>
+            <label>Segurança (Patente)</label>
+            <select id="seguranca_rank"></select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Auxiliar (Nome)</label>
+            <select id="auxiliares_sel"></select>
+          </div>
+          <div>
+            <label>Auxiliar (Patente)</label>
+            <select id="auxiliares_rank"></select>
+          </div>
+        </div>
+        <div class="muted">Se o policial não estiver na lista, escolha “+ Adicionar policial…” no select de Nomes.</div>
       </div>
 
       <div class="panel">
@@ -171,6 +201,74 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlsb253a2d0ZHN6bXBjandsZXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NzQxMDIsImV4cCI6MjA3NTU1MDEwMn0.Cc-BtnHlXaGVCY6T6iXe0QA1tsfc17aX8lswEICvtw0';
   const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // ===== Roster & Ranks =====
+  let RANKS = [];           // [{id,name,sort_order}]
+  let OFFICERS = [];        // [{id,name,current_rank_id}]
+  const NAME_SELECTS = ['motorista_sel','encarregado_sel','seguranca_sel','auxiliares_sel'];
+  const RANK_SELECTS = ['motorista_rank','encarregado_rank','seguranca_rank','auxiliares_rank'];
+
+  async function loadRanks(){
+    const { data, error } = await supa.from('ranks').select('id,name,sort_order').order('sort_order', { ascending: true });
+    if(error){ console.error(error); alert('Erro ao carregar patentes.'); return; }
+    RANKS = data || [];
+    // Preenche todos os selects de patente
+    RANK_SELECTS.forEach(id => fillRankSelect(id));
+  }
+
+  function fillRankSelect(id){
+    const sel = $(id);
+    sel.innerHTML = `<option value="">Selecione a patente…</option>` + RANKS.map(r => `<option value="${r.id}">${esc(r.name)}</option>`).join('');
+  }
+
+  async function loadOfficers(){
+    const { data, error } = await supa.from('officers').select('id,name,current_rank_id').eq('active', true).order('name');
+    if(error){ console.error(error); alert('Erro ao carregar policiais.'); return; }
+    OFFICERS = data || [];
+    // Preenche todos os selects de nome
+    NAME_SELECTS.forEach(id => fillOfficerSelect(id));
+  }
+
+  function fillOfficerSelect(id){
+    const sel = $(id);
+    sel.innerHTML =
+      `<option value="">Selecione…</option>` +
+      OFFICERS.map(o => `<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('') +
+      `<option value="__add__">+ Adicionar policial…</option>`;
+  }
+
+  // Ao trocar o nome, auto-preenche a patente com a "current_rank_id" do officer
+  function linkNameToRank(){
+    NAME_SELECTS.forEach((nameId, idx) => {
+      const rankId = RANK_SELECTS[idx];
+      $(nameId).addEventListener('change', async (e) => {
+        const val = e.target.value;
+        if(val === '__add__'){
+          const nome = prompt('Nome do novo policial (como aparecerá):');
+          if(nome && nome.trim()){
+            const defaultRank = RANKS.find(r => r.name === 'SD PM') || RANKS[0];
+            const { error } = await supa.from('officers').insert({ name: nome.trim(), current_rank_id: defaultRank?.id || null });
+            if(error){ console.error(error); alert('Erro ao adicionar policial.'); e.target.value = ''; return; }
+            await loadOfficers();
+            const found = OFFICERS.find(o => o.name === nome.trim());
+            if(found){ e.target.value = found.id; $(rankId).value = found.current_rank_id || ''; }
+          }else{
+            e.target.value = '';
+          }
+          return;
+        }
+        const off = OFFICERS.find(o => o.id === val);
+        $(rankId).value = off?.current_rank_id || '';
+      });
+    });
+  }
+
+  // Início: carrega listas
+  (async function initRoster(){
+    await loadRanks();
+    await loadOfficers();
+    linkNameToRank();
+  })();
+
   // data/hora default
   (function(){
     const d=new Date(), z=n=>String(n).padStart(2,'0');
@@ -192,17 +290,41 @@
   if(!$('list-ocorrencias').children.length) addOcorrencia();
   if(!$('list-abordados').children.length) addAbordado();
 
-  // coleta
+  // coleta para impressão
   function collect(){
     const L=id=>[...$(id).querySelectorAll('input')].map(i=>i.value).filter(Boolean);
     const O=[...$('list-ocorrencias').children].map(d=>{const [h,t]=d.querySelectorAll('input');return{h:h.value,t:t.value}}).filter(o=>o.t);
+    // Nomes (pelo id) e rótulos (nome + patente) para PDF
+    const officerById = id => OFFICERS.find(o => o.id === id)?.name || '';
+    const rankById = id => RANKS.find(r => String(r.id) === String(id))?.name || '';
+    const mName = officerById($('motorista_sel').value);
+    const eName = officerById($('encarregado_sel').value);
+    const sName = officerById($('seguranca_sel').value);
+    const aName = officerById($('auxiliares_sel').value);
+    const mRank = rankById($('motorista_rank').value);
+    const eRank = rankById($('encarregado_rank').value);
+    const sRank = rankById($('seguranca_rank').value);
+    const aRank = rankById($('auxiliares_rank').value);
+
     return{
       numero:$('numero').value,datahora:$('datahora').value,rota:$('rota').value,
-      motorista:$('motorista').value,encarregado:$('encarregado').value,
-      seguranca:$('seguranca').value,auxiliares:$('auxiliares').value,
+      motorista: mRank && mName ? `${mRank} ${mName}` : (mName || ''),
+      encarregado: eRank && eName ? `${eRank} ${eName}` : (eName || ''),
+      seguranca: sRank && sName ? `${sRank} ${sName}` : (sName || ''),
+      auxiliares: aRank && aName ? `${aRank} ${aName}` : (aName || ''),
       ilicitos:L('list-ilicitos'),veiculos:L('list-veiculos'),
       ocorrencias:O,abordados:L('list-abordados'),
-      resOc:+($('res-oc').value||0),resAp:+($('res-ap').value||0),resAc:+($('res-ac').value||0)
+      resOc:+($('res-oc').value||0),resAp:+($('res-ap').value||0),resAc:+($('res-ac').value||0),
+
+      // também devolvo ids/ranks selecionados para salvar
+      _ids: {
+        motorista: $('motorista_sel').value, encarregado: $('encarregado_sel').value,
+        seguranca: $('seguranca_sel').value, auxiliares: $('auxiliares_sel').value
+      },
+      _rank_ids: {
+        motorista: $('motorista_rank').value, encarregado: $('encarregado_rank').value,
+        seguranca: $('seguranca_rank').value, auxiliares: $('auxiliares_rank').value
+      }
     };
   }
 
@@ -239,31 +361,41 @@
     return out;
   }
 
-  /* ==== Lista de policiais (1 auxiliar) ==== */
-  function getOfficerList() {
-    const motorista  = ($('motorista').value  || '').trim();
-    const encarregado= ($('encarregado').value|| '').trim();
-    const seguranca  = ($('seguranca').value  || '').trim();
-    const auxiliar   = ($('auxiliares').value || '').trim(); // 1 só
-    const list = [motorista, encarregado, seguranca, auxiliar].filter(Boolean);
-    return Array.from(new Set(list.map(n => n.replace(/\s+/g, ' '))));
+  /* ==== Monta lista de {nome + patente selecionada} ==== */
+  function selectedOfficerAndRankPairs(){
+    const pairs = [];
+    const make = (selId, rankId) => {
+      const officerId = $(selId).value || '';
+      const rankSel = $(rankId).value || '';
+      if(!officerId) return;
+      const officer = OFFICERS.find(o => o.id === officerId);
+      const rankObj = RANKS.find(r => String(r.id) === String(rankSel));
+      pairs.push({
+        name: officer?.name || '',
+        rank_name: rankObj?.name || ''  // salva a patente do dia como texto
+      });
+    };
+    make('motorista_sel','motorista_rank');
+    make('encarregado_sel','encarregado_rank');
+    make('seguranca_sel','seguranca_rank');
+    make('auxiliares_sel','auxiliares_rank');
+    return pairs.filter(p => p.name && p.rank_name);
   }
 
-  /* ==== Salvar ilícitos para TODOS os policiais ==== */
+  /* ==== Salvar ilícitos para TODOS com patente do dia ==== */
   async function saveIllicitsToSupabase(){
-    const officers = getOfficerList();
-    const rota     = ($('rota').value || '').trim() || null;
-
-    const lines = [...document.querySelectorAll('#list-ilicitos input')]
-      .map(i => i.value).filter(Boolean).join('\n');
-
+    const rota = ($('rota').value || '').trim() || null;
+    const lines = [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value).filter(Boolean).join('\n');
     const items = parseIlicitosText(lines);
-    if (!items.length) { alert('Preencha ao menos 1 ilícito.'); return; }
-    if (!officers.length) { alert('Informe os dados da equipe.'); return; }
+    const pairs = selectedOfficerAndRankPairs(); // [{name, rank_name}...]
 
-    const rows = officers.flatMap(off =>
-      items.map(({ item, qty }) => ({
-        officer: off,
+    if(!items.length){ alert('Preencha ao menos 1 ilícito.'); return; }
+    if(!pairs.length){ alert('Selecione Nome e Patente para a equipe.'); return; }
+
+    const rows = pairs.flatMap(({name, rank_name}) =>
+      items.map(({item, qty}) => ({
+        officer: name,       // nome oficial do roster
+        rank_at_time: rank_name, // patente escolhida no dia
         rota,
         item_type: item,
         quantity: Number(qty)
@@ -272,10 +404,9 @@
 
     const btn = $('saveCloudBtn'); const old = btn.textContent;
     btn.textContent = 'Salvando…'; btn.disabled = true;
-
     try{
       const { error } = await supa.from('rso_items').insert(rows);
-      if (error) { console.error(error); alert('Falha ao salvar no Supabase. Veja o console.'); return; }
+      if(error){ console.error(error); alert('Falha ao salvar no Supabase. Veja o console.'); return; }
       btn.textContent = 'Salvo!';
     }catch(e){
       console.error(e); alert('Falha de rede/JS. Veja o console.');
@@ -285,44 +416,21 @@
   }
   $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
 
-  /* ==== Totais 7 dias (CORRIGIDO) ==== */
+  /* ==== Totais 7 dias (por policial; ignora variação de patente) ==== */
   async function showTotals7d(){
-    // tenta usar a VIEW
-    let data, error;
-    try{
-      const resp = await supa.from('rso_weekly_aggregates').select('*');
-      data = resp.data; error = resp.error;
-    }catch(e){ error = e; }
+    const cutoff = new Date(Date.now()-7*24*60*60*1000).toISOString();
+    const { data, error } = await supa
+      .from('rso_items')
+      .select('officer,item_type,quantity,recorded_at')
+      .gte('recorded_at', cutoff);
 
-    if(error){
-      // fallback: agrega no cliente
-      const cutoff = new Date(Date.now()-7*24*60*60*1000).toISOString();
-      const resp = await supa
-        .from('rso_items')
-        .select('officer,item_type,quantity,recorded_at')
-        .gte('recorded_at', cutoff);
+    if(error){ console.error(error); alert('Erro ao buscar totais. Veja o console.'); return; }
 
-      if(resp.error){
-        console.error(resp.error);
-        alert('Erro ao buscar totais. Veja o console.');
-        return;
-      }
-      const agg = {};
-      resp.data.forEach(r=>{
-        const off = r.officer || '—';
-        if(!agg[off]) agg[off] = {};
-        agg[off][r.item_type] = (agg[off][r.item_type] || 0) + Number(r.quantity || 0);
-      });
-      renderTotals(agg);
-      return;
-    }
-
-    // ✅ caminho com VIEW: monta corretamente por policial -> item
     const agg = {};
-    (data || []).forEach(r=>{
+    data.forEach(r=>{
       const off = r.officer || '—';
       if(!agg[off]) agg[off] = {};
-      agg[off][r.item_type] = Number(r.total || 0);
+      agg[off][r.item_type] = (agg[off][r.item_type] || 0) + Number(r.quantity || 0);
     });
     renderTotals(agg);
   }
@@ -360,7 +468,7 @@
   }
 
   document.getElementById('totalsBtn').addEventListener('click', showTotals7d);
-  document.getElementById('printBtn').addEventListener('click', ()=>{ fillSheet(collect()); window.print(); });
+  document.getElementById('printBtn').addEventListener('click', ()=>{ const d=collect(); fillSheet(d); window.print(); });
   window.onbeforeprint = ()=> fillSheet(collect());
 </script>
 </body>
