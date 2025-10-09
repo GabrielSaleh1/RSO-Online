@@ -9,17 +9,20 @@
     --bg:#0f172a; --panel:#111827; --muted:#9ca3af; --accent:#60a5fa;
     --btn:#2563eb; --btnH:#1e40af; --line:#324156; --field:#0b1220;
   }
+
   /* ===== TELA ===== */
   body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
        background:var(--bg); color:#e5e7eb; margin:0; padding:24px;}
   .wrap{max-width:980px;margin:0 auto}
-  h1{margin:0 0 18px; color:var(--accent); text-align:center}
+  h1{margin:0 0 18px; color:#60a5fa; text-align:center}
   .grid{display:grid; gap:12px}
   .panel{background:var(--panel); border-radius:12px; padding:16px; box-shadow:0 8px 24px #0005; overflow:hidden}
   label{font-weight:600; font-size:14px; display:block; margin:6px 0}
-  /* filas mais robustas (nada sobrepõe / sai do card) */
+
+  /* linhas de campos: robustas e responsivas */
   .row{display:flex; flex-wrap:wrap; gap:12px}
   .row > div{flex:1 1 260px; min-width:220px}
+
   input,textarea{
     box-sizing:border-box; width:100%;
     padding:10px 12px; border-radius:10px; border:1px solid var(--line);
@@ -27,29 +30,44 @@
   }
   textarea{min-height:70px; resize:vertical}
   .muted{color:var(--muted); font-size:12px}
+
   .btn{background:var(--btn); border:none; color:white; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer}
   .btn:hover{background:var(--btnH)}
   .btn-sec{background:#0b1220; border:1px solid var(--line)}
+
   .list{display:grid; gap:10px}
-  /* itens dinâmicos sem encavalamento */
+  /* itens dinâmicos com add/remover */
   .item,.item-2{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
   .item-2 input[type="time"]{width:90px}
   .item button,.item-2 button{flex-shrink:0; height:38px}
   .pill{padding:6px 10px; border:1px dashed var(--line); border-radius:8px; cursor:pointer; text-align:center}
-  pre{background:#0b1220; border:1px solid var(--line); padding:14px; border-radius:10px; white-space:pre-wrap; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 
   @media (max-width:720px){ .row > div{flex:1 1 100%; min-width:unset} }
 
-  /* ===== IMPRESSÃO / PDF ===== */
+  /* ===== IMPRESSÃO (A4 em “página”) ===== */
+  @page { size: A4; margin: 14mm; }
   @media print {
-    body{ background:#fff; color:#000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .panel{ background:#fff; box-shadow:none; border:0; padding:0 }
-    input, textarea{ background:#fff; color:#000; border:1px solid #000 }
-    h1{ color:#000 }
-    .no-print, .pill{ display:none !important; }
+    body{ background:#fff; color:#000; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
     #form-area{ display:none !important; }
-    #print-area{ display:block !important; }
-    #saida-print{ background:#fff; border:0; color:#000; padding:0; font-size:14px; }
+    #sheet{ display:block !important; }
+  }
+  /* folha que será impressa */
+  #sheet{
+    display:none;               /* visível só no print */
+    width:100%;
+    background:#fff;
+    color:#000;
+    border:1px solid #000;
+    border-radius:4px;
+    padding:14mm;
+    box-sizing:border-box;
+  }
+  #sheet h2{ margin:0 0 10px; text-align:center; font-size:18px; }
+  #sheet pre{
+    white-space:pre-wrap;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12.5px;
+    margin:0;
   }
 </style>
 </head>
@@ -58,7 +76,7 @@
 
   <h1>Relatório de Serviço Operacional</h1>
 
-  <!-- FORM (visível na tela, oculto no PDF) -->
+  <!-- ===== FORM NA TELA ===== -->
   <div id="form-area" class="grid">
     <div class="panel grid">
       <div class="row">
@@ -94,8 +112,8 @@
           <input id="seguranca" placeholder="EST SD PM Jonny" />
         </div>
         <div>
-          <label>Auxiliar(es)</label>
-          <input id="auxiliares" placeholder="Separe por vírgula" />
+          <label>Auxiliar</label>
+          <input id="auxiliares" placeholder="EST SD PM Joãozinho" />
         </div>
       </div>
     </div>
@@ -103,26 +121,26 @@
     <div class="panel grid">
       <label>Ilícitos</label>
       <div id="list-ilicitos" class="list"></div>
-      <div class="pill no-print" onclick="addIlicito()">+ adicionar ilícito</div>
+      <div class="pill" onclick="addIlicito()">+ adicionar ilícito</div>
     </div>
 
     <div class="panel grid">
       <label>Veículos</label>
       <div id="list-veiculos" class="list"></div>
-      <div class="pill no-print" onclick="addVeiculo()">+ adicionar veículo</div>
+      <div class="pill" onclick="addVeiculo()">+ adicionar veículo</div>
     </div>
 
     <div class="panel grid">
       <label>Ocorrências</label>
       <div id="list-ocorrencias" class="list"></div>
-      <div class="pill no-print" onclick="addOcorrencia()">+ adicionar ocorrência</div>
+      <div class="pill" onclick="addOcorrencia()">+ adicionar ocorrência</div>
       <div class="muted">Dica: descreva com verbo no passado e detalhe local/apoio.</div>
     </div>
 
     <div class="panel grid">
       <label>Abordados</label>
       <div id="list-abordados" class="list"></div>
-      <div class="pill no-print" onclick="addAbordado()">+ adicionar abordado</div>
+      <div class="pill" onclick="addAbordado()">+ adicionar abordado</div>
     </div>
 
     <div class="panel grid">
@@ -143,14 +161,14 @@
     </div>
 
     <div class="grid panel">
-      <pre id="saida"></pre>
       <button class="btn btn-sec" id="printBtn">Imprimir / PDF</button>
     </div>
   </div>
 
-  <!-- SOMENTE NO PDF -->
-  <div id="print-area" style="display:none">
-    <pre id="saida-print"></pre>
+  <!-- ===== FOLHA A SER IMPRESSA ===== -->
+  <div id="sheet">
+    <h2>Relatório de Serviço Operacional</h2>
+    <pre id="sheet-text"></pre>
   </div>
 
 </div>
@@ -159,31 +177,31 @@
   const $ = (id) => document.getElementById(id);
   const pad2 = (n) => String(n).padStart(2, '0');
 
-  // Data/Hora padrão agora
+  // Data/Hora default
   (function initDate(){
     const d = new Date();
     const z = (n)=>String(n).padStart(2,'0');
     $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
   })();
 
-  // elementos dinâmicos (add/remover)
+  // ===== listas dinâmicas =====
   function addIlicito(val=''){
     const wrap = document.createElement('div');
     wrap.className = 'item';
     wrap.innerHTML = `
       <input placeholder="ex.: 02x Bomba caseira" value="${val}"/>
-      <button class="btn btn-sec no-print" type="button">remover</button>`;
-    wrap.querySelector('button').onclick = ()=> (wrap.remove(), render());
-    $('list-ilicitos').appendChild(wrap); render();
+      <button class="btn btn-sec" type="button">remover</button>`;
+    wrap.querySelector('button').onclick = ()=> wrap.remove();
+    $('list-ilicitos').appendChild(wrap);
   }
   function addVeiculo(val=''){
     const wrap = document.createElement('div');
     wrap.className = 'item';
     wrap.innerHTML = `
       <input placeholder="ex.: BMW R1250 HP - Branca - 57URU265 - Apreendida" value="${val}"/>
-      <button class="btn btn-sec no-print" type="button">remover</button>`;
-    wrap.querySelector('button').onclick = ()=> (wrap.remove(), render());
-    $('list-veiculos').appendChild(wrap); render();
+      <button class="btn btn-sec" type="button">remover</button>`;
+    wrap.querySelector('button').onclick = ()=> wrap.remove();
+    $('list-veiculos').appendChild(wrap);
   }
   function addOcorrencia(h='', texto=''){
     const wrap = document.createElement('div');
@@ -191,21 +209,27 @@
     wrap.innerHTML = `
       <input type="time" value="${h}">
       <input placeholder="Descreva a ocorrência" value="${texto}">
-      <button class="btn btn-sec no-print" type="button">remover</button>`;
-    wrap.querySelector('button').onclick = ()=> (wrap.remove(), render());
-    $('list-ocorrencias').appendChild(wrap); render();
+      <button class="btn btn-sec" type="button">remover</button>`;
+    wrap.querySelector('button').onclick = ()=> wrap.remove();
+    $('list-ocorrencias').appendChild(wrap);
   }
   function addAbordado(nome=''){
     const wrap = document.createElement('div');
     wrap.className = 'item';
     wrap.innerHTML = `
       <input placeholder="ex.: Renato Cruz – 4910 – BOPM – Cb Ducati 20:14" value="${nome}">
-      <button class="btn btn-sec no-print" type="button">remover</button>`;
-    wrap.querySelector('button').onclick = ()=> (wrap.remove(), render());
-    $('list-abordados').appendChild(wrap); render();
+      <button class="btn btn-sec" type="button">remover</button>`;
+    wrap.querySelector('button').onclick = ()=> wrap.remove();
+    $('list-abordados').appendChild(wrap);
   }
 
-  // coleta & render do relatório
+  // inicia com 1 item em cada lista
+  if(!$('list-ilicitos').children.length) addIlicito();
+  if(!$('list-veiculos').children.length) addVeiculo();
+  if(!$('list-ocorrencias').children.length) addOcorrencia();
+  if(!$('list-abordados').children.length) addAbordado();
+
+  // ===== formata texto para a folha =====
   function coletar(){
     const ilicitos = [...$('list-ilicitos').querySelectorAll('input')].map(i=>i.value).filter(Boolean);
     const veiculos = [...$('list-veiculos').querySelectorAll('input')].map(i=>i.value).filter(Boolean);
@@ -233,11 +257,13 @@
     const dt = d.datahora ? new Date(d.datahora) : new Date();
     const dd = pad2(dt.getDate())+'/'+pad2(dt.getMonth()+1)+'/'+dt.getFullYear();
     const hh = pad2(dt.getHours())+':'+pad2(dt.getMinutes());
+
     const bloc = (arr)=> arr.length ? arr.map(x=>`- ${x}`).join('\n') : '';
     const blocOcc = d.ocorrencias.length
       ? d.ocorrencias.sort((a,b)=>(a.h||'').localeCompare(b.h||''))
           .map(o=> o.h ? `- ÀS ${o.h}: ${o.t}` : `- ${o.t}`).join('\n')
       : '';
+
     return `
 — RELATÓRIO DE SERVIÇO —
 Nº: ${d.numero} / DataHora: ${dd} ${hh}
@@ -268,36 +294,17 @@ ${d.resAc}x Ação.
 `.trim();
   }
 
-  function render(){
-    const txt = formatar(coletar());
-    $('saida').textContent = txt;
-    $('saida-print').textContent = txt;
+  function atualizarFolha(){
+    $('sheet-text').textContent = formatar(coletar());
   }
 
-  // inputs atualizam o preview
-  window.addEventListener('input', (e)=>{
-    if(['INPUT','TEXTAREA'].includes(e.target.tagName)) render();
-  });
-
-  // iniciar com 1 campo em cada lista
-  if(!$('list-ilicitos').children.length) addIlicito();
-  if(!$('list-veiculos').children.length) addVeiculo();
-  if(!$('list-ocorrencias').children.length) addOcorrencia();
-  if(!$('list-abordados').children.length) addAbordado();
-  // setar datahora padrão e primeira renderização
-  (function initDateIfEmpty(){
-    if(!$('datahora').value){
-      const d=new Date(), z=n=>String(n).padStart(2,'0');
-      $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
-    }
-  })();
-  render();
-
-  // imprimir PDF
+  // sempre atualizar a folha antes de imprimir
   document.getElementById('printBtn').addEventListener('click', ()=>{
-    render();             // garante que o preview e o PDF estejam iguais
+    atualizarFolha();
     window.print();
   });
+  // e também se o usuário apertar Ctrl+P direto
+  window.onbeforeprint = atualizarFolha;
 </script>
 </body>
 </html>
