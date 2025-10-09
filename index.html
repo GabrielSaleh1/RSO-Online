@@ -75,12 +75,12 @@
 
       <div class="panel">
         <div class="row">
-          <div><label>Motorista</label><input id="motorista" placeholder="Cabo Ducati"></div>
-          <div><label>Encarregado</label><input id="encarregado" placeholder="2º Sgt Rangel"></div>
+          <div><label>Motorista</label><input id="motorista" placeholder="CB PM Ducati"></div>
+          <div><label>Encarregado</label><input id="encarregado" placeholder="2º SGT Rangel"></div>
         </div>
         <div class="row">
-          <div><label>Segurança</label><input id="seguranca" placeholder="EST SD PM Jonny"></div>
-          <div><label>Auxiliar(es)</label><input id="auxiliares" placeholder="Separe por vírgula"></div>
+          <div><label>Segurança</label><input id="seguranca" placeholder="EST SD PM Jhonny"></div>
+          <div><label>Auxiliar (1)</label><input id="auxiliares" placeholder="EST SD PM João"></div>
         </div>
       </div>
 
@@ -120,10 +120,9 @@
       </div>
 
       <div class="panel" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button class="btn" id="saveCloudBtn" type="button">Salvar ilícitos (Supabase)</button>
+        <button class="btn" id="saveCloudBtn" type="button">Salvar ilícitos</button>
         <button class="btn btn-sec" id="totalsBtn" type="button">Totais 7 dias</button>
         <button class="btn" id="printBtn" type="button">Imprimir / PDF</button>
-        <button class="btn btn-sec" id="testConnBtn" type="button">Teste conexão</button>
       </div>
 
       <div id="totalsPanel" class="panel" style="display:none">
@@ -150,7 +149,7 @@
           <b>Motorista:</b><span id="k-motorista">—</span>
           <b>Encarregado:</b><span id="k-encarregado">—</span>
           <b>Segurança:</b><span id="k-seguranca">—</span>
-          <b>Auxiliar(es):</b><span id="k-auxiliares">—</span>
+          <b>Auxiliar:</b><span id="k-auxiliares">—</span>
         </div>
       </div>
       <div class="section"><h3>ILÍCITOS</h3><ul class="clean" id="ul-ilicitos"><li>—</li></ul></div>
@@ -167,11 +166,9 @@
   const pad2 = n => String(n).padStart(2,'0');
   const esc = s => (s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 
-  // ===== Supabase config (já preenchido) =====
+  /* ===== Supabase (sua URL e anon key) ===== */
   const SUPABASE_URL = 'https://ilonwkgtdszmpcjwlezc.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlsb253a2d0ZHN6bXBjandsZXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NzQxMDIsImV4cCI6MjA3NTU1MDEwMn0.Cc-BtnHlXaGVCY6T6iXe0QA1tsfc17aX8lswEICvtw0';
-
-  // cria client Supabase (via CDN carregado)
   const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // data/hora default
@@ -180,7 +177,7 @@
     $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
   })();
 
-  // dinâmicos
+  // campos dinâmicos
   function addIlicito(v=''){mkItem('list-ilicitos',v,'ex.: 02x Maconha');}
   function addVeiculo(v=''){mkItem('list-veiculos',v,'ex.: BMW R1250 HP - Branca - 57URU265 - Apreendida');}
   function addAbordado(v=''){mkItem('list-abordados',v,'ex.: Renato Cruz – 4910 – BOPM – Cb Ducati 20:14');}
@@ -199,15 +196,26 @@
   function collect(){
     const L=id=>[...$(id).querySelectorAll('input')].map(i=>i.value).filter(Boolean);
     const O=[...$('list-ocorrencias').children].map(d=>{const [h,t]=d.querySelectorAll('input');return{h:h.value,t:t.value}}).filter(o=>o.t);
-    return{numero:$('numero').value,datahora:$('datahora').value,rota:$('rota').value,motorista:$('motorista').value,encarregado:$('encarregado').value,seguranca:$('seguranca').value,auxiliares:$('auxiliares').value,ilicitos:L('list-ilicitos'),veiculos:L('list-veiculos'),ocorrencias:O,abordados:L('list-abordados'),resOc:+($('res-oc').value||0),resAp:+($('res-ap').value||0),resAc:+($('res-ac').value||0)};
+    return{
+      numero:$('numero').value,datahora:$('datahora').value,rota:$('rota').value,
+      motorista:$('motorista').value,encarregado:$('encarregado').value,
+      seguranca:$('seguranca').value,auxiliares:$('auxiliares').value,
+      ilicitos:L('list-ilicitos'),veiculos:L('list-veiculos'),
+      ocorrencias:O,abordados:L('list-abordados'),
+      resOc:+($('res-oc').value||0),resAp:+($('res-ap').value||0),resAc:+($('res-ac').value||0)
+    };
   }
 
-  // PDF
+  // PDF preenchido
   function fillSheet(d){
     const dt=d.datahora?new Date(d.datahora):new Date();
     const dd=`${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
     $('meta-numero').textContent=`Nº: ${d.numero||'—'}`; $('meta-data').textContent=`Data/Hora: ${dd}`;
-    $('rota-out').textContent=d.rota||'—'; $('k-motorista').textContent=d.motorista||'—'; $('k-encarregado').textContent=d.encarregado||'—'; $('k-seguranca').textContent=d.seguranca||'—'; $('k-auxiliares').textContent=d.auxiliares||'—';
+    $('rota-out').textContent=d.rota||'—';
+    $('k-motorista').textContent=d.motorista||'—';
+    $('k-encarregado').textContent=d.encarregado||'—';
+    $('k-seguranca').textContent=d.seguranca||'—';
+    $('k-auxiliares').textContent=d.auxiliares||'—';
     const setList=(id,a)=>{const u=$(id);u.innerHTML=''; if(!a||!a.length){u.innerHTML='<li>—</li>';return} a.forEach(v=>{const li=document.createElement('li'); li.innerHTML=esc(v); u.appendChild(li);});};
     setList('ul-ilicitos',d.ilicitos); setList('ul-veiculos',d.veiculos); setList('ul-abordados',d.abordados);
     const ulO=$('ul-ocorrencias'); ulO.innerHTML=''; if(!d.ocorrencias.length){ulO.innerHTML='<li>—</li>';} else { d.ocorrencias.sort((a,b)=>(a.h||'').localeCompare(b.h||'')).forEach(o=>{ const li=document.createElement('li'); li.innerHTML=esc(o.h?`ÀS ${o.h}: ${o.t}`:o.t); ulO.appendChild(li); }); }
@@ -217,7 +225,7 @@
   $('printBtn').addEventListener('click',()=>{fillSheet(collect());window.print();});
   window.onbeforeprint=()=>fillSheet(collect());
 
-  // PARSER de ilícitos
+  /* ===== Parser de ilícitos ===== */
   function parseIlicitosText(multiline){
     const parts = (multiline||'').split(/\n|,|;/).map(s=>s.trim()).filter(Boolean);
     const out=[];
@@ -231,45 +239,61 @@
     return out;
   }
 
-  // SALVAR no Supabase (um row por item)
-  async function saveIllicitsToSupabase(){
-    const officer = $('motorista').value.trim() || '—';
-    const rota    = $('rota').value.trim() || null;
-    const lines   = [...$('list-ilicitos').querySelectorAll('input')].map(i=>i.value).filter(Boolean).join('\n');
-    const items   = parseIlicitosText(lines);
-    if(!items.length){ alert('Preencha ao menos 1 ilícito.'); return; }
+  /* ==== Lista de policiais (1 auxiliar) ==== */
+  function getOfficerList() {
+    const motorista  = ($('motorista').value  || '').trim();
+    const encarregado= ($('encarregado').value|| '').trim();
+    const seguranca  = ($('seguranca').value  || '').trim();
+    const auxiliar   = ($('auxiliares').value || '').trim(); // 1 só
+    const list = [motorista, encarregado, seguranca, auxiliar].filter(Boolean);
+    return Array.from(new Set(list.map(n => n.replace(/\s+/g, ' '))));
+  }
 
-    const rows = items.map(({item,qty})=>({ officer, rota, item_type:item, quantity:qty }));
-    const btn = $('saveCloudBtn'); const old=btn.textContent; btn.textContent='Salvando…'; btn.disabled=true;
+  /* ==== Salvar ilícitos para TODOS os policiais ==== */
+  async function saveIllicitsToSupabase(){
+    const officers = getOfficerList();
+    const rota     = ($('rota').value || '').trim() || null;
+
+    const lines = [...document.querySelectorAll('#list-ilicitos input')]
+      .map(i => i.value).filter(Boolean).join('\n');
+
+    const items = parseIlicitosText(lines);
+    if (!items.length) { alert('Preencha ao menos 1 ilícito.'); return; }
+    if (!officers.length) { alert('Informe os dados da equipe.'); return; }
+
+    const rows = officers.flatMap(off =>
+      items.map(({ item, qty }) => ({
+        officer: off,
+        rota,
+        item_type: item,
+        quantity: Number(qty)
+      }))
+    );
+
+    const btn = $('saveCloudBtn'); const old = btn.textContent;
+    btn.textContent = 'Salvando…'; btn.disabled = true;
 
     try{
-      const { data, error } = await supa.from('rso_items').insert(rows).select();
-      if(error){
-        console.error('Supabase insert error:', error);
-        alert('Falha ao salvar no Supabase. Veja o console.');
-        return;
-      }
+      const { error } = await supa.from('rso_items').insert(rows);
+      if (error) { console.error(error); alert('Falha ao salvar no Supabase. Veja o console.'); return; }
       btn.textContent = 'Salvo!';
     }catch(e){
-      console.error('Network/JS error:', e);
-      alert('Falha de rede/JS. Veja o console.');
+      console.error(e); alert('Falha de rede/JS. Veja o console.');
     }finally{
-      setTimeout(()=>{ btn.textContent=old; btn.disabled=false; }, 1200);
+      setTimeout(()=>{ btn.textContent = old; btn.disabled=false; }, 1200);
     }
   }
   $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
 
-  // TOTALS 7 DIAS
+  /* ==== Totais 7 dias ==== */
   async function showTotals7d(){
     let data, error;
     try{
       const resp = await supa.from('rso_weekly_aggregates').select('*');
       data = resp.data; error = resp.error;
-    }catch(e){
-      error = e;
-    }
+    }catch(e){ error = e; }
+
     if(error){
-      // fallback: buscar linhas e agregar no cliente
       const cutoff = new Date(Date.now()-7*24*60*60*1000).toISOString();
       const resp = await supa.from('rso_items').select('officer,item_type,quantity,recorded_at').gte('recorded_at', cutoff);
       if(resp.error){ alert('Erro ao buscar totais. Veja o console.'); console.error(resp.error); return; }
@@ -284,7 +308,7 @@
     const agg = {};
     (data||[]).forEach(r=>{
       agg[r.officer] = agg[r.officer] || {};
-      agg[r.officer][r.item_type] = Number(r.total);
+      agg[r.item_type] = Number(r.total);
     });
     renderTotals(agg);
   }
@@ -321,21 +345,9 @@
     const a = document.createElement('a'); a.href=url; a.download='RSO-totais-7dias.csv'; a.click(); URL.revokeObjectURL(url);
   }
 
-  // TESTE conexão (insere linha de teste)
-  $('testConnBtn').addEventListener('click', async ()=>{
-    const btn = $('testConnBtn'); const old = btn.textContent; btn.textContent = 'Testando...'; btn.disabled=true;
-    try{
-      const { data, error } = await supa.from('rso_items').insert([{ officer:'_TEST_', rota:'TEST', item_type:'ping', quantity:1 }]).select();
-      if(error){ console.error(error); alert('Teste falhou. Veja o console.'); }
-      else { alert('Teste OK: inserção bem-sucedida'); }
-    }catch(e){
-      console.error(e); alert('Teste falhou (rede/JS). Veja o console.'); 
-    }finally{ btn.textContent = old; btn.disabled=false; }
-  });
-
-  // liga botões de totals
-  $('totalsBtn').addEventListener('click', showTotals7d);
-
+  document.getElementById('totalsBtn').addEventListener('click', showTotals7d);
+  document.getElementById('printBtn').addEventListener('click', ()=>{ fillSheet(collect()); window.print(); });
+  window.onbeforeprint = ()=> fillSheet(collect());
 </script>
 </body>
 </html>
