@@ -1,192 +1,303 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RSO Online</title>
-  <style>
-    :root{
-      --bg:#111827;
-      --panel:#1f2937;
-      --field:#273449;
-      --line:#374151;
-      --text:#e5e7eb;
-      --accent:#2563eb;
-    }
-    body{
-      font-family:Arial, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      margin:0;
-      padding:20px;
-    }
-    h1{
-      text-align:center;
-      color:#60a5fa;
-      margin-bottom:6px;
-    }
-    .logo{
-      display:block;
-      margin:0 auto 10px auto;
-      width:100px;
-    }
-    .panel{
-      background:var(--panel);
-      border-radius:12px;
-      padding:20px;
-      box-shadow:0 0 10px rgba(0,0,0,0.3);
-      max-width:800px;
-      margin:auto;
-      overflow:hidden;
-    }
-    label{font-weight:bold; display:block; margin-top:10px;}
-    .row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-    }
-    .row>div{
-      flex:1 1 260px;
-      min-width:220px;
-    }
-    input, textarea{
-      box-sizing:border-box;
-      width:100%;
-      padding:10px 12px;
-      border-radius:10px;
-      border:1px solid var(--line);
-      background:var(--field);
-      color:var(--text);
-      display:block;
-    }
-    button{
-      background:var(--accent);
-      color:#fff;
-      font-weight:bold;
-      border:none;
-      border-radius:10px;
-      padding:10px 20px;
-      cursor:pointer;
-      margin-top:16px;
-    }
-    button:hover{background:#1e40af;}
-    pre{
-      background:#fff;
-      color:#000;
-      padding:20px;
-      border-radius:10px;
-      white-space:pre-wrap;
-      font-family:"Courier New",monospace;
-    }
-    .assinatura{
-      margin-top:40px;
-      text-align:right;
-      font-style:italic;
-      font-size:1.1em;
-    }
-    @media print{
-      body{background:#fff; color:#000;}
-      .panel{box-shadow:none;}
-      button{display:none;}
-      .logo{filter:brightness(1);}
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RSO Online</title>
+<style>
+  :root {
+    --bg:#0f172a; --panel:#111827; --muted:#9ca3af; --accent:#60a5fa;
+    --btn:#2563eb; --btnH:#1e40af; --line:#324156; --field:#0b1220;
+  }
+  /* ===== TELA ===== */
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+       background:var(--bg); color:#e5e7eb; margin:0; padding:24px;}
+  .wrap{max-width:980px;margin:0 auto}
+  h1{margin:0 0 18px; color:var(--accent); text-align:center}
+  .grid{display:grid; gap:12px}
+  .panel{background:var(--panel); border-radius:12px; padding:16px; box-shadow:0 8px 24px #0005; overflow:hidden}
+  label{font-weight:600; font-size:14px; display:block; margin:6px 0}
+  /* filas mais robustas (nada sobrepõe / sai do card) */
+  .row{display:flex; flex-wrap:wrap; gap:12px}
+  .row > div{flex:1 1 260px; min-width:220px}
+  input,textarea{
+    box-sizing:border-box; width:100%;
+    padding:10px 12px; border-radius:10px; border:1px solid var(--line);
+    background:var(--field); color:#e5e7eb; display:block;
+  }
+  textarea{min-height:70px; resize:vertical}
+  .muted{color:var(--muted); font-size:12px}
+  .btn{background:var(--btn); border:none; color:white; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer}
+  .btn:hover{background:var(--btnH)}
+  .btn-sec{background:#0b1220; border:1px solid var(--line)}
+  .list{display:grid; gap:10px}
+  /* itens dinâmicos sem encavalamento */
+  .item,.item-2{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+  .item-2 input[type="time"]{width:90px}
+  .item button,.item-2 button{flex-shrink:0; height:38px}
+  .pill{padding:6px 10px; border:1px dashed var(--line); border-radius:8px; cursor:pointer; text-align:center}
+  pre{background:#0b1220; border:1px solid var(--line); padding:14px; border-radius:10px; white-space:pre-wrap; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+  @media (max-width:720px){ .row > div{flex:1 1 100%; min-width:unset} }
+
+  /* ===== IMPRESSÃO / PDF ===== */
+  @media print {
+    body{ background:#fff; color:#000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .panel{ background:#fff; box-shadow:none; border:0; padding:0 }
+    input, textarea{ background:#fff; color:#000; border:1px solid #000 }
+    h1{ color:#000 }
+    .no-print, .pill{ display:none !important; }
+    #form-area{ display:none !important; }
+    #print-area{ display:block !important; }
+    #saida-print{ background:#fff; border:0; color:#000; padding:0; font-size:14px; }
+  }
+</style>
 </head>
 <body>
-  <img src="https://i.imgur.com/5iB1q6e.png" alt="Brasão Tobias de Aguiar" class="logo">
+<div class="wrap">
+
   <h1>Relatório de Serviço Operacional</h1>
 
-  <div class="panel">
-    <form id="rsoForm">
+  <!-- FORM (visível na tela, oculto no PDF) -->
+  <div id="form-area" class="grid">
+    <div class="panel grid">
       <div class="row">
         <div>
-          <label for="numero">N° do RSO</label>
-          <input type="text" id="numero" required>
+          <label>Nº do RSO</label>
+          <input id="numero" placeholder="0169" />
         </div>
         <div>
-          <label for="dataHora">Data/Hora</label>
-          <input type="datetime-local" id="dataHora" required>
+          <label>Data/Hora</label>
+          <input id="datahora" type="datetime-local" />
         </div>
       </div>
+      <div>
+        <label>Rota</label>
+        <input id="rota" placeholder="91136" />
+      </div>
+    </div>
 
+    <div class="panel grid">
       <div class="row">
         <div>
-          <label for="rota">Rota</label>
-          <input type="text" id="rota">
+          <label>Motorista</label>
+          <input id="motorista" placeholder="Cabo PM Ducati" />
+        </div>
+        <div>
+          <label>Encarregado</label>
+          <input id="encarregado" placeholder="2º Sgt Rangel" />
         </div>
       </div>
+      <div class="row">
+        <div>
+          <label>Segurança</label>
+          <input id="seguranca" placeholder="EST SD PM Jonny" />
+        </div>
+        <div>
+          <label>Auxiliar(es)</label>
+          <input id="auxiliares" placeholder="Separe por vírgula" />
+        </div>
+      </div>
+    </div>
 
-      <label>Motorista</label><input type="text" id="motorista">
-      <label>Encarregado</label><input type="text" id="encarregado">
-      <label>Segurança</label><input type="text" id="seguranca">
-      <label>Auxiliar(es)</label><input type="text" id="auxiliares">
+    <div class="panel grid">
+      <label>Ilícitos</label>
+      <div id="list-ilicitos" class="list"></div>
+      <div class="pill no-print" onclick="addIlicito()">+ adicionar ilícito</div>
+    </div>
 
-      <label>Ilícitos</label><textarea id="ilicitos"></textarea>
-      <label>Veículos</label><textarea id="veiculos"></textarea>
-      <label>Ocorrências</label><textarea id="ocorrencias"></textarea>
-      <label>Abordados</label><textarea id="abordados"></textarea>
-      <label>Resultado</label><textarea id="resultado"></textarea>
+    <div class="panel grid">
+      <label>Veículos</label>
+      <div id="list-veiculos" class="list"></div>
+      <div class="pill no-print" onclick="addVeiculo()">+ adicionar veículo</div>
+    </div>
 
-      <button type="button" id="printBtn">Imprimir / PDF</button>
-    </form>
+    <div class="panel grid">
+      <label>Ocorrências</label>
+      <div id="list-ocorrencias" class="list"></div>
+      <div class="pill no-print" onclick="addOcorrencia()">+ adicionar ocorrência</div>
+      <div class="muted">Dica: descreva com verbo no passado e detalhe local/apoio.</div>
+    </div>
 
-    <pre id="output"></pre>
-    <div class="assinatura">Assinatura: Kaio Mathias</div>
+    <div class="panel grid">
+      <label>Abordados</label>
+      <div id="list-abordados" class="list"></div>
+      <div class="pill no-print" onclick="addAbordado()">+ adicionar abordado</div>
+    </div>
+
+    <div class="panel grid">
+      <div class="row">
+        <div>
+          <label>Ocorrências (qtd)</label>
+          <input id="res-oc" type="number" min="0" value="0" />
+        </div>
+        <div>
+          <label>Apoios (qtd)</label>
+          <input id="res-ap" type="number" min="0" value="0" />
+        </div>
+      </div>
+      <div>
+        <label>Ações (qtd)</label>
+        <input id="res-ac" type="number" min="0" value="0" />
+      </div>
+    </div>
+
+    <div class="grid panel">
+      <pre id="saida"></pre>
+      <button class="btn btn-sec" id="printBtn">Imprimir / PDF</button>
+    </div>
   </div>
 
-  <script>
-    const form = document.getElementById("rsoForm");
-    const output = document.getElementById("output");
-    const printBtn = document.getElementById("printBtn");
+  <!-- SOMENTE NO PDF -->
+  <div id="print-area" style="display:none">
+    <pre id="saida-print"></pre>
+  </div>
 
-    form.addEventListener("input", gerarRelatorio);
-    function gerarRelatorio(){
-      const numero = numero.value = document.getElementById("numero").value;
-      const dataHora = document.getElementById("dataHora").value.replace("T"," ");
-      const rota = document.getElementById("rota").value;
-      const motorista = document.getElementById("motorista").value;
-      const encarregado = document.getElementById("encarregado").value;
-      const seguranca = document.getElementById("seguranca").value;
-      const auxiliares = document.getElementById("auxiliares").value;
-      const ilicitos = document.getElementById("ilicitos").value;
-      const veiculos = document.getElementById("veiculos").value;
-      const ocorrencias = document.getElementById("ocorrencias").value;
-      const abordados = document.getElementById("abordados").value;
-      const resultado = document.getElementById("resultado").value;
+</div>
 
-      const relatorio = `
+<script>
+  const $ = (id) => document.getElementById(id);
+  const pad2 = (n) => String(n).padStart(2, '0');
+
+  // Data/Hora padrão agora
+  (function initDate(){
+    const d = new Date();
+    const z = (n)=>String(n).padStart(2,'0');
+    $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
+  })();
+
+  // elementos dinâmicos (add/remover)
+  function addIlicito(val=''){
+    const wrap = document.createElement('div');
+    wrap.className = 'item';
+    wrap.innerHTML = `
+      <input placeholder="ex.: 02x Bomba caseira" value="${val}"/>
+      <button class="btn btn-sec no-print" type="button">remover</button>`;
+    wrap.querySelector('button').onclick = ()=> (wrap.remove(), render());
+    $('list-ilicitos').appendChild(wrap); render();
+  }
+  function addVeiculo(val=''){
+    const wrap = document.createElement('div');
+    wrap.className = 'item';
+    wrap.innerHTML = `
+      <input placeholder="ex.: BMW R1250 HP - Branca - 57URU265 - Apreendida" value="${val}"/>
+      <button class="btn btn-sec no-print" type="button">remover</button>`;
+    wrap.querySelector('button').onclick = ()=> (wrap.remove(), render());
+    $('list-veiculos').appendChild(wrap); render();
+  }
+  function addOcorrencia(h='', texto=''){
+    const wrap = document.createElement('div');
+    wrap.className = 'item-2';
+    wrap.innerHTML = `
+      <input type="time" value="${h}">
+      <input placeholder="Descreva a ocorrência" value="${texto}">
+      <button class="btn btn-sec no-print" type="button">remover</button>`;
+    wrap.querySelector('button').onclick = ()=> (wrap.remove(), render());
+    $('list-ocorrencias').appendChild(wrap); render();
+  }
+  function addAbordado(nome=''){
+    const wrap = document.createElement('div');
+    wrap.className = 'item';
+    wrap.innerHTML = `
+      <input placeholder="ex.: Renato Cruz – 4910 – BOPM – Cb Ducati 20:14" value="${nome}">
+      <button class="btn btn-sec no-print" type="button">remover</button>`;
+    wrap.querySelector('button').onclick = ()=> (wrap.remove(), render());
+    $('list-abordados').appendChild(wrap); render();
+  }
+
+  // coleta & render do relatório
+  function coletar(){
+    const ilicitos = [...$('list-ilicitos').querySelectorAll('input')].map(i=>i.value).filter(Boolean);
+    const veiculos = [...$('list-veiculos').querySelectorAll('input')].map(i=>i.value).filter(Boolean);
+    const ocorrencias = [...$('list-ocorrencias').children].map(div=>{
+      const ins = div.querySelectorAll('input'); return {h:ins[0].value, t:ins[1].value};
+    }).filter(o=>o.t);
+    const abordados = [...$('list-abordados').querySelectorAll('input')].map(i=>i.value).filter(Boolean);
+
+    return {
+      numero:$('numero').value,
+      datahora:$('datahora').value,
+      rota:$('rota').value,
+      motorista:$('motorista').value,
+      encarregado:$('encarregado').value,
+      seguranca:$('seguranca').value,
+      auxiliares:$('auxiliares').value,
+      ilicitos, veiculos, ocorrencias, abordados,
+      resOc:Number($('res-oc').value||0),
+      resAp:Number($('res-ap').value||0),
+      resAc:Number($('res-ac').value||0),
+    };
+  }
+
+  function formatar(d){
+    const dt = d.datahora ? new Date(d.datahora) : new Date();
+    const dd = pad2(dt.getDate())+'/'+pad2(dt.getMonth()+1)+'/'+dt.getFullYear();
+    const hh = pad2(dt.getHours())+':'+pad2(dt.getMinutes());
+    const bloc = (arr)=> arr.length ? arr.map(x=>`- ${x}`).join('\n') : '';
+    const blocOcc = d.ocorrencias.length
+      ? d.ocorrencias.sort((a,b)=>(a.h||'').localeCompare(b.h||''))
+          .map(o=> o.h ? `- ÀS ${o.h}: ${o.t}` : `- ${o.t}`).join('\n')
+      : '';
+    return `
 — RELATÓRIO DE SERVIÇO —
-Nº: ${numero} / DataHora: ${dataHora}
+Nº: ${d.numero} / DataHora: ${dd} ${hh}
 
-# ROTA - ${rota}
+# ROTA - ${d.rota}
 
-Motorista: ${motorista}
-Encarregado: ${encarregado}
-Segurança: ${seguranca}
-Auxiliar(es): ${auxiliares}
+Motorista: ${d.motorista}
+Encarregado: ${d.encarregado}
+Segurança: ${d.seguranca}
+Auxiliar(es): ${d.auxiliares}
 
 # ILÍCITOS #
-${ilicitos}
+${bloc(d.ilicitos)}
 
 # VEÍCULOS #
-${veiculos}
+${bloc(d.veiculos)}
 
 # OCORRÊNCIAS #
-${ocorrencias}
+${blocOcc}
 
 # ABORDADOS #
-${abordados}
+${bloc(d.abordados)}
 
 # RESULTADO #
-${resultado}
+${d.resOc}x Ocorrência.
+${d.resAp}x Apoio.
+${d.resAc}x Ação.
 `.trim();
-      output.textContent = relatorio;
-    }
+  }
 
-    printBtn.addEventListener("click", ()=>{
-      gerarRelatorio();
-      window.print();
-    });
-  </script>
+  function render(){
+    const txt = formatar(coletar());
+    $('saida').textContent = txt;
+    $('saida-print').textContent = txt;
+  }
+
+  // inputs atualizam o preview
+  window.addEventListener('input', (e)=>{
+    if(['INPUT','TEXTAREA'].includes(e.target.tagName)) render();
+  });
+
+  // iniciar com 1 campo em cada lista
+  if(!$('list-ilicitos').children.length) addIlicito();
+  if(!$('list-veiculos').children.length) addVeiculo();
+  if(!$('list-ocorrencias').children.length) addOcorrencia();
+  if(!$('list-abordados').children.length) addAbordado();
+  // setar datahora padrão e primeira renderização
+  (function initDateIfEmpty(){
+    if(!$('datahora').value){
+      const d=new Date(), z=n=>String(n).padStart(2,'0');
+      $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
+    }
+  })();
+  render();
+
+  // imprimir PDF
+  document.getElementById('printBtn').addEventListener('click', ()=>{
+    render();             // garante que o preview e o PDF estejam iguais
+    window.print();
+  });
+</script>
 </body>
 </html>
