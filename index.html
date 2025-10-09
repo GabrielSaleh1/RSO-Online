@@ -332,7 +332,7 @@
     return out;
   }
 
-  /* ===== Salvar ilícitos no Supabase ===== */
+  /* ===== Salvar ilícitos ===== */
   function selectedOfficerAndRankPairs(){
     const pairs = [];
     const pick = (selId, rankId) => {
@@ -435,42 +435,6 @@
     });
   }
 
-  async function showTotals7d(){
-    const cutoff = new Date(Date.now()-7*24*60*60*1000).toISOString();
-    const { data, error } = await supa
-      .from('rso_items')
-      .select('officer,item_type,quantity,recorded_at')
-      .gte('recorded_at', cutoff);
-
-    if(error){ console.error(error); alert('Erro ao buscar totais. Veja o console.'); return; }
-
-    // agrega
-    const aggByOfficer = {}; // { officer: {item: total} }
-    const aggByItem    = {}; // { item: total }
-    const seriesByDay  = {}; // { 'dd/mm': total }
-    data.forEach(r=>{
-      const off = r.officer || '—';
-      const it  = r.item_type || '—';
-      const q   = Number(r.quantity || 0);
-      if(!aggByOfficer[off]) aggByOfficer[off] = {};
-      aggByOfficer[off][it] = (aggByOfficer[off][it] || 0) + q;
-
-      aggByItem[it] = (aggByItem[it] || 0) + q;
-
-      const d = new Date(r.recorded_at);
-      const key = `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}`;
-      seriesByDay[key] = (seriesByDay[key] || 0) + q;
-    });
-
-    // tabela
-    renderTotals(aggByOfficer);
-    // gráficos
-    renderCharts(aggByOfficer, aggByItem, seriesByDay);
-
-    $('totalsPanel').style.display = 'block';
-    $('exportCsvBtn').onclick = ()=> exportTotalsCSV(aggByOfficer);
-  }
-
   function renderTotals(agg){
     const c = $('totalsContent');
     if(!agg || !Object.keys(agg).length){ c.innerHTML='<div class="muted">Sem dados nos últimos 7 dias.</div>'; return; }
@@ -499,6 +463,59 @@
     const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
     const url  = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href=url; a.download='RSO-totais-7dias.csv'; a.click(); URL.revokeObjectURL(url);
+  }
+
+  // ======= FUNÇÃO CORRIGIDA: Totais 7 dias (detecta coluna de data) =======
+  async function showTotals7d(){
+    const cutoff = Date.now() - 7*24*60*60*1000;
+
+    // 1) Busca tudo e deixa o JS decidir qual coluna de data usar
+    const { data, error } = await supa.from('rso_items').select('*');
+
+    if (error) {
+      console.error('Erro Supabase:', error);
+      alert('Erro ao buscar totais. Veja o console.');
+      return;
+    }
+
+    // 2) Decide qual coluna de data usar
+    const pickTime = (row) => row.recorded_at ?? row.created_at ?? row.inserted_at ?? null;
+
+    // 3) Filtra últimos 7 dias (se houver coluna temporal; senão, mostra tudo)
+    const last7d = (data || []).filter(r => {
+      const t = pickTime(r);
+      if (!t) return true;
+      const ms = new Date(t).getTime();
+      return !isNaN(ms) && ms >= cutoff;
+    });
+
+    // 4) Agregações
+    const aggByOfficer = {}; // { officer: {item: total} }
+    const aggByItem    = {}; // { item: total }
+    const seriesByDay  = {}; // { 'dd/mm': total }
+
+    last7d.forEach(r=>{
+      const off = r.officer || '—';
+      const it  = (r.item_type || '—').toLowerCase();
+      const q   = Number(r.quantity || 0);
+
+      if(!aggByOfficer[off]) aggByOfficer[off] = {};
+      aggByOfficer[off][it] = (aggByOfficer[off][it] || 0) + q;
+
+      aggByItem[it] = (aggByItem[it] || 0) + q;
+
+      const when = pickTime(r);
+      const d = when ? new Date(when) : new Date();
+      const key = `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}`;
+      seriesByDay[key] = (seriesByDay[key] || 0) + q;
+    });
+
+    // 5) Renderiza tabela e gráficos
+    renderTotals(aggByOfficer);
+    renderCharts(aggByOfficer, aggByItem, seriesByDay);
+
+    $('totalsPanel').style.display = 'block';
+    $('exportCsvBtn').onclick = ()=> exportTotalsCSV(aggByOfficer);
   }
 
   document.getElementById('totalsBtn').addEventListener('click', showTotals7d);
