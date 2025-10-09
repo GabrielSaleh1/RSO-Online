@@ -285,8 +285,9 @@
   }
   $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
 
-  /* ==== Totais 7 dias ==== */
+  /* ==== Totais 7 dias (CORRIGIDO) ==== */
   async function showTotals7d(){
+    // tenta usar a VIEW
     let data, error;
     try{
       const resp = await supa.from('rso_weekly_aggregates').select('*');
@@ -294,21 +295,34 @@
     }catch(e){ error = e; }
 
     if(error){
+      // fallback: agrega no cliente
       const cutoff = new Date(Date.now()-7*24*60*60*1000).toISOString();
-      const resp = await supa.from('rso_items').select('officer,item_type,quantity,recorded_at').gte('recorded_at', cutoff);
-      if(resp.error){ alert('Erro ao buscar totais. Veja o console.'); console.error(resp.error); return; }
+      const resp = await supa
+        .from('rso_items')
+        .select('officer,item_type,quantity,recorded_at')
+        .gte('recorded_at', cutoff);
+
+      if(resp.error){
+        console.error(resp.error);
+        alert('Erro ao buscar totais. Veja o console.');
+        return;
+      }
       const agg = {};
       resp.data.forEach(r=>{
-        agg[r.officer] = agg[r.officer] || {};
-        agg[r.officer][r.item_type] = (agg[r.officer][r.item_type]||0) + Number(r.quantity);
+        const off = r.officer || '—';
+        if(!agg[off]) agg[off] = {};
+        agg[off][r.item_type] = (agg[off][r.item_type] || 0) + Number(r.quantity || 0);
       });
       renderTotals(agg);
       return;
     }
+
+    // ✅ caminho com VIEW: monta corretamente por policial -> item
     const agg = {};
-    (data||[]).forEach(r=>{
-      agg[r.officer] = agg[r.officer] || {};
-      agg[r.item_type] = Number(r.total);
+    (data || []).forEach(r=>{
+      const off = r.officer || '—';
+      if(!agg[off]) agg[off] = {};
+      agg[off][r.item_type] = Number(r.total || 0);
     });
     renderTotals(agg);
   }
