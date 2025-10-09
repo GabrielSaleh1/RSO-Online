@@ -1,152 +1,311 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RSO Online</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #111827;
-      color: white;
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      color: #60a5fa;
-    }
-    label {
-      display: block;
-      margin-top: 12px;
-      font-weight: bold;
-    }
-    input, textarea, button {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      border-radius: 6px;
-      border: none;
-    }
-    input, textarea {
-      background-color: #1f2937;
-      color: white;
-    }
-    button {
-      background-color: #2563eb;
-      color: white;
-      font-weight: bold;
-      margin-top: 16px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #1e40af;
-    }
-    pre {
-      background: #1f2937;
-      padding: 15px;
-      border-radius: 6px;
-      white-space: pre-wrap;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RSO Online</title>
+<style>
+  :root { --bg:#0f172a; --panel:#111827; --muted:#9ca3af; --accent:#60a5fa; --btn:#2563eb; --btnH:#1e40af; --line:#1f2937; }
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:#e5e7eb; margin:0; padding:24px;}
+  .wrap{max-width:980px;margin:0 auto}
+  h1{margin:0 0 18px; color:var(--accent); text-align:center}
+  .grid{display:grid; gap:12px}
+  .panel{background:var(--panel); border-radius:12px; padding:16px; box-shadow:0 8px 24px #0005}
+  label{font-weight:600; font-size:14px}
+  input,textarea{width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:#0b1220; color:#e5e7eb}
+  textarea{min-height:70px; resize:vertical}
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .muted{color:var(--muted); font-size:12px}
+  .btn{background:var(--btn); border:none; color:white; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer}
+  .btn:hover{background:var(--btnH)}
+  .btn-sec{background:#0b1220; border:1px solid var(--line)}
+  .list{display:grid; gap:10px}
+  .item{display:grid; grid-template-columns:1fr auto; gap:8px}
+  .item-2{grid-template-columns:120px 1fr auto}
+  .pill{padding:6px 10px; border:1px dashed var(--line); border-radius:8px; cursor:pointer; text-align:center}
+  pre{background:#0b1220; border:1px solid var(--line); padding:14px; border-radius:10px; white-space:pre-wrap}
+  @media (max-width:720px){ .row{grid-template-columns:1fr} .item-2{grid-template-columns:1fr} }
+</style>
 </head>
 <body>
+<div class="wrap">
   <h1>Relatório de Serviço Operacional</h1>
 
-  <form id="rsoForm">
-    <label>N° do RSO:</label>
-    <input type="text" id="numero" required>
+  <div class="panel grid">
+    <div class="row">
+      <div>
+        <label>Nº do RSO</label>
+        <input id="numero" placeholder="0169" />
+      </div>
+      <div>
+        <label>Data/Hora</label>
+        <input id="datahora" type="datetime-local" />
+      </div>
+    </div>
+    <div>
+      <label>Rota</label>
+      <input id="rota" placeholder="91136" />
+    </div>
+  </div>
 
-    <label>Motorista:</label>
-    <input type="text" id="motorista">
+  <div class="panel grid">
+    <div class="row">
+      <div>
+        <label>Motorista</label>
+        <input id="motorista" placeholder="Cabo PM Ducati" />
+      </div>
+      <div>
+        <label>Encarregado</label>
+        <input id="encarregado" placeholder="2º Sgt Rangel" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Segurança</label>
+        <input id="seguranca" placeholder="EST SD PM Jonny" />
+      </div>
+      <div>
+        <label>Auxiliar(es)</label>
+        <input id="auxiliares" placeholder="Separe por vírgula" />
+      </div>
+    </div>
+  </div>
 
-    <label>Encarregado:</label>
-    <input type="text" id="encarregado">
+  <div class="panel grid">
+    <label>Ilícitos</label>
+    <div id="list-ilicitos" class="list"></div>
+    <div class="pill" onclick="addIlicito()">+ adicionar ilícito</div>
+  </div>
 
-    <label>Segurança:</label>
-    <input type="text" id="seguranca">
+  <div class="panel grid">
+    <label>Veículos</label>
+    <div id="list-veiculos" class="list"></div>
+    <div class="pill" onclick="addVeiculo()">+ adicionar veículo</div>
+  </div>
 
-    <label>Auxiliar(es):</label>
-    <input type="text" id="auxiliares">
+  <div class="panel grid">
+    <label>Ocorrências</label>
+    <div id="list-ocorrencias" class="list"></div>
+    <div class="pill" onclick="addOcorrencia()">+ adicionar ocorrência</div>
+    <div class="muted">Dica: descreva com verbo no passado e detalhe local/apoio.</div>
+  </div>
 
-    <label>Ilícitos:</label>
-    <textarea id="ilicitos"></textarea>
+  <div class="panel grid">
+    <label>Abordados</label>
+    <div id="list-abordados" class="list"></div>
+    <div class="pill" onclick="addAbordado()">+ adicionar abordado</div>
+  </div>
 
-    <label>Veículos:</label>
-    <textarea id="veiculos"></textarea>
+  <div class="panel grid">
+    <div class="row">
+      <div>
+        <label>Ocorrências (qtd)</label>
+        <input id="res-oc" type="number" min="0" value="0" />
+      </div>
+      <div>
+        <label>Apoios (qtd)</label>
+        <input id="res-ap" type="number" min="0" value="0" />
+      </div>
+    </div>
+    <div>
+      <label>Ações (qtd)</label>
+      <input id="res-ac" type="number" min="0" value="0" />
+    </div>
+  </div>
 
-    <label>Ocorrências:</label>
-    <textarea id="ocorrencias"></textarea>
+  <div class="grid panel">
+    <div class="row">
+      <button class="btn" onclick="gerar()">Gerar relatório</button>
+      <button class="btn btn-sec" onclick="limpar()">Limpar</button>
+    </div>
+    <pre id="saida"></pre>
+    <div class="row">
+      <button class="btn" id="copyBtn" onclick="copiar()" disabled>Copiar</button>
+      <button class="btn btn-sec" id="saveBtn" onclick="baixar()" disabled>Baixar .txt</button>
+    </div>
+    <button class="btn btn-sec" onclick="window.print()">Imprimir / PDF</button>
+  </div>
+</div>
 
-    <label>Abordados:</label>
-    <textarea id="abordados"></textarea>
+<script>
+  // utils
+  const $ = (id) => document.getElementById(id);
+  const pad2 = (n) => String(n).padStart(2, '0');
 
-    <label>Resultado:</label>
-    <textarea id="resultado"></textarea>
+  // Data/Hora default agora
+  (function initDate(){
+    const d = new Date();
+    const z = (n)=>String(n).padStart(2,'0');
+    $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
+  })();
 
-    <button type="submit">Gerar Relatório</button>
-  </form>
+  // listas dinâmicas
+  function addIlicito(qtd='', desc=''){
+    const wrap = document.createElement('div');
+    wrap.className = 'item';
+    wrap.innerHTML = `
+      <input placeholder="ex.: 02x Bomba caseira" value="${desc || qtd}" />
+      <button class="btn btn-sec" type="button">remover</button>`;
+    wrap.querySelector('button').onclick = ()=> wrap.remove() || salvarAuto();
+    $('list-ilicitos').appendChild(wrap); salvarAuto();
+  }
+  function addVeiculo(desc=''){
+    const wrap = document.createElement('div');
+    wrap.className = 'item';
+    wrap.innerHTML = `
+      <input placeholder="ex.: BMW R1250 HP - Branca - 57URU265 - Apreendida" value="${desc}" />
+      <button class="btn btn-sec" type="button">remover</button>`;
+    wrap.querySelector('button').onclick = ()=> wrap.remove() || salvarAuto();
+    $('list-veiculos').appendChild(wrap); salvarAuto();
+  }
+  function addOcorrencia(h='', texto=''){
+    const wrap = document.createElement('div');
+    wrap.className = 'item-2';
+    wrap.innerHTML = `
+      <input type="time" value="${h}">
+      <input placeholder="Descreva a ocorrência" value="${texto}">
+      <button class="btn btn-sec" type="button">remover</button>`;
+    wrap.querySelector('button').onclick = ()=> wrap.remove() || salvarAuto();
+    $('list-ocorrencias').appendChild(wrap); salvarAuto();
+  }
+  function addAbordado(nome=''){
+    const wrap = document.createElement('div');
+    wrap.className = 'item';
+    wrap.innerHTML = `
+      <input placeholder="ex.: Renato Cruz – 4910 – BOPM – Cb Ducati 20:14" value="${nome}">
+      <button class="btn btn-sec" type="button">remover</button>`;
+    wrap.querySelector('button').onclick = ()=> wrap.remove() || salvarAuto();
+    $('list-abordados').appendChild(wrap); salvarAuto();
+  }
 
-  <h2>Resultado:</h2>
-  <pre id="output"></pre>
-  <button id="copyBtn" style="display:none;">Copiar Relatório</button>
+  // estado → localStorage
+  const KEY='rso.v1';
+  function salvarAuto(){
+    const data = coletarDados();
+    localStorage.setItem(KEY, JSON.stringify(data));
+  }
+  function carregarAuto(){
+    const raw = localStorage.getItem(KEY); if(!raw) return;
+    try{
+      const d = JSON.parse(raw);
+      $('numero').value=d.numero||'';
+      $('datahora').value=d.datahora||$('datahora').value;
+      $('rota').value=d.rota||'';
+      $('motorista').value=d.motorista||'';
+      $('encarregado').value=d.encarregado||'';
+      $('seguranca').value=d.seguranca||'';
+      $('auxiliares').value=d.auxiliares||'';
+      $('res-oc').value=d.resOc||0; $('res-ap').value=d.resAp||0; $('res-ac').value=d.resAc||0;
 
-  <script>
-    const form = document.getElementById("rsoForm");
-    const output = document.getElementById("output");
-    const copyBtn = document.getElementById("copyBtn");
+      d.ilicitos?.forEach(i=>addIlicito('',i));
+      d.veiculos?.forEach(v=>addVeiculo(v));
+      d.ocorrencias?.forEach(o=>addOcorrencia(o.h,o.t));
+      d.abordados?.forEach(a=>addAbordado(a));
+    }catch(e){}
+  }
+  window.addEventListener('input', (e)=>{
+    if(['INPUT','TEXTAREA'].includes(e.target.tagName)) salvarAuto();
+  });
+  carregarAuto();
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
+  function coletarDados(){
+    const getList = (id)=>[...$(id).querySelectorAll('input,textarea')];
+    const ilicitos = [...$('list-ilicitos').querySelectorAll('input')].map(i=>i.value).filter(Boolean);
+    const veiculos = [...$('list-veiculos').querySelectorAll('input')].map(i=>i.value).filter(Boolean);
+    const ocorrencias = [...$('list-ocorrencias').children].map(div=>{
+      const ins = div.querySelectorAll('input'); return {h:ins[0].value, t:ins[1].value};
+    }).filter(o=>o.t);
+    const abordados = [...$('list-abordados').querySelectorAll('input')].map(i=>i.value).filter(Boolean);
 
-      const numero = document.getElementById("numero").value;
-      const motorista = document.getElementById("motorista").value;
-      const encarregado = document.getElementById("encarregado").value;
-      const seguranca = document.getElementById("seguranca").value;
-      const auxiliares = document.getElementById("auxiliares").value;
-      const ilicitos = document.getElementById("ilicitos").value;
-      const veiculos = document.getElementById("veiculos").value;
-      const ocorrencias = document.getElementById("ocorrencias").value;
-      const abordados = document.getElementById("abordados").value;
-      const resultado = document.getElementById("resultado").value;
+    return {
+      numero:$('numero').value,
+      datahora:$('datahora').value,
+      rota:$('rota').value,
+      motorista:$('motorista').value,
+      encarregado:$('encarregado').value,
+      seguranca:$('seguranca').value,
+      auxiliares:$('auxiliares').value,
+      ilicitos, veiculos, ocorrencias, abordados,
+      resOc:Number($('res-oc').value||0),
+      resAp:Number($('res-ap').value||0),
+      resAc:Number($('res-ac').value||0),
+    };
+  }
 
-      const relatorio = `
+  function formatarRelatorio(d){
+    const dt = d.datahora ? new Date(d.datahora) : new Date();
+    const dd = pad2(dt.getDate())+'/'+pad2(dt.getMonth()+1)+'/'+dt.getFullYear();
+    const hh = pad2(dt.getHours())+':'+pad2(dt.getMinutes());
+
+    const bloc = (arr)=> arr.length ? arr.join('\n') : '';
+    const blocOcc = d.ocorrencias.length
+      ? d.ocorrencias
+          .sort((a,b)=>(a.h||'').localeCompare(b.h||''))
+          .map(o=> o.h ? `- ÀS ${o.h}: ${o.t}` : `- ${o.t}`)
+          .join('\n')
+      : '';
+
+    return `
 — RELATÓRIO DE SERVIÇO —
-Nº: ${numero}
+Nº: ${d.numero} / DataHora: ${dd} ${hh}
 
-# ROTA -
+# ROTA - ${d.rota}
 
-Motorista: ${motorista}
-Encarregado: ${encarregado}
-Segurança: ${seguranca}
-Auxiliar(es): ${auxiliares}
+Motorista: ${d.motorista}
+Encarregado: ${d.encarregado}
+Segurança: ${d.seguranca}
+Auxiliar(es): ${d.auxiliares}
 
 # ILÍCITOS #
-${ilicitos}
+${bloc(d.ilicitos)}
 
 # VEÍCULOS #
-${veiculos}
+${bloc(d.veiculos)}
 
 # OCORRÊNCIAS #
-${ocorrencias}
+${blocOcc}
 
 # ABORDADOS #
-${abordados}
+${bloc(d.abordados)}
 
 # RESULTADO #
-${resultado}
+${d.resOc}x Ocorrência.
+${d.resAp}x Apoio.
+${d.resAc}x Ação.
 `.trim();
+  }
 
-      output.textContent = relatorio;
-      copyBtn.style.display = "block";
-    });
+  function gerar(){
+    const d = coletarDados();
+    const txt = formatarRelatorio(d);
+    $('saida').textContent = txt;
+    $('copyBtn').disabled = $('saveBtn').disabled = !txt.length;
+  }
 
-    copyBtn.addEventListener("click", () => {
-      navigator.clipboard.writeText(output.textContent);
-      copyBtn.textContent = "Copiado!";
-      setTimeout(() => copyBtn.textContent = "Copiar Relatório", 1500);
-    });
-  </script>
+  function copiar(){
+    navigator.clipboard.writeText($('saida').textContent);
+    $('copyBtn').textContent='Copiado!';
+    setTimeout(()=>$('copyBtn').textContent='Copiar',1200);
+  }
+
+  function baixar(){
+    const blob = new Blob([$('saida').textContent], {type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `RSO-${$('numero').value || 'sem-numero'}.txt`;
+    a.click(); URL.revokeObjectURL(url);
+  }
+
+  function limpar(){
+    localStorage.removeItem(KEY);
+    location.reload();
+  }
+
+  // começa com 1 campo em cada lista pra facilitar
+  if(!$('list-ilicitos').children.length) addIlicito();
+  if(!$('list-veiculos').children.length) addVeiculo();
+  if(!$('list-ocorrencias').children.length) addOcorrencia();
+  if(!$('list-abordados').children.length) addAbordado();
+</script>
 </body>
 </html>
