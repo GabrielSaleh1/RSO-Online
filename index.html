@@ -10,7 +10,6 @@
     --brand:#4f9cf9; --btn:#2563eb; --btnH:#1e40af; --field:#0b1220;
   }
 
-  /* ======== TELA (form) ======== */
   body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
   .wrap{max-width:980px;margin:24px auto;padding:0 16px}
   h1{margin:0 0 16px;text-align:center;color:var(--brand);font-weight:800;letter-spacing:.3px}
@@ -24,18 +23,39 @@
   }
   textarea{min-height:72px;resize:vertical}
   .list{display:grid;gap:10px}
-  .item,.item-2{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+  /* === AJUSTE DOS BOTÕES REMOVER E ADICIONAR === */
+  .item,.item-2{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
   .item-2 input[type="time"]{width:100px}
-  .item button,.item-2 button{flex-shrink:0;height:38px}
-  .pill{border:1px dashed var(--line);border-radius:10px;padding:8px 12px;text-align:center;cursor:pointer;color:#bcd3ff;background:#0c1422}
+  .item button,.item-2 button{
+    flex-shrink:0;
+    padding:8px 12px;
+    height:auto;
+    align-self:center;
+  }
+  .pill{
+    border:1px dashed var(--line);
+    border-radius:10px;
+    padding:8px 12px;
+    text-align:center;
+    cursor:pointer;
+    color:#bcd3ff;
+    background:#0c1422;
+    font-weight:700;
+  }
   .pill:hover{background:#0e1829}
+
   .muted{color:var(--muted);font-size:.85rem}
   .btn{background:var(--btn);color:#fff;border:none;border-radius:10px;padding:12px 16px;font-weight:800;cursor:pointer}
   .btn:hover{background:var(--btnH)}
 
   @media (max-width:720px){ .row>div{flex:1 1 100%;min-width:unset} }
 
-  /* ======== IMPRESSÃO (A4) ======== */
   @page{size:A4;margin:14mm}
   @media print{
     body{background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -43,27 +63,18 @@
     #sheet{display:block!important}
   }
 
-  /* folha do PDF */
   #sheet{
     display:none;background:#fff;color:#0b0b0b;border:1px solid #bfc8d6;border-radius:6px;
     box-sizing:border-box;padding:14mm;width:100%;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif
   }
-  .doc-header{
-    text-align:center;margin-bottom:10px
-  }
-  .doc-title{
-    font-weight:900;font-size:22px;color:#0d2a5c;margin:0 0 4px
-  }
-  .doc-sub{
-    font-size:12px;color:#3b4a63;margin:0
-  }
+  .doc-header{text-align:center;margin-bottom:10px}
+  .doc-title{font-weight:900;font-size:22px;color:#0d2a5c;margin:0 0 4px}
+  .doc-sub{font-size:12px;color:#3b4a63;margin:0}
   .doc-rule{height:1px;background:linear-gradient(90deg,#ccd6e4 0,#8aa7ff 40%,#ccd6e4 100%);margin:10px 0 14px;border:none}
   .meta{display:flex;justify-content:space-between;gap:12px;font-weight:700;margin-bottom:8px}
   .meta span{white-space:nowrap}
   .section{margin:10px 0 12px}
-  .section h3{
-    font-size:14px;margin:0 0 8px;color:#0d2a5c;font-weight:900;letter-spacing:.3px
-  }
+  .section h3{font-size:14px;margin:0 0 8px;color:#0d2a5c;font-weight:900;letter-spacing:.3px}
   .kv{display:grid;grid-template-columns:140px 1fr;gap:4px 12px;font-size:13px}
   .kv b{color:#22324d}
   ul.clean{margin:0;padding-left:16px;font-size:13px}
@@ -75,47 +86,25 @@
   <div class="wrap">
     <h1>Relatório de Serviço Operacional</h1>
 
-    <!-- ============ FORM ============ -->
     <div id="form-area">
       <div class="panel">
         <div class="row">
-          <div>
-            <label>Nº do RSO</label>
-            <input id="numero" placeholder="0169">
-          </div>
-          <div>
-            <label>Data/Hora</label>
-            <input id="datahora" type="datetime-local">
-          </div>
+          <div><label>Nº do RSO</label><input id="numero" placeholder="0169"></div>
+          <div><label>Data/Hora</label><input id="datahora" type="datetime-local"></div>
         </div>
         <div class="row">
-          <div>
-            <label>Rota</label>
-            <input id="rota" placeholder="91136">
-          </div>
+          <div><label>Rota</label><input id="rota" placeholder="91136"></div>
         </div>
       </div>
 
       <div class="panel">
         <div class="row">
-          <div>
-            <label>Motorista</label>
-            <input id="motorista" placeholder="Cabo PM Ducati">
-          </div>
-          <div>
-            <label>Encarregado</label>
-            <input id="encarregado" placeholder="2º Sgt Rangel">
-          </div>
+          <div><label>Motorista</label><input id="motorista" placeholder="Cabo PM Ducati"></div>
+          <div><label>Encarregado</label><input id="encarregado" placeholder="2º Sgt Rangel"></div>
         </div>
         <div class="row">
-          <div>
-            <label>Segurança</label>
-            <input id="seguranca" placeholder="EST SD PM Jonny">
-          </div>
-          <div>
-            <label>Auxiliar(es)</label>
-            <input id="auxiliares" placeholder="Separe por vírgula">
-          </div>
+          <div><label>Segurança</label><input id="seguranca" placeholder="EST SD PM Jonny"></div>
+          <div><label>Auxiliar(es)</label><input id="auxiliares" placeholder="Separe por vírgula"></div>
         </div>
       </div>
 
@@ -146,20 +135,11 @@
 
       <div class="panel">
         <div class="row">
-          <div>
-            <label>Ocorrências (qtd)</label>
-            <input id="res-oc" type="number" min="0" value="0">
-          </div>
-          <div>
-            <label>Apoios (qtd)</label>
-            <input id="res-ap" type="number" min="0" value="0">
-          </div>
+          <div><label>Ocorrências (qtd)</label><input id="res-oc" type="number" min="0" value="0"></div>
+          <div><label>Apoios (qtd)</label><input id="res-ap" type="number" min="0" value="0"></div>
         </div>
         <div class="row">
-          <div>
-            <label>Ações (qtd)</label>
-            <input id="res-ac" type="number" min="0" value="0">
-          </div>
+          <div><label>Ações (qtd)</label><input id="res-ac" type="number" min="0" value="0"></div>
         </div>
       </div>
 
@@ -168,7 +148,6 @@
       </div>
     </div>
 
-    <!-- ============ FOLHA A4 DO PDF ============ -->
     <div id="sheet">
       <div class="doc-header">
         <h2 class="doc-title">Relatório de Serviço Operacional</h2>
@@ -182,177 +161,71 @@
       </div>
 
       <div class="section">
-        <h3>ROTA</h3>
-        <div id="rota-out" style="font-size:13px">—</div>
+        <h3>ROTA</h3><div id="rota-out" style="font-size:13px">—</div>
       </div>
-
       <div class="section">
         <h3>EFETIVO</h3>
         <div class="kv">
-          <b>Motorista:</b> <span id="k-motorista">—</span>
-          <b>Encarregado:</b> <span id="k-encarregado">—</span>
-          <b>Segurança:</b>  <span id="k-seguranca">—</span>
-          <b>Auxiliar(es):</b> <span id="k-auxiliares">—</span>
+          <b>Motorista:</b><span id="k-motorista">—</span>
+          <b>Encarregado:</b><span id="k-encarregado">—</span>
+          <b>Segurança:</b><span id="k-seguranca">—</span>
+          <b>Auxiliar(es):</b><span id="k-auxiliares">—</span>
         </div>
       </div>
-
-      <div class="section">
-        <h3>ILÍCITOS</h3>
-        <ul class="clean" id="ul-ilicitos"><li>—</li></ul>
-      </div>
-
-      <div class="section">
-        <h3>VEÍCULOS</h3>
-        <ul class="clean" id="ul-veiculos"><li>—</li></ul>
-      </div>
-
-      <div class="section">
-        <h3>OCORRÊNCIAS</h3>
-        <ul class="clean" id="ul-ocorrencias"><li>—</li></ul>
-      </div>
-
-      <div class="section">
-        <h3>ABORDADOS</h3>
-        <ul class="clean" id="ul-abordados"><li>—</li></ul>
-      </div>
-
-      <div class="section">
-        <h3>RESULTADO</h3>
-        <ul class="clean" id="ul-resultado">
-          <li>0x Ocorrência.</li>
-          <li>0x Apoio.</li>
-          <li>0x Ação.</li>
-        </ul>
-      </div>
-
+      <div class="section"><h3>ILÍCITOS</h3><ul class="clean" id="ul-ilicitos"><li>—</li></ul></div>
+      <div class="section"><h3>VEÍCULOS</h3><ul class="clean" id="ul-veiculos"><li>—</li></ul></div>
+      <div class="section"><h3>OCORRÊNCIAS</h3><ul class="clean" id="ul-ocorrencias"><li>—</li></ul></div>
+      <div class="section"><h3>ABORDADOS</h3><ul class="clean" id="ul-abordados"><li>—</li></ul></div>
+      <div class="section"><h3>RESULTADO</h3><ul class="clean" id="ul-resultado">
+        <li>0x Ocorrência.</li><li>0x Apoio.</li><li>0x Ação.</li></ul></div>
       <hr class="footer-rule">
-      <div class="doc-footer">
-        <div>RSO Online</div>
-        <div id="rodape-data">—</div>
-      </div>
+      <div class="doc-footer"><div>RSO Online</div><div id="rodape-data">—</div></div>
     </div>
   </div>
 
 <script>
   const $ = (id)=>document.getElementById(id);
   const pad2 = n => String(n).padStart(2,'0');
-  const esc = s => (s||'').replace(/[&<>"]/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m]));
+  const esc = s => (s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 
-  // data/hora padrão
-  (function(){
-    const d=new Date(), z=n=>String(n).padStart(2,'0');
-    $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
-  })();
+  (function(){const d=new Date(),z=n=>String(n).padStart(2,'0');
+  $('datahora').value=`${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;})();
 
-  // add/remover itens
-  function addIlicito(v=''){ mkItem('list-ilicitos', v, 'ex.: 02x Bomba caseira'); }
-  function addVeiculo(v=''){ mkItem('list-veiculos', v, 'ex.: BMW R1250 HP - Branca - 57URU265 - Apreendida'); }
-  function addAbordado(v=''){ mkItem('list-abordados', v, 'ex.: Renato Cruz – 4910 – BOPM – Cb Ducati 20:14'); }
-  function addOcorrencia(h='',t=''){
-    const wrap=document.createElement('div');
-    wrap.className='item-2';
-    wrap.innerHTML = `
-      <input type="time" value="${h}">
-      <input placeholder="Descreva a ocorrência" value="${t}">
-      <button class="btn" type="button" style="background:#0c1422;border:1px solid var(--line)">remover</button>`;
-    wrap.querySelector('button').onclick=()=>wrap.remove();
-    $('list-ocorrencias').appendChild(wrap);
-  }
-  function mkItem(listId,val,ph){
-    const wrap=document.createElement('div');
-    wrap.className='item';
-    wrap.innerHTML = `
-      <input placeholder="${ph}" value="${val}">
-      <button class="btn" type="button" style="background:#0c1422;border:1px solid var(--line)">remover</button>`;
-    wrap.querySelector('button').onclick=()=>wrap.remove();
-    $(listId).appendChild(wrap);
-  }
-
-  // cria 1 campo por lista
+  function addIlicito(v=''){mkItem('list-ilicitos',v,'ex.: 02x Bomba caseira');}
+  function addVeiculo(v=''){mkItem('list-veiculos',v,'ex.: BMW R1250 HP - Branca - 57URU265 - Apreendida');}
+  function addAbordado(v=''){mkItem('list-abordados',v,'ex.: Renato Cruz – 4910 – BOPM – Cb Ducati 20:14');}
+  function addOcorrencia(h='',t=''){const w=document.createElement('div');w.className='item-2';
+  w.innerHTML=`<input type="time" value="${h}"><input placeholder="Descreva a ocorrência" value="${t}"><button class="btn" type="button" style="background:#0c1422;border:1px solid var(--line)">remover</button>`;
+  w.querySelector('button').onclick=()=>w.remove();$('list-ocorrencias').appendChild(w);}
+  function mkItem(id,v,ph){const w=document.createElement('div');w.className='item';
+  w.innerHTML=`<input placeholder="${ph}" value="${v}"><button class="btn" type="button" style="background:#0c1422;border:1px solid var(--line)">remover</button>`;
+  w.querySelector('button').onclick=()=>w.remove();$(id).appendChild(w);}
   if(!$('list-ilicitos').children.length) addIlicito();
   if(!$('list-veiculos').children.length) addVeiculo();
   if(!$('list-ocorrencias').children.length) addOcorrencia();
   if(!$('list-abordados').children.length) addAbordado();
 
-  // coleta dados atuais
   function collect(){
-    const L = id => [...$(id).querySelectorAll('input')].map(i=>i.value).filter(Boolean);
-    const O = [...$('list-ocorrencias').children].map(div=>{
-      const [h,t]=div.querySelectorAll('input'); return {h:h.value,t:t.value};
-    }).filter(o=>o.t);
-    return {
-      numero: $('numero').value,
-      datahora: $('datahora').value,
-      rota: $('rota').value,
-      motorista: $('motorista').value,
-      encarregado: $('encarregado').value,
-      seguranca: $('seguranca').value,
-      auxiliares: $('auxiliares').value,
-      ilicitos: L('list-ilicitos'),
-      veiculos: L('list-veiculos'),
-      ocorrencias: O,
-      abordados: L('list-abordados'),
-      resOc: +($('res-oc').value||0),
-      resAp: +($('res-ap').value||0),
-      resAc: +($('res-ac').value||0),
-    };
+    const L=id=>[...$(id).querySelectorAll('input')].map(i=>i.value).filter(Boolean);
+    const O=[...$('list-ocorrencias').children].map(d=>{const [h,t]=d.querySelectorAll('input');return{h:h.value,t:t.value}}).filter(o=>o.t);
+    return{numero:$('numero').value,datahora:$('datahora').value,rota:$('rota').value,motorista:$('motorista').value,
+      encarregado:$('encarregado').value,seguranca:$('seguranca').value,auxiliares:$('auxiliares').value,
+      ilicitos:L('list-ilicitos'),veiculos:L('list-veiculos'),ocorrencias:O,abordados:L('list-abordados'),
+      resOc:+($('res-oc').value||0),resAp:+($('res-ap').value||0),resAc:+($('res-ac').value||0)};
   }
-
-  // injeta no layout da folha A4
-  function fillSheet(d){
-    const dt = d.datahora ? new Date(d.datahora) : new Date();
-    const dd = `${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
-    $('meta-numero').textContent = `Nº: ${d.numero || '—'}`;
-    $('meta-data').textContent   = `Data/Hora: ${dd}`;
-    $('rota-out').textContent    = d.rota || '—';
-    $('k-motorista').textContent = d.motorista || '—';
-    $('k-encarregado').textContent = d.encarregado || '—';
-    $('k-seguranca').textContent = d.seguranca || '—';
-    $('k-auxiliares').textContent = d.auxiliares || '—';
-
-    const setList = (id, arr) => {
-      const ul = $(id); ul.innerHTML='';
-      if(!arr || !arr.length){ ul.innerHTML='<li>—</li>'; return; }
-      arr.forEach(v=>{
-        const li=document.createElement('li');
-        li.innerHTML = esc(v);
-        ul.appendChild(li);
-      });
-    };
-    setList('ul-ilicitos', d.ilicitos);
-    setList('ul-veiculos', d.veiculos);
-    setList('ul-abordados', d.abordados);
-
-    const ulO = $('ul-ocorrencias'); ulO.innerHTML='';
-    if(!d.ocorrencias.length){ ulO.innerHTML='<li>—</li>'; }
-    else{
-      d.ocorrencias
-        .sort((a,b)=>(a.h||'').localeCompare(b.h||''))
-        .forEach(o=>{
-          const li=document.createElement('li');
-          li.innerHTML = esc(o.h ? `ÀS ${o.h}: ${o.t}` : o.t);
-          ulO.appendChild(li);
-        });
-    }
-
-    $('ul-resultado').innerHTML = `
-      <li>${d.resOc}x Ocorrência.</li>
-      <li>${d.resAp}x Apoio.</li>
-      <li>${d.resAc}x Ação.</li>
-    `;
-
-    // rodapé com data de emissão
-    const now=new Date();
-    $('rodape-data').textContent = `Emitido em ${pad2(now.getDate())}/${pad2(now.getMonth()+1)}/${now.getFullYear()} ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+  function fillSheet(d){const dt=d.datahora?new Date(d.datahora):new Date();
+    const dd=`${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
+    $('meta-numero').textContent=`Nº: ${d.numero||'—'}`;$('meta-data').textContent=`Data/Hora: ${dd}`;$('rota-out').textContent=d.rota||'—';
+    $('k-motorista').textContent=d.motorista||'—';$('k-encarregado').textContent=d.encarregado||'—';$('k-seguranca').textContent=d.seguranca||'—';$('k-auxiliares').textContent=d.auxiliares||'—';
+    const setList=(id,a)=>{const u=$(id);u.innerHTML='';if(!a||!a.length){u.innerHTML='<li>—</li>';return}a.forEach(v=>{const li=document.createElement('li');li.innerHTML=esc(v);u.appendChild(li);});};
+    setList('ul-ilicitos',d.ilicitos);setList('ul-veiculos',d.veiculos);setList('ul-abordados',d.abordados);
+    const ulO=$('ul-ocorrencias');ulO.innerHTML='';if(!d.ocorrencias.length){ulO.innerHTML='<li>—</li>';}
+    else{d.ocorrencias.sort((a,b)=>(a.h||'').localeCompare(b.h||'')).forEach(o=>{const li=document.createElement('li');li.innerHTML=esc(o.h?`ÀS ${o.h}: ${o.t}`:o.t);ulO.appendChild(li);});}
+    $('ul-resultado').innerHTML=`<li>${d.resOc}x Ocorrência.</li><li>${d.resAp}x Apoio.</li><li>${d.resAc}x Ação.</li>`;
+    const now=new Date();$('rodape-data').textContent=`Emitido em ${pad2(now.getDate())}/${pad2(now.getMonth()+1)}/${now.getFullYear()} ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
   }
-
-  // imprimir
-  $('printBtn').addEventListener('click', ()=>{
-    fillSheet(collect());
-    window.print();
-  });
-  // se usar Ctrl+P
-  window.onbeforeprint = ()=> fillSheet(collect());
+  $('printBtn').addEventListener('click',()=>{fillSheet(collect());window.print();});
+  window.onbeforeprint=()=>fillSheet(collect());
 </script>
 </body>
 </html>
