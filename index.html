@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSO Online</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111827;
+      color: white;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #60a5fa;
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border-radius: 6px;
+      border: none;
+    }
+    input, textarea {
+      background-color: #1f2937;
+      color: white;
+    }
+    button {
+      background-color: #2563eb;
+      color: white;
+      font-weight: bold;
+      margin-top: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1e40af;
+    }
+    pre {
+      background: #1f2937;
+      padding: 15px;
+      border-radius: 6px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Relatório de Serviço Operacional</h1>
+
+  <form id="rsoForm">
+    <label>N° do RSO:</label>
+    <input type="text" id="numero" required>
+
+    <label>Motorista:</label>
+    <input type="text" id="motorista">
+
+    <label>Encarregado:</label>
+    <input type="text" id="encarregado">
+
+    <label>Segurança:</label>
+    <input type="text" id="seguranca">
+
+    <label>Auxiliar(es):</label>
+    <input type="text" id="auxiliares">
+
+    <label>Ilícitos:</label>
+    <textarea id="ilicitos"></textarea>
+
+    <label>Veículos:</label>
+    <textarea id="veiculos"></textarea>
+
+    <label>Ocorrências:</label>
+    <textarea id="ocorrencias"></textarea>
+
+    <label>Abordados:</label>
+    <textarea id="abordados"></textarea>
+
+    <label>Resultado:</label>
+    <textarea id="resultado"></textarea>
+
+    <button type="submit">Gerar Relatório</button>
+  </form>
+
+  <h2>Resultado:</h2>
+  <pre id="output"></pre>
+  <button id="copyBtn" style="display:none;">Copiar Relatório</button>
+
+  <script>
+    const form = document.getElementById("rsoForm");
+    const output = document.getElementById("output");
+    const copyBtn = document.getElementById("copyBtn");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const numero = document.getElementById("numero").value;
+      const motorista = document.getElementById("motorista").value;
+      const encarregado = document.getElementById("encarregado").value;
+      const seguranca = document.getElementById("seguranca").value;
+      const auxiliares = document.getElementById("auxiliares").value;
+      const ilicitos = document.getElementById("ilicitos").value;
+      const veiculos = document.getElementById("veiculos").value;
+      const ocorrencias = document.getElementById("ocorrencias").value;
+      const abordados = document.getElementById("abordados").value;
+      const resultado = document.getElementById("resultado").value;
+
+      const relatorio = `
+— RELATÓRIO DE SERVIÇO —
+Nº: ${numero}
+
+# ROTA -
+
+Motorista: ${motorista}
+Encarregado: ${encarregado}
+Segurança: ${seguranca}
+Auxiliar(es): ${auxiliares}
+
+# ILÍCITOS #
+${ilicitos}
+
+# VEÍCULOS #
+${veiculos}
+
+# OCORRÊNCIAS #
+${ocorrencias}
+
+# ABORDADOS #
+${abordados}
+
+# RESULTADO #
+${resultado}
+`.trim();
+
+      output.textContent = relatorio;
+      copyBtn.style.display = "block";
+    });
+
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(output.textContent);
+      copyBtn.textContent = "Copiado!";
+      setTimeout(() => copyBtn.textContent = "Copiar Relatório", 1500);
+    });
+  </script>
+</body>
+</html>
