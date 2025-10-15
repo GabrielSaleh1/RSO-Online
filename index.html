@@ -56,6 +56,7 @@
   textarea{min-height:72px;resize:vertical}
   .list{display:grid;gap:10px}
   .item,.item-2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .item select{flex:1 1 240px;min-width:200px}
   .item-2 input[type="time"]{width:110px}
   .pill{border:1px dashed var(--line);border-radius:12px;padding:10px 12px;text-align:center;cursor:pointer;color:#efe6c4;background:var(--chip);font-weight:800}
   .pill:hover{background:var(--chipH)}
@@ -119,22 +120,35 @@
       <div class="muted" style="margin-top:8px">Identificador numérico descontinuado <span class="flag">Nº RSO removido</span></div>
     </div>
 
+    <!-- EQUIPE: agora suporta múltiplos por função -->
     <div class="panel">
-      <div class="row">
-        <div><label>Motorista (Nome)</label><select id="motorista_sel"></select></div>
-        <div><label>Motorista (Patente)</label><select id="motorista_rank"></select></div>
+      <h3 style="margin:0 0 10px">Efetivo</h3>
+
+      <div>
+        <label>Motorista(s)</label>
+        <div id="list-motorista" class="list"></div>
+        <div class="pill" onclick="addTeamItem('motorista')">+ adicionar motorista</div>
       </div>
-      <div class="row">
-        <div><label>Encarregado (Nome)</label><select id="encarregado_sel"></select></div>
-        <div><label>Encarregado (Patente)</label><select id="encarregado_rank"></select></div>
+      <div style="height:10px"></div>
+
+      <div>
+        <label>Chefe de barca / Encarregado(s)</label>
+        <div id="list-encarregado" class="list"></div>
+        <div class="pill" onclick="addTeamItem('encarregado')">+ adicionar chefe de barca</div>
       </div>
-      <div class="row">
-        <div><label>Segurança (Nome)</label><select id="seguranca_sel"></select></div>
-        <div><label>Segurança (Patente)</label><select id="seguranca_rank"></select></div>
+      <div style="height:10px"></div>
+
+      <div>
+        <label>Segurança(s)</label>
+        <div id="list-seguranca" class="list"></div>
+        <div class="pill" onclick="addTeamItem('seguranca')">+ adicionar segurança</div>
       </div>
-      <div class="row">
-        <div><label>Auxiliar (Nome)</label><select id="auxiliares_sel"></select></div>
-        <div><label>Auxiliar (Patente)</label><select id="auxiliares_rank"></select></div>
+      <div style="height:10px"></div>
+
+      <div>
+        <label>Auxiliar(es)</label>
+        <div id="list-auxiliares" class="list"></div>
+        <div class="pill" onclick="addTeamItem('auxiliares')">+ adicionar auxiliar</div>
       </div>
     </div>
 
@@ -203,10 +217,10 @@
     <div class="meta"><span id="meta-data">Data/Hora: —</span><span id="meta-rota">Rota: —</span></div>
     <div class="section"><h3>EFETIVO</h3>
       <div class="kv">
-        <b>Motorista:</b><span id="k-motorista">—</span>
-        <b>Encarregado:</b><span id="k-encarregado">—</span>
-        <b>Segurança:</b><span id="k-seguranca">—</span>
-        <b>Auxiliar:</b><span id="k-auxiliares">—</span>
+        <b>Motorista(s):</b><span id="k-motorista">—</span>
+        <b>Encarregado(s):</b><span id="k-encarregado">—</span>
+        <b>Segurança(s):</b><span id="k-seguranca">—</span>
+        <b>Auxiliar(es):</b><span id="k-auxiliares">—</span>
       </div>
     </div>
     <div class="section"><h3>ABORDADOS</h3><ul class="clean" id="ul-abordados"><li>—</li></ul></div>
@@ -236,39 +250,26 @@
 
   // === Ranks & Officers ===
   let RANKS = [], OFFICERS = [];
-  const NAME_SELECTS = ['motorista_sel','encarregado_sel','seguranca_sel','auxiliares_sel'];
-  const RANK_SELECTS = ['motorista_rank','encarregado_rank','seguranca_rank','auxiliares_rank'];
+  const ROLE_IDS = {
+    motorista: 'list-motorista',
+    encarregado: 'list-encarregado',
+    seguranca: 'list-seguranca',
+    auxiliares: 'list-auxiliares'
+  };
 
   async function loadRanks(){
     const { data, error } = await supa.from('ranks').select('id,name,sort_order').order('sort_order',{ascending:true});
     if(error){ console.error(error); alert('Erro ao carregar patentes.'); return; }
     RANKS = data || [];
-    RANK_SELECTS.forEach(id=>{
-      $(id).innerHTML = `<option value="">Selecione a patente…</option>` + RANKS.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
-    });
   }
 
   async function loadOfficers(){
     const { data, error } = await supa.from('officers').select('id,name,current_rank_id').eq('active',true).order('name');
     if(error){ console.error(error); alert('Erro ao carregar policiais.'); return; }
     OFFICERS = data || [];
-    NAME_SELECTS.forEach(id=>{
-      $(id).innerHTML = `<option value="">Selecione…</option>` + OFFICERS.map(o=>`<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');
-    });
   }
 
-  function linkNameToRank(){
-    NAME_SELECTS.forEach((nameId, idx) => {
-      const rankId = RANK_SELECTS[idx];
-      $(nameId).addEventListener('change', (e) => {
-        const val = e.target.value;
-        const off = OFFICERS.find(o => o.id === val);
-        $(rankId).value = off?.current_rank_id || '';
-      });
-    });
-  }
-
-  // ===== Campos dinâmicos =====
+  // ===== Campos dinâmicos (lista simples) =====
   function mkItem(id,v,ph){
     const w=document.createElement('div'); w.className='item';
     w.innerHTML=`<input placeholder="${ph}" value="${v}"><button class="btn btn-sec" type="button">remover</button>`;
@@ -285,28 +286,63 @@
     $('list-ocorrencias').appendChild(w);
   }
 
+  // ===== Efetivo dinâmico (múltiplos por função) =====
+  function addTeamItem(role){
+    const containerId = ROLE_IDS[role];
+    const wrap = document.createElement('div');
+    wrap.className = 'item';
+    const nameSel = document.createElement('select');
+    const rankSel = document.createElement('select');
+    nameSel.innerHTML = `<option value="">Selecione…</option>` + OFFICERS.map(o=>`<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');
+    rankSel.innerHTML = `<option value="">Selecione a patente…</option>` + RANKS.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
+    const delBtn = document.createElement('button'); delBtn.type='button'; delBtn.className='btn btn-sec'; delBtn.textContent='remover';
+    delBtn.onclick = ()=> wrap.remove();
+
+    // Auto-preencher patente pelo policial selecionado
+    nameSel.addEventListener('change', (e)=>{
+      const off = OFFICERS.find(o => o.id === e.target.value);
+      rankSel.value = off?.current_rank_id || '';
+    });
+
+    wrap.appendChild(nameSel);
+    wrap.appendChild(rankSel);
+    wrap.appendChild(delBtn);
+    $(containerId).appendChild(wrap);
+  }
+
+  function collectRole(role){
+    const container = $(ROLE_IDS[role]);
+    const items = [...(container?.querySelectorAll('.item')||[])];
+    const res = [];
+    items.forEach(it=>{
+      const [nameSel, rankSel] = it.querySelectorAll('select');
+      const officerId = nameSel?.value || '';
+      const rankId = rankSel?.value || '';
+      if(!officerId) return;
+      const off = OFFICERS.find(o=>o.id===officerId);
+      const rankObj = RANKS.find(r=>String(r.id)===String(rankId));
+      res.push({ name: off?.name || '', rank_name: rankObj?.name || '', label: `${rankObj?.name?rankObj.name+' ':''}${off?.name||''}`.trim() });
+    });
+    return res;
+  }
+
   // ===== Coleta e impressão =====
   function collect(){
     const L=id=>[...$(id).querySelectorAll('input')].map(i=>i.value).filter(Boolean);
     const O=[...$('list-ocorrencias').children].map(d=>{const [h,t]=d.querySelectorAll('input');return{h:h.value,t:t.value}}).filter(o=>o.t);
 
-    const officerById = id => OFFICERS.find(o => o.id === id)?.name || '';
-    const rankById = id => RANKS.find(r => String(r.id) === String(id))?.name || '';
-    const mName = officerById($('motorista_sel').value);
-    const eName = officerById($('encarregado_sel').value);
-    const sName = officerById($('seguranca_sel').value);
-    const aName = officerById($('auxiliares_sel').value);
-    const mRank = rankById($('motorista_rank').value);
-    const eRank = rankById($('encarregado_rank').value);
-    const sRank = rankById($('seguranca_rank').value);
-    const aRank = rankById($('auxiliares_rank').value);
+    const motoristaArr = collectRole('motorista');
+    const encarregadoArr = collectRole('encarregado');
+    const segurancaArr = collectRole('seguranca');
+    const auxiliaresArr = collectRole('auxiliares');
 
     return{
       datahora:$('datahora').value, rota:$('rota').value,
-      motorista: mRank && mName ? `${mRank} ${mName}` : (mName || ''),
-      encarregado: eRank && eName ? `${eRank} ${eName}` : (eName || ''),
-      seguranca: sRank && sName ? `${sRank} ${sName}` : (sName || ''),
-      auxiliares: aRank && aName ? `${aRank} ${aName}` : (aName || ''),
+      motorista: motoristaArr.map(x=>x.label),
+      encarregado: encarregadoArr.map(x=>x.label),
+      seguranca: segurancaArr.map(x=>x.label),
+      auxiliares: auxiliaresArr.map(x=>x.label),
+      _pairs: [...motoristaArr, ...encarregadoArr, ...segurancaArr, ...auxiliaresArr], // para salvar
       ilicitos:L('list-ilicitos'), veiculos:L('list-veiculos'),
       ocorrencias:O, abordados:L('list-abordados'),
       resOc:+($('res-oc').value||0), resAp:+($('res-ap').value||0), resAc:+($('res-ac').value||0)
@@ -318,10 +354,12 @@
     const dd=`${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
     $('meta-data').textContent=`Data/Hora: ${dd}`;
     $('meta-rota').textContent=`Rota: ${d.rota||'—'}`;
-    $('k-motorista').textContent=d.motorista||'—';
-    $('k-encarregado').textContent=d.encarregado||'—';
-    $('k-seguranca').textContent=d.seguranca||'—';
-    $('k-auxiliares').textContent=d.auxiliares||'—';
+
+    const joinOrDash = arr => (arr && arr.length) ? esc(arr.join(' | ')) : '—';
+    $('k-motorista').innerHTML = joinOrDash(d.motorista);
+    $('k-encarregado').innerHTML = joinOrDash(d.encarregado);
+    $('k-seguranca').innerHTML = joinOrDash(d.seguranca);
+    $('k-auxiliares').innerHTML = joinOrDash(d.auxiliares);
 
     const setList=(id,a)=>{
       const u=$(id); u.innerHTML='';
@@ -333,9 +371,9 @@
     setList('ul-veiculos',d.veiculos);
 
     const ulO=$('ul-ocorrencias'); ulO.innerHTML='';
-    if(!d.ocorrencias.length){ulO.innerHTML='<li>—</li>';}
-    else{
-      d.ocorrencias.sort((a,b)=>(a.h||'').localeCompare(b.h||'')).forEach(o=>{
+    if(!d.ocorrencias.length){ulO.innerHTML='<li>—</li>';} else {
+      d.ocorrencias.sort((a,b)=>(a.h||'').localeCompare(b.h||''));
+      d.ocorrencias.forEach(o=>{
         const li=document.createElement('li'); li.innerHTML=esc(o.h?`ÀS ${o.h}: ${o.t}`:o.t); ulO.appendChild(li);
       });
     }
@@ -358,20 +396,9 @@
   }
 
   function selectedOfficerAndRankPairs(){
-    const pairs = [];
-    const make = (selId, rankId) => {
-      const officerId = $(selId).value || '';
-      const rankSel = $(rankId).value || '';
-      if(!officerId || !rankSel) return;
-      const officer = OFFICERS.find(o => o.id === officerId);
-      const rankObj = RANKS.find(r => String(r.id) === String(rankSel));
-      pairs.push({ name: officer?.name || '', rank_name: rankObj?.name || '' });
-    };
-    make('motorista_sel','motorista_rank');
-    make('encarregado_sel','encarregado_rank');
-    make('seguranca_sel','seguranca_rank');
-    make('auxiliares_sel','auxiliares_rank');
-    return pairs.filter(p => p.name && p.rank_name);
+    // Usa a coleta já com múltiplos
+    const d = collect();
+    return (d._pairs || []).map(p=>({ name: p.name, rank_name: p.rank_name }));
   }
 
   // ===== Salvar ilícitos (Supabase) =====
@@ -382,7 +409,7 @@
     const pairs = selectedOfficerAndRankPairs();
 
     if(!items.length){ alert('Preencha ao menos 1 ilícito.'); return; }
-    if(!pairs.length){ alert('Selecione Nome e Patente para a equipe.'); return; }
+    if(!pairs.length){ alert('Selecione pelo menos 1 membro de equipe (nome e patente).'); return; }
 
     const rows = pairs.flatMap(({name, rank_name}) =>
       items.map(({item, qty}) => ({
@@ -467,7 +494,6 @@
   (async function init(){
     await loadRanks();
     await loadOfficers();
-    linkNameToRank();
 
     // data/hora default
     const d=new Date(), z=n=>String(n).padStart(2,'0');
@@ -478,6 +504,12 @@
     if(!$('list-ilicitos').children.length) addIlicito();
     if(!$('list-veiculos').children.length) addVeiculo();
     if(!$('list-ocorrencias').children.length) addOcorrencia();
+
+    // efetivo default: 1 item por função
+    addTeamItem('motorista');
+    addTeamItem('encarregado');
+    addTeamItem('seguranca');
+    addTeamItem('auxiliares');
 
     // eventos
     $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
