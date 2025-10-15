@@ -19,6 +19,14 @@
     --field:#0c1015;
     --chip:#131a22;
     --chipH:#18212c;
+
+    /* Tabela (tema escuro) */
+    --tbl-head:#18212c;
+    --tbl-row:#0f1318;
+    --tbl-row-alt:#0c1015;
+    --tbl-border:#2f3947;
+    --tbl-text:#e6e9ee;
+    --tbl-muted:#b7c0cc;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
@@ -58,6 +66,14 @@
   .btn-danger:hover{background:var(--btnDangerH)}
   .btn-sec{background:var(--chip);border:1px solid var(--line);color:#f6e9b8}
   @media (max-width:720px){ .row>div{flex:1 1 100%;min-width:unset} }
+
+  /* Tabela Totais (tema escuro) */
+  .tot-wrap h4{margin:10px 0 6px;color:var(--tbl-text)}
+  table.tot{width:100%;border-collapse:separate;border-spacing:0 6px;color:var(--tbl-text)}
+  .tot th{background:var(--tbl-head);border:1px solid var(--tbl-border);padding:10px 12px;text-align:left}
+  .tot td{background:var(--tbl-row);border:1px solid var(--tbl-border);padding:10px 12px}
+  .tot tr:nth-child(even) td{background:var(--tbl-row-alt)}
+  .tot .muted{color:var(--tbl-muted)}
 
   /* Impressão A4 */
   @page{size:A4;margin:14mm}
@@ -166,7 +182,7 @@
 
     <div id="totalsPanel" class="panel" style="display:none">
       <h3 style="margin:0 0 10px">Totais por policial (últimos 7 dias)</h3>
-      <div id="totalsContent"></div>
+      <div id="totalsContent" class="tot-wrap"></div>
       <div style="margin-top:10px;display:flex;gap:8px">
         <button class="btn btn-sec" id="exportCsvBtn" type="button">Exportar CSV</button>
         <button class="btn btn-sec" type="button" onclick="document.getElementById('totalsPanel').style.display='none'">Fechar</button>
@@ -174,7 +190,7 @@
     </div>
   </div>
 
-  <!-- FOLHA A4 (também com Abordados acima de Ilícitos) -->
+  <!-- FOLHA A4 (Abordados acima de Ilícitos) -->
   <div id="sheet">
     <div class="doc-header">
       <div class="doc-mark" aria-hidden="true"></div>
@@ -384,7 +400,7 @@
       const { error } = await supa.from('rso_items').insert(rows);
       if(error){ console.error(error); alert('Falha ao salvar no Supabase. Veja o console.'); return; }
       btn.textContent = 'Salvo!';
-      lastSavedIllicitHash = hash(lines); // marca como salvo
+      lastSavedIllicitHash = (function hash(str){ let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; } return String(h);} )(lines);
     }catch(e){
       console.error(e); alert('Falha de rede/JS. Veja o console.');
     }finally{
@@ -420,11 +436,11 @@
     }
     let html = '';
     Object.keys(agg).sort().forEach(off=>{
-      html += `<h4 style="margin:10px 0 6px">${esc(off)}</h4>`;
-      html += `<table class="tot" style="width:100%;border-collapse:separate;border-spacing:0 6px"><thead><tr><th style="text-align:left;border:1px solid #d2dae6;padding:10px 12px;background:#f3f6fb">Item</th><th style="text-align:left;border:1px solid #d2dae6;padding:10px 12px;background:#f3f6fb">Quantidade</th></tr></thead><tbody>`;
+      html += `<h4>${esc(off)}</h4>`;
+      html += `<table class="tot"><thead><tr><th>Item</th><th>Quantidade</th></tr></thead><tbody>`;
       const items = agg[off];
       Object.keys(items).sort().forEach(it=>{
-        html += `<tr><td style="border:1px solid #d2dae6;padding:10px 12px">${esc(it)}</td><td style="border:1px solid #d2dae6;padding:10px 12px">${items[it]}</td></tr>`;
+        html += `<tr><td>${esc(it)}</td><td>${items[it]}</td></tr>`;
       });
       html += `</tbody></table>`;
     });
@@ -469,7 +485,7 @@
 
     // Alerta inteligente no imprimir
     $('printBtn').addEventListener('click', ()=>{
-      const currentHash = hash(getIllicitText());
+      const currentHash = (function hash(str){ let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; } return String(h);} )(getIllicitText());
       if(currentHash !== lastSavedIllicitHash){
         const goOn = confirm('⚠️ Ilícitos parecem NÃO estar salvos.\nClique em “OK” para imprimir mesmo assim, ou “Cancelar” para voltar e salvar.');
         if(!goOn) return;
