@@ -12,9 +12,10 @@
     --text:#e6e9ee;
     --line:#262e3a;
     --brand:#c9a227;
-    --brand-2:#c62828;
     --btn:#c9a227;
     --btnH:#a8881f;
+    --btnDanger:#c62828;
+    --btnDangerH:#a02020;
     --field:#0c1015;
     --chip:#131a22;
     --chipH:#18212c;
@@ -51,10 +52,11 @@
   .pill{border:1px dashed var(--line);border-radius:12px;padding:10px 12px;text-align:center;cursor:pointer;color:#efe6c4;background:var(--chip);font-weight:800}
   .pill:hover{background:var(--chipH)}
   .muted{color:var(--muted);font-size:.85rem}
-  .btn{background:var(--btn);color:#1a1a1a;border:none;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer}
+  .btn{display:block;width:100%;text-align:center;background:var(--btn);color:#1a1a1a;border:none;border-radius:12px;padding:14px;font-weight:900;cursor:pointer;margin:6px 0}
   .btn:hover{background:var(--btnH)}
+  .btn-danger{background:var(--btnDanger);color:#fff}
+  .btn-danger:hover{background:var(--btnDangerH)}
   .btn-sec{background:var(--chip);border:1px solid var(--line);color:#f6e9b8}
-  .flag{display:inline-block;font-size:.78rem;font-weight:900;background:rgba(198,40,40,.12);border:1px solid rgba(198,40,40,.35);color:#ffb4b4;border-radius:999px;padding:6px 10px}
   @media (max-width:720px){ .row>div{flex:1 1 100%;min-width:unset} }
 
   /* Impressão A4 */
@@ -69,7 +71,7 @@
   .doc-mark{
     width:48px;height:48px;border-radius:8px;display:grid;place-items:center;
     background:linear-gradient(145deg,#1b222d,#0e141b);
-    border:1px solid #c9d4e8;color:#d4b64c;font-weight:900;font-size:22px;
+    border:1px solid #c9d4e8;color:#d4b64c;font-weight:900;font-size:22px
   }
   .doc-mark::before{content:"⚡"}
   .doc-title{font-weight:900;font-size:20px;color:#0d2a5c;margin:0 0 2px;text-align:center}
@@ -80,126 +82,124 @@
   .footer-rule{height:1px;background:#ccd6e4;margin:12px 0 8px}
   .doc-footer{display:flex;justify-content:space-between;font-size:11px;color:#506079}
 </style>
-
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-  <div class="wrap">
-    <div class="brand">
-      <div class="mark" aria-hidden="true"></div>
-      <div>
-        <h1><span class="accent">ROTA</span> • Relatório de Serviço Operacional</h1>
-        <p class="subtitle">Batalhão de Polícia de Choque — Rondas Ostensivas Tobias de Aguiar</p>
-      </div>
-    </div>
-
-    <!-- FORM -->
-    <div id="form-area">
-      <div class="panel">
-        <div class="row">
-          <div><label>Data/Hora</label><input id="datahora" type="datetime-local"></div>
-          <div><label>Rota</label><input id="rota" placeholder="91136"></div>
-        </div>
-        <div class="muted" style="margin-top:8px">Identificador numérico descontinuado <span class="flag">Nº RSO removido</span></div>
-      </div>
-
-      <div class="panel">
-        <div class="row">
-          <div><label>Motorista (Nome)</label><select id="motorista_sel"></select></div>
-          <div><label>Motorista (Patente)</label><select id="motorista_rank"></select></div>
-        </div>
-        <div class="row">
-          <div><label>Encarregado (Nome)</label><select id="encarregado_sel"></select></div>
-          <div><label>Encarregado (Patente)</label><select id="encarregado_rank"></select></div>
-        </div>
-        <div class="row">
-          <div><label>Segurança (Nome)</label><select id="seguranca_sel"></select></div>
-          <div><label>Segurança (Patente)</label><select id="seguranca_rank"></select></div>
-        </div>
-        <div class="row">
-          <div><label>Auxiliar (Nome)</label><select id="auxiliares_sel"></select></div>
-          <div><label>Auxiliar (Patente)</label><select id="auxiliares_rank"></select></div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <label>Ilícitos</label>
-        <div id="list-ilicitos" class="list"></div>
-        <div class="pill" onclick="addIlicito()">+ adicionar ilícito</div>
-      </div>
-
-      <div class="panel">
-        <label>Veículos</label>
-        <div id="list-veiculos" class="list"></div>
-        <div class="pill" onclick="addVeiculo()">+ adicionar veículo</div>
-      </div>
-
-      <div class="panel">
-        <label>Ocorrências</label>
-        <div id="list-ocorrencias" class="list"></div>
-        <div class="pill" onclick="addOcorrencia()">+ adicionar ocorrência</div>
-      </div>
-
-      <div class="panel">
-        <label>Abordados</label>
-        <div id="list-abordados" class="list"></div>
-        <div class="pill" onclick="addAbordado()">+ adicionar abordado</div>
-      </div>
-
-      <div class="panel">
-        <div class="row">
-          <div><label>Ocorrências (qtd)</label><input id="res-oc" type="number" min="0" value="0"></div>
-          <div><label>Apoios (qtd)</label><input id="res-ap" type="number" min="0" value="0"></div>
-        </div>
-        <div class="row">
-          <div><label>Ações (qtd)</label><input id="res-ac" type="number" min="0" value="0"></div>
-        </div>
-      </div>
-
-      <div class="panel" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button class="btn" id="saveCloudBtn" type="button">Salvar ilícitos</button>
-        <button class="btn btn-sec" id="totalsBtn" type="button">Totais 7 dias</button>
-        <button class="btn" id="printBtn" type="button">Imprimir / PDF</button>
-      </div>
-
-      <div id="totalsPanel" class="panel" style="display:none">
-        <h3 style="margin:0 0 10px">Totais por policial (últimos 7 dias)</h3>
-        <div id="totalsContent"></div>
-        <div style="margin-top:10px;display:flex;gap:8px">
-          <button class="btn btn-sec" id="exportCsvBtn" type="button">Exportar CSV</button>
-          <button class="btn btn-sec" type="button" onclick="document.getElementById('totalsPanel').style.display='none'">Fechar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- FOLHA A4 IMPRESSÃO -->
-    <div id="sheet">
-      <div class="doc-header">
-        <div class="doc-mark" aria-hidden="true"></div>
-        <div>
-          <h2 class="doc-title">ROTA • Relatório de Serviço Operacional</h2>
-          <p class="doc-sub">Batalhão de Polícia de Choque — Documento gerado automaticamente</p>
-        </div>
-      </div>
-      <hr class="doc-rule">
-      <div class="meta"><span id="meta-data">Data/Hora: —</span><span id="meta-rota">Rota: —</span></div>
-      <div class="section"><h3>EFETIVO</h3>
-        <div class="kv">
-          <b>Motorista:</b><span id="k-motorista">—</span>
-          <b>Encarregado:</b><span id="k-encarregado">—</span>
-          <b>Segurança:</b><span id="k-seguranca">—</span>
-          <b>Auxiliar:</b><span id="k-auxiliares">—</span>
-        </div>
-      </div>
-      <div class="section"><h3>ILÍCITOS</h3><ul class="clean" id="ul-ilicitos"><li>—</li></ul></div>
-      <div class="section"><h3>VEÍCULOS</h3><ul class="clean" id="ul-veiculos"><li>—</li></ul></div>
-      <div class="section"><h3>OCORRÊNCIAS</h3><ul class="clean" id="ul-ocorrencias"><li>—</li></ul></div>
-      <div class="section"><h3>ABORDADOS</h3><ul class="clean" id="ul-abordados"><li>—</li></ul></div>
-      <div class="section"><h3>RESULTADO</h3><ul class="clean" id="ul-resultado"><li>0x Ocorrência.</li><li>0x Apoio.</li><li>0x Ação.</li></ul></div>
-      <hr class="footer-rule"><div class="doc-footer"><div>RSO • ROTA</div><div id="rodape-data">—</div></div>
+<div class="wrap">
+  <div class="brand">
+    <div class="mark" aria-hidden="true"></div>
+    <div>
+      <h1><span class="accent">ROTA</span> • Relatório de Serviço Operacional</h1>
+      <p class="subtitle">Batalhão de Polícia de Choque — Rondas Ostensivas Tobias de Aguiar</p>
     </div>
   </div>
+
+  <div id="form-area">
+    <div class="panel">
+      <div class="row">
+        <div><label>Data/Hora</label><input id="datahora" type="datetime-local"></div>
+        <div><label>Rota</label><input id="rota" placeholder="91136"></div>
+      </div>
+      <div class="muted" style="margin-top:8px">Identificador numérico descontinuado <span class="flag">Nº RSO removido</span></div>
+    </div>
+
+    <div class="panel">
+      <div class="row">
+        <div><label>Motorista (Nome)</label><select id="motorista_sel"></select></div>
+        <div><label>Motorista (Patente)</label><select id="motorista_rank"></select></div>
+      </div>
+      <div class="row">
+        <div><label>Encarregado (Nome)</label><select id="encarregado_sel"></select></div>
+        <div><label>Encarregado (Patente)</label><select id="encarregado_rank"></select></div>
+      </div>
+      <div class="row">
+        <div><label>Segurança (Nome)</label><select id="seguranca_sel"></select></div>
+        <div><label>Segurança (Patente)</label><select id="seguranca_rank"></select></div>
+      </div>
+      <div class="row">
+        <div><label>Auxiliar (Nome)</label><select id="auxiliares_sel"></select></div>
+        <div><label>Auxiliar (Patente)</label><select id="auxiliares_rank"></select></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <label>Ilícitos</label>
+      <div id="list-ilicitos" class="list"></div>
+      <div class="pill" onclick="addIlicito()">+ adicionar ilícito</div>
+    </div>
+
+    <div class="panel">
+      <label>Veículos</label>
+      <div id="list-veiculos" class="list"></div>
+      <div class="pill" onclick="addVeiculo()">+ adicionar veículo</div>
+    </div>
+
+    <div class="panel">
+      <label>Ocorrências</label>
+      <div id="list-ocorrencias" class="list"></div>
+      <div class="pill" onclick="addOcorrencia()">+ adicionar ocorrência</div>
+    </div>
+
+    <div class="panel">
+      <label>Abordados</label>
+      <div id="list-abordados" class="list"></div>
+      <div class="pill" onclick="addAbordado()">+ adicionar abordado</div>
+    </div>
+
+    <div class="panel">
+      <div class="row">
+        <div><label>Ocorrências (qtd)</label><input id="res-oc" type="number" min="0" value="0"></div>
+        <div><label>Apoios (qtd)</label><input id="res-ap" type="number" min="0" value="0"></div>
+      </div>
+      <div class="row">
+        <div><label>Ações (qtd)</label><input id="res-ac" type="number" min="0" value="0"></div>
+      </div>
+    </div>
+
+    <!-- Botões empilhados -->
+    <div class="panel" style="display:flex;flex-direction:column;gap:8px;align-items:stretch">
+      <button class="btn" id="saveCloudBtn" type="button">💾 Salvar ilícitos</button>
+      <button class="btn btn-danger" id="printBtn" type="button">🧾 Imprimir / PDF</button>
+      <button class="btn btn-sec" id="totalsBtn" type="button">Totais 7 dias</button>
+    </div>
+
+    <div id="totalsPanel" class="panel" style="display:none">
+      <h3 style="margin:0 0 10px">Totais por policial (últimos 7 dias)</h3>
+      <div id="totalsContent"></div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn btn-sec" id="exportCsvBtn" type="button">Exportar CSV</button>
+        <button class="btn btn-sec" type="button" onclick="document.getElementById('totalsPanel').style.display='none'">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOLHA A4 -->
+  <div id="sheet">
+    <div class="doc-header">
+      <div class="doc-mark" aria-hidden="true"></div>
+      <div>
+        <h2 class="doc-title">ROTA • Relatório de Serviço Operacional</h2>
+        <p class="doc-sub">Batalhão de Polícia de Choque — Documento gerado automaticamente</p>
+      </div>
+    </div>
+    <hr class="doc-rule">
+    <div class="meta"><span id="meta-data">Data/Hora: —</span><span id="meta-rota">Rota: —</span></div>
+    <div class="section"><h3>EFETIVO</h3>
+      <div class="kv">
+        <b>Motorista:</b><span id="k-motorista">—</span>
+        <b>Encarregado:</b><span id="k-encarregado">—</span>
+        <b>Segurança:</b><span id="k-seguranca">—</span>
+        <b>Auxiliar:</b><span id="k-auxiliares">—</span>
+      </div>
+    </div>
+    <div class="section"><h3>ILÍCITOS</h3><ul class="clean" id="ul-ilicitos"><li>—</li></ul></div>
+    <div class="section"><h3>VEÍCULOS</h3><ul class="clean" id="ul-veiculos"><li>—</li></ul></div>
+    <div class="section"><h3>OCORRÊNCIAS</h3><ul class="clean" id="ul-ocorrencias"><li>—</li></ul></div>
+    <div class="section"><h3>ABORDADOS</h3><ul class="clean" id="ul-abordados"><li>—</li></ul></div>
+    <div class="section"><h3>RESULTADO</h3><ul class="clean" id="ul-resultado"><li>0x Ocorrência.</li><li>0x Apoio.</li><li>0x Ação.</li></ul></div>
+    <hr class="footer-rule"><div class="doc-footer"><div>RSO • ROTA</div><div id="rodape-data">—</div></div>
+  </div>
+</div>
 
 <script>
   const $ = id => document.getElementById(id);
@@ -211,32 +211,37 @@
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlsb253a2d0ZHN6bXBjandsZXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NzQxMDIsImV4cCI6MjA3NTU1MDEwMn0.Cc-BtnHlXaGVCY6T6iXe0QA1tsfc17aX8lswEICvtw0';
   const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // === Estado de “salvo” para alerta inteligente ===
+  let lastSavedIllicitHash = '';
+  const getIllicitText = () =>
+    [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value.trim()).filter(Boolean).join('\n');
+  const hash = str => {
+    // hash simples (djb2)
+    let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; }
+    return String(h);
+  };
+
   // === Ranks & Officers ===
-  let RANKS = [];
-  let OFFICERS = [];
+  let RANKS = [], OFFICERS = [];
   const NAME_SELECTS = ['motorista_sel','encarregado_sel','seguranca_sel','auxiliares_sel'];
   const RANK_SELECTS = ['motorista_rank','encarregado_rank','seguranca_rank','auxiliares_rank'];
 
   async function loadRanks(){
     const { data, error } = await supa.from('ranks').select('id,name,sort_order').order('sort_order',{ascending:true});
     if(error){ console.error(error); alert('Erro ao carregar patentes.'); return; }
-    RANKS = (data||[]);
-    RANK_SELECTS.forEach(fillRankSelect);
-  }
-  function fillRankSelect(id){
-    const sel = $(id);
-    sel.innerHTML = `<option value="">Selecione a patente…</option>` + RANKS.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
+    RANKS = data || [];
+    RANK_SELECTS.forEach(id=>{
+      $(id).innerHTML = `<option value="">Selecione a patente…</option>` + RANKS.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
+    });
   }
 
   async function loadOfficers(){
     const { data, error } = await supa.from('officers').select('id,name,current_rank_id').eq('active',true).order('name');
     if(error){ console.error(error); alert('Erro ao carregar policiais.'); return; }
-    OFFICERS = (data||[]);
-    NAME_SELECTS.forEach(fillOfficerSelect);
-  }
-  function fillOfficerSelect(id){
-    const sel = $(id);
-    sel.innerHTML = `<option value="">Selecione…</option>` + OFFICERS.map(o=>`<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');
+    OFFICERS = data || [];
+    NAME_SELECTS.forEach(id=>{
+      $(id).innerHTML = `<option value="">Selecione…</option>` + OFFICERS.map(o=>`<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');
+    });
   }
 
   function linkNameToRank(){
@@ -249,29 +254,6 @@
       });
     });
   }
-
-  // Inicialização
-  (async function init(){
-    await loadRanks();
-    await loadOfficers();
-    linkNameToRank();
-
-    // data/hora default
-    const d=new Date(), z=n=>String(n).padStart(2,'0');
-    $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
-
-    // listas default
-    if(!$('list-ilicitos').children.length) addIlicito();
-    if(!$('list-veiculos').children.length) addVeiculo();
-    if(!$('list-ocorrencias').children.length) addOcorrencia();
-    if(!$('list-abordados').children.length) addAbordado();
-
-    // botões
-    $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
-    $('totalsBtn').addEventListener('click', showTotals7d);
-    $('printBtn').addEventListener('click', ()=>{ fillSheet(collect()); window.print(); });
-    window.onbeforeprint = ()=> fillSheet(collect());
-  })();
 
   // ===== Campos dinâmicos =====
   function mkItem(id,v,ph){
@@ -382,7 +364,7 @@
   // ===== Salvar ilícitos (Supabase) =====
   async function saveIllicitsToSupabase(){
     const rota = ($('rota').value || '').trim() || null;
-    const lines = [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value).filter(Boolean).join('\n');
+    const lines = getIllicitText();
     const items = parseIlicitosText(lines);
     const pairs = selectedOfficerAndRankPairs();
 
@@ -405,6 +387,8 @@
       const { error } = await supa.from('rso_items').insert(rows);
       if(error){ console.error(error); alert('Falha ao salvar no Supabase. Veja o console.'); return; }
       btn.textContent = 'Salvo!';
+      // marca como salvo
+      lastSavedIllicitHash = hash(lines);
     }catch(e){
       console.error(e); alert('Falha de rede/JS. Veja o console.');
     }finally{
@@ -466,6 +450,40 @@
     const url  = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href=url; a.download='RSO-totais-7dias.csv'; a.click(); URL.revokeObjectURL(url);
   }
+
+  // ===== Inicialização =====
+  (async function init(){
+    await loadRanks();
+    await loadOfficers();
+    linkNameToRank();
+
+    // data/hora default
+    const d=new Date(), z=n=>String(n).padStart(2,'0');
+    $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
+
+    // listas default
+    if(!$('list-ilicitos').children.length) addIlicito();
+    if(!$('list-veiculos').children.length) addVeiculo();
+    if(!$('list-ocorrencias').children.length) addOcorrencia();
+    if(!$('list-abordados').children.length) addAbordado();
+
+    // eventos
+    $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
+    $('totalsBtn').addEventListener('click', showTotals7d);
+
+    // Alerta inteligente no imprimir
+    $('printBtn').addEventListener('click', ()=>{
+      const currentHash = hash(getIllicitText());
+      if(currentHash !== lastSavedIllicitHash){
+        const goOn = confirm('⚠️ Ilícitos parecem NÃO estar salvos.\nClique em “OK” para imprimir mesmo assim, ou “Cancelar” para voltar e salvar.');
+        if(!goOn) return;
+      }
+      const d=collect(); fillSheet(d); window.print();
+    });
+
+    // Garante folha preenchida ao imprimir
+    window.onbeforeprint = ()=> fillSheet(collect());
+  })();
 </script>
 </body>
 </html>
