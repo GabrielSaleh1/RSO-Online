@@ -122,6 +122,13 @@
       </div>
     </div>
 
+    <!-- Abordados acima de Ilícitos -->
+    <div class="panel">
+      <label>Abordados</label>
+      <div id="list-abordados" class="list"></div>
+      <div class="pill" onclick="addAbordado()">+ adicionar abordado</div>
+    </div>
+
     <div class="panel">
       <label>Ilícitos</label>
       <div id="list-ilicitos" class="list"></div>
@@ -138,12 +145,6 @@
       <label>Ocorrências</label>
       <div id="list-ocorrencias" class="list"></div>
       <div class="pill" onclick="addOcorrencia()">+ adicionar ocorrência</div>
-    </div>
-
-    <div class="panel">
-      <label>Abordados</label>
-      <div id="list-abordados" class="list"></div>
-      <div class="pill" onclick="addAbordado()">+ adicionar abordado</div>
     </div>
 
     <div class="panel">
@@ -173,7 +174,7 @@
     </div>
   </div>
 
-  <!-- FOLHA A4 -->
+  <!-- FOLHA A4 (também com Abordados acima de Ilícitos) -->
   <div id="sheet">
     <div class="doc-header">
       <div class="doc-mark" aria-hidden="true"></div>
@@ -192,10 +193,10 @@
         <b>Auxiliar:</b><span id="k-auxiliares">—</span>
       </div>
     </div>
+    <div class="section"><h3>ABORDADOS</h3><ul class="clean" id="ul-abordados"><li>—</li></ul></div>
     <div class="section"><h3>ILÍCITOS</h3><ul class="clean" id="ul-ilicitos"><li>—</li></ul></div>
     <div class="section"><h3>VEÍCULOS</h3><ul class="clean" id="ul-veiculos"><li>—</li></ul></div>
     <div class="section"><h3>OCORRÊNCIAS</h3><ul class="clean" id="ul-ocorrencias"><li>—</li></ul></div>
-    <div class="section"><h3>ABORDADOS</h3><ul class="clean" id="ul-abordados"><li>—</li></ul></div>
     <div class="section"><h3>RESULTADO</h3><ul class="clean" id="ul-resultado"><li>0x Ocorrência.</li><li>0x Apoio.</li><li>0x Ação.</li></ul></div>
     <hr class="footer-rule"><div class="doc-footer"><div>RSO • ROTA</div><div id="rodape-data">—</div></div>
   </div>
@@ -215,11 +216,7 @@
   let lastSavedIllicitHash = '';
   const getIllicitText = () =>
     [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value.trim()).filter(Boolean).join('\n');
-  const hash = str => {
-    // hash simples (djb2)
-    let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; }
-    return String(h);
-  };
+  const hash = str => { let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; } return String(h); };
 
   // === Ranks & Officers ===
   let RANKS = [], OFFICERS = [];
@@ -315,9 +312,9 @@
       if(!a||!a.length){u.innerHTML='<li>—</li>';return}
       a.forEach(v=>{const li=document.createElement('li'); li.innerHTML=esc(v); u.appendChild(li);});
     };
+    setList('ul-abordados',d.abordados);
     setList('ul-ilicitos',d.ilicitos);
     setList('ul-veiculos',d.veiculos);
-    setList('ul-abordados',d.abordados);
 
     const ulO=$('ul-ocorrencias'); ulO.innerHTML='';
     if(!d.ocorrencias.length){ulO.innerHTML='<li>—</li>';}
@@ -364,7 +361,7 @@
   // ===== Salvar ilícitos (Supabase) =====
   async function saveIllicitsToSupabase(){
     const rota = ($('rota').value || '').trim() || null;
-    const lines = getIllicitText();
+    const lines = [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value).filter(Boolean).join('\n');
     const items = parseIlicitosText(lines);
     const pairs = selectedOfficerAndRankPairs();
 
@@ -387,8 +384,7 @@
       const { error } = await supa.from('rso_items').insert(rows);
       if(error){ console.error(error); alert('Falha ao salvar no Supabase. Veja o console.'); return; }
       btn.textContent = 'Salvo!';
-      // marca como salvo
-      lastSavedIllicitHash = hash(lines);
+      lastSavedIllicitHash = hash(lines); // marca como salvo
     }catch(e){
       console.error(e); alert('Falha de rede/JS. Veja o console.');
     }finally{
@@ -462,10 +458,10 @@
     $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
 
     // listas default
+    if(!$('list-abordados').children.length) addAbordado();
     if(!$('list-ilicitos').children.length) addIlicito();
     if(!$('list-veiculos').children.length) addVeiculo();
     if(!$('list-ocorrencias').children.length) addOcorrencia();
-    if(!$('list-abordados').children.length) addAbordado();
 
     // eventos
     $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
@@ -481,7 +477,7 @@
       const d=collect(); fillSheet(d); window.print();
     });
 
-    // Garante folha preenchida ao imprimir
+    // Preencher antes de imprimir
     window.onbeforeprint = ()=> fillSheet(collect());
   })();
 </script>
