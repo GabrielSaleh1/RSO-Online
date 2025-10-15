@@ -25,7 +25,15 @@
 
   /* Header */
   .brand{display:flex;align-items:center;gap:14px;justify-content:center;margin-bottom:18px}
-  .brand .mark img{width:80px;height:80px;border-radius:14px;border:2px solid var(--brand);background:#111;box-shadow:0 0 18px rgba(201,162,39,.25)}
+  .brand .mark{
+    width:80px;height:80px;border-radius:14px;
+    display:grid;place-items:center;
+    background:linear-gradient(145deg,#1b222d,#0e141b);
+    border:2px solid var(--brand);
+    box-shadow:0 0 18px rgba(201,162,39,.25);
+    font-size:40px;color:var(--brand);font-weight:900;
+  }
+  .brand .mark::before{content:"⚡"}
   h1{margin:0;text-align:center;font-weight:900;letter-spacing:.2px;font-size:1.7rem}
   h1 .accent{color:var(--brand)}
   .subtitle{margin:6px 0 0;text-align:center;color:var(--muted);font-size:.95rem}
@@ -58,7 +66,12 @@
   }
   #sheet{display:none;background:#fff;color:#0b0b0b;border:1px solid #bfc8d6;border-radius:8px;padding:14mm;width:100%;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif}
   .doc-header{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:8px}
-  .doc-mark img{width:48px;height:48px;border-radius:8px;border:1px solid #c9d4e8}
+  .doc-mark{
+    width:48px;height:48px;border-radius:8px;display:grid;place-items:center;
+    background:linear-gradient(145deg,#1b222d,#0e141b);
+    border:1px solid #c9d4e8;color:#d4b64c;font-weight:900;font-size:22px;
+  }
+  .doc-mark::before{content:"⚡"}
   .doc-title{font-weight:900;font-size:20px;color:#0d2a5c;margin:0 0 2px;text-align:center}
   .doc-sub{font-size:12px;color:#3b4a63;margin:0;text-align:center}
   .doc-rule{height:1px;background:linear-gradient(90deg,#ccd6e4 0,#d4b64c 40%,#ccd6e4 100%);margin:10px 0 14px;border:none}
@@ -74,10 +87,7 @@
 <body>
   <div class="wrap">
     <div class="brand">
-      <div class="mark">
-        <!-- Se esta imagem não carregar no GitHub Pages, me avise que eu incorporo via Base64 -->
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/Bras%C3%A3o_da_ROTA.svg" alt="Brasão da ROTA">
-      </div>
+      <div class="mark" aria-hidden="true"></div>
       <div>
         <h1><span class="accent">ROTA</span> • Relatório de Serviço Operacional</h1>
         <p class="subtitle">Batalhão de Polícia de Choque — Rondas Ostensivas Tobias de Aguiar</p>
@@ -166,7 +176,7 @@
     <!-- FOLHA A4 IMPRESSÃO -->
     <div id="sheet">
       <div class="doc-header">
-        <div class="doc-mark"><img src="https://upload.wikimedia.org/wikipedia/commons/0/00/Bras%C3%A3o_da_ROTA.svg" alt="Brasão da ROTA"></div>
+        <div class="doc-mark" aria-hidden="true"></div>
         <div>
           <h2 class="doc-title">ROTA • Relatório de Serviço Operacional</h2>
           <p class="doc-sub">Batalhão de Polícia de Choque — Documento gerado automaticamente</p>
@@ -210,7 +220,7 @@
   async function loadRanks(){
     const { data, error } = await supa.from('ranks').select('id,name,sort_order').order('sort_order',{ascending:true});
     if(error){ console.error(error); alert('Erro ao carregar patentes.'); return; }
-    RANKS = data || [];
+    RANKS = (data||[]);
     RANK_SELECTS.forEach(fillRankSelect);
   }
   function fillRankSelect(id){
@@ -221,7 +231,7 @@
   async function loadOfficers(){
     const { data, error } = await supa.from('officers').select('id,name,current_rank_id').eq('active',true).order('name');
     if(error){ console.error(error); alert('Erro ao carregar policiais.'); return; }
-    OFFICERS = data || [];
+    OFFICERS = (data||[]);
     NAME_SELECTS.forEach(fillOfficerSelect);
   }
   function fillOfficerSelect(id){
