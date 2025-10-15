@@ -112,7 +112,6 @@
       <label>Abordados</label>
       <div id="list-abordados" class="list"></div>
       <div class="pill" onclick="addAbordado()">+ adicionar abordado</div>
-      <div class="muted">Preencha: <b>Nome</b> — <b>CPF/ID</b> — <b>Situação</b> (ex.: BOPM — Cb Ducati 20:40)</div>
     </div>
 
     <!-- ILÍCITOS (livre) -->
@@ -127,7 +126,6 @@
       <label>Veículos</label>
       <div id="list-veiculos" class="list"></div>
       <div class="pill" onclick="addVeiculo()">+ adicionar veículo</div>
-      <div class="muted">Preencha: <b>Modelo</b> — <b>Cor</b> — <b>Emplacamento</b> — <b>Situação</b></div>
     </div>
 
     <div class="panel">
@@ -258,7 +256,7 @@
         <input placeholder="Modelo do veículo" value="${esc(modelo)}">
         <input placeholder="Cor" value="${esc(cor)}">
         <input placeholder="Emplacamento" value="${esc(placa)}">
-        <input placeholder="Situação" value="${esc(sit)}">
+        <input placeholder="Situação (ex.: Apreendido)" value="${esc(sit)}">
       </div>
       <button class="btn btn-sec" type="button">remover</button>`;
     w.querySelector('button').onclick=()=>w.remove();
