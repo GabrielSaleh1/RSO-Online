@@ -3,139 +3,105 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RSO Online</title>
+<title>RSO • ROTA</title>
 <style>
-  :root{ --bg:#0f172a; --panel:#111827; --muted:#9ca3af; --text:#e5e7eb; --line:#2a3647; --brand:#4f9cf9; --btn:#2563eb; --btnH:#1e40af; --field:#0b1220; }
+  :root{
+    --bg:#0b0d10;
+    --panel:#0f1318;
+    --muted:#a7adb7;
+    --text:#e6e9ee;
+    --line:#262e3a;
+    --brand:#c9a227;
+    --brand-2:#c62828;
+    --btn:#c9a227;
+    --btnH:#a8881f;
+    --field:#0c1015;
+    --chip:#131a22;
+    --chipH:#18212c;
+  }
+  *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
-  .wrap{max-width:980px;margin:24px auto;padding:0 16px}
-  h1{margin:0 0 16px;text-align:center;color:var(--brand);font-weight:800;letter-spacing:.3px}
-  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+  .wrap{max-width:1000px;margin:28px auto;padding:0 16px}
+  .brand{display:flex;align-items:center;gap:14px;justify-content:center;margin-bottom:18px}
+  .brand .mark img{width:80px;height:80px;border-radius:14px;border:2px solid var(--brand);background:#111;box-shadow:0 0 18px rgba(201,162,39,.25)}
+  h1{margin:0;text-align:center;font-weight:900;letter-spacing:.2px;font-size:1.7rem}
+  h1 .accent{color:var(--brand)}
+  .subtitle{margin:6px 0 0;text-align:center;color:var(--muted);font-size:.95rem}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 10px 26px rgba(0,0,0,.32)}
   .row{display:flex;flex-wrap:wrap;gap:12px}
   .row>div{flex:1 1 260px;min-width:220px}
   label{display:block;font-weight:700;font-size:.92rem;margin:6px 0}
-  input,textarea,select{width:100%;box-sizing:border-box;background:var(--field);border:1px solid var(--line);color:var(--text);padding:10px 12px;border-radius:10px;display:block}
+  input,textarea,select{width:100%;background:var(--field);border:1px solid var(--line);color:var(--text);padding:11px 12px;border-radius:12px}
   textarea{min-height:72px;resize:vertical}
-  .list{display:grid;gap:10px}
-  .item,.item-2{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .item-2 input[type="time"]{width:100px}
-  .item button,.item-2 button{flex-shrink:0;padding:8px 12px;height:auto;align-self:center}
-  .pill{border:1px dashed var(--line);border-radius:10px;padding:8px 12px;text-align:center;cursor:pointer;color:#bcd3ff;background:#0c1422;font-weight:700}
-  .pill:hover{background:#0e1829}
+  .pill{border:1px dashed var(--line);border-radius:12px;padding:10px 12px;text-align:center;cursor:pointer;color:#efe6c4;background:var(--chip);font-weight:800}
+  .pill:hover{background:var(--chipH)}
   .muted{color:var(--muted);font-size:.85rem}
-  .btn{background:var(--btn);color:#fff;border:none;border-radius:10px;padding:12px 16px;font-weight:800;cursor:pointer}
+  .btn{background:var(--btn);color:#1a1a1a;border:none;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer}
   .btn:hover{background:var(--btnH)}
-  .btn-sec{background:#0c1422;border:1px solid var(--line);color:#cfe0ff}
+  .btn-sec{background:var(--chip);border:1px solid var(--line);color:#f6e9b8}
+  .flag{display:inline-block;font-size:.78rem;font-weight:900;background:rgba(198,40,40,.12);border:1px solid rgba(198,40,40,.35);color:#ffb4b4;border-radius:999px;padding:6px 10px}
   @media (max-width:720px){ .row>div{flex:1 1 100%;min-width:unset} }
-
-  /* Impressão A4 */
   @page{size:A4;margin:14mm}
   @media print{
     body{background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     #form-area{display:none!important}
     #sheet{display:block!important}
   }
-  #sheet{display:none;background:#fff;color:#0b0b0b;border:1px solid #bfc8d6;border-radius:6px;box-sizing:border-box;padding:14mm;width:100%;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif}
-  .doc-header{text-align:center;margin-bottom:10px}
-  .doc-title{font-weight:900;font-size:22px;color:#0d2a5c;margin:0 0 4px}
-  .doc-sub{font-size:12px;color:#3b4a63;margin:0}
-  .doc-rule{height:1px;background:linear-gradient(90deg,#ccd6e4 0,#8aa7ff 40%,#ccd6e4 100%);margin:10px 0 14px;border:none}
-  .meta{display:flex;justify-content:space-between;gap:12px;font-weight:700;margin-bottom:8px}
-  .meta span{white-space:nowrap}
-  .section{margin:10px 0 12px}
-  .section h3{font-size:14px;margin:0 0 8px;color:#0d2a5c;font-weight:900;letter-spacing:.3px}
-  .kv{display:grid;grid-template-columns:140px 1fr;gap:4px 12px;font-size:13px}
-  .kv b{color:#22324d}
-  ul.clean{margin:0;padding-left:16px;font-size:13px}
-  .footer-rule{height:1px;background:#ccd6e4;margin:12px 0 8px}
-  .doc-footer{display:flex;justify-content:space-between;font-size:11px;color:#506079}
-  table.tot{width:100%;border-collapse:separate;border-spacing:0 6px}
-  table.tot th,table.tot td{padding:10px 12px;border:1px solid var(--line)}
-  table.tot th{background:#0c1422;text-align:left}
+  #sheet{display:none;background:#fff;color:#0b0b0b;border:1px solid #bfc8d6;border-radius:8px;padding:14mm;width:100%;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  .doc-header{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:8px}
+  .doc-mark img{width:48px;height:48px;border-radius:8px;border:1px solid #c9d4e8}
+  .doc-title{font-weight:900;font-size:20px;color:#0d2a5c;margin:0 0 2px;text-align:center}
+  .doc-sub{font-size:12px;color:#3b4a63;margin:0;text-align:center}
+  .doc-rule{height:1px;background:linear-gradient(90deg,#ccd6e4 0,#d4b64c 40%,#ccd6e4 100%);margin:10px 0 14px;border:none}
 </style>
 
-<!-- Supabase JS v2 (CDN) -->
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <div class="wrap">
-    <h1>Relatório de Serviço Operacional</h1>
+    <div class="brand">
+      <div class="mark">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/00/Bras%C3%A3o_da_ROTA.svg" alt="Brasão da ROTA">
+      </div>
+      <div>
+        <h1><span class="accent">ROTA</span> • Relatório de Serviço Operacional</h1>
+        <p class="subtitle">Batalhão de Polícia de Choque — Rondas Ostensivas Tobias de Aguiar</p>
+      </div>
+    </div>
 
-    <!-- FORM -->
     <div id="form-area">
       <div class="panel">
         <div class="row">
-          <div><label>Nº do RSO</label><input id="numero" placeholder="0169"></div>
           <div><label>Data/Hora</label><input id="datahora" type="datetime-local"></div>
+          <div><label>Rota</label><input id="rota" placeholder="91136"></div>
         </div>
-        <div class="row"><div><label>Rota</label><input id="rota" placeholder="91136"></div></div>
+        <div class="muted" style="margin-top:8px">Identificador numérico descontinuado <span class="flag">Nº RSO removido</span></div>
       </div>
 
       <div class="panel">
         <div class="row">
-          <div>
-            <label>Motorista (Nome)</label>
-            <select id="motorista_sel"></select>
-          </div>
-          <div>
-            <label>Motorista (Patente)</label>
-            <select id="motorista_rank"></select>
-          </div>
+          <div><label>Motorista</label><select id="motorista_sel"></select></div>
+          <div><label>Patente</label><select id="motorista_rank"></select></div>
         </div>
         <div class="row">
-          <div>
-            <label>Encarregado (Nome)</label>
-            <select id="encarregado_sel"></select>
-          </div>
-          <div>
-            <label>Encarregado (Patente)</label>
-            <select id="encarregado_rank"></select>
-          </div>
+          <div><label>Encarregado</label><select id="encarregado_sel"></select></div>
+          <div><label>Patente</label><select id="encarregado_rank"></select></div>
         </div>
         <div class="row">
-          <div>
-            <label>Segurança (Nome)</label>
-            <select id="seguranca_sel"></select>
-          </div>
-          <div>
-            <label>Segurança (Patente)</label>
-            <select id="seguranca_rank"></select>
-          </div>
+          <div><label>Segurança</label><select id="seguranca_sel"></select></div>
+          <div><label>Patente</label><select id="seguranca_rank"></select></div>
         </div>
         <div class="row">
-          <div>
-            <label>Auxiliar (Nome)</label>
-            <select id="auxiliares_sel"></select>
-          </div>
-          <div>
-            <label>Auxiliar (Patente)</label>
-            <select id="auxiliares_rank"></select>
-          </div>
+          <div><label>Auxiliar</label><select id="auxiliares_sel"></select></div>
+          <div><label>Patente</label><select id="auxiliares_rank"></select></div>
         </div>
       </div>
 
-      <div class="panel">
-        <label>Ilícitos</label>
-        <div id="list-ilicitos" class="list"></div>
-        <div class="pill" onclick="addIlicito()">+ adicionar ilícito</div>
-      </div>
-
-      <div class="panel">
-        <label>Veículos</label>
-        <div id="list-veiculos" class="list"></div>
-        <div class="pill" onclick="addVeiculo()">+ adicionar veículo</div>
-      </div>
-
-      <div class="panel">
-        <label>Ocorrências</label>
-        <div id="list-ocorrencias" class="list"></div>
-        <div class="pill" onclick="addOcorrencia()">+ adicionar ocorrência</div>
-      </div>
-
-      <div class="panel">
-        <label>Abordados</label>
-        <div id="list-abordados" class="list"></div>
-        <div class="pill" onclick="addAbordado()">+ adicionar abordado</div>
-      </div>
+      <div class="panel"><label>Ilícitos</label><div id="list-ilicitos" class="list"></div><div class="pill" onclick="addIlicito()">+ adicionar ilícito</div></div>
+      <div class="panel"><label>Veículos</label><div id="list-veiculos" class="list"></div><div class="pill" onclick="addVeiculo()">+ adicionar veículo</div></div>
+      <div class="panel"><label>Ocorrências</label><div id="list-ocorrencias" class="list"></div><div class="pill" onclick="addOcorrencia()">+ adicionar ocorrência</div></div>
+      <div class="panel"><label>Abordados</label><div id="list-abordados" class="list"></div><div class="pill" onclick="addAbordado()">+ adicionar abordado</div></div>
 
       <div class="panel">
         <div class="row">
@@ -163,15 +129,16 @@
       </div>
     </div>
 
-    <!-- FOLHA A4 PARA IMPRESSÃO -->
     <div id="sheet">
       <div class="doc-header">
-        <h2 class="doc-title">Relatório de Serviço Operacional</h2>
-        <p class="doc-sub">Documento gerado automaticamente</p>
+        <div class="doc-mark"><img src="https://upload.wikimedia.org/wikipedia/commons/0/00/Bras%C3%A3o_da_ROTA.svg" alt="Brasão da ROTA"></div>
+        <div>
+          <h2 class="doc-title">ROTA • Relatório de Serviço Operacional</h2>
+          <p class="doc-sub">Batalhão de Polícia de Choque — Documento gerado automaticamente</p>
+        </div>
       </div>
       <hr class="doc-rule">
-      <div class="meta"><span id="meta-numero">Nº: —</span><span id="meta-data">Data/Hora: —</span></div>
-      <div class="section"><h3>ROTA</h3><div id="rota-out" style="font-size:13px">—</div></div>
+      <div class="meta"><span id="meta-data">Data/Hora: —</span><span id="meta-rota">Rota: —</span></div>
       <div class="section"><h3>EFETIVO</h3>
         <div class="kv">
           <b>Motorista:</b><span id="k-motorista">—</span>
@@ -185,23 +152,22 @@
       <div class="section"><h3>OCORRÊNCIAS</h3><ul class="clean" id="ul-ocorrencias"><li>—</li></ul></div>
       <div class="section"><h3>ABORDADOS</h3><ul class="clean" id="ul-abordados"><li>—</li></ul></div>
       <div class="section"><h3>RESULTADO</h3><ul class="clean" id="ul-resultado"><li>0x Ocorrência.</li><li>0x Apoio.</li><li>0x Ação.</li></ul></div>
-      <hr class="footer-rule"><div class="doc-footer"><div>RSO Online</div><div id="rodape-data">—</div></div>
+      <hr class="footer-rule"><div class="doc-footer"><div>RSO • ROTA</div><div id="rodape-data">—</div></div>
     </div>
   </div>
 
 <script>
-  const $ = id => document.getElementById(id);
-  const pad2 = n => String(n).padStart(2,'0');
-  const esc = s => (s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
-
-  /* ===== Supabase (sua URL e anon key) ===== */
+  // === Supabase Config ===
   const SUPABASE_URL = 'https://ilonwkgtdszmpcjwlezc.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlsb253a2d0ZHN6bXBjandsZXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NzQxMDIsImV4cCI6MjA3NTU1MDEwMn0.Cc-BtnHlXaGVCY6T6iXe0QA1tsfc17aX8lswEICvtw0';
   const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // ===== Roster & Ranks =====
-  let RANKS = [];           // [{id,name,sort_order}]
-  let OFFICERS = [];        // [{id,name,current_rank_id}]
+  const $ = id => document.getElementById(id);
+  const pad2 = n => String(n).padStart(2,'0');
+  const esc = s => (s||'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
+
+  let RANKS = [];
+  let OFFICERS = [];
   const NAME_SELECTS = ['motorista_sel','encarregado_sel','seguranca_sel','auxiliares_sel'];
   const RANK_SELECTS = ['motorista_rank','encarregado_rank','seguranca_rank','auxiliares_rank'];
 
@@ -213,7 +179,7 @@
   }
   function fillRankSelect(id){
     const sel = $(id);
-    sel.innerHTML = `<option value="">Selecione a patente…</option>` + RANKS.map(r => `<option value="${r.id}">${esc(r.name)}</option>`).join('');
+    sel.innerHTML = `<option value=\"\">Selecione a patente…</option>` + RANKS.map(r => `<option value=\"${r.id}\">${esc(r.name)}</option>`).join('');
   }
 
   async function loadOfficers(){
@@ -224,12 +190,9 @@
   }
   function fillOfficerSelect(id){
     const sel = $(id);
-    sel.innerHTML =
-      `<option value="">Selecione…</option>` +
-      OFFICERS.map(o => `<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');
+    sel.innerHTML = `<option value=\"\">Selecione…</option>` + OFFICERS.map(o => `<option value=\"${esc(o.id)}\">${esc(o.name)}</option>`).join('');
   }
 
-  // Ao trocar o nome, auto-preenche a patente com a "current_rank_id" do officer (sem opção de adicionar)
   function linkNameToRank(){
     NAME_SELECTS.forEach((nameId, idx) => {
       const rankId = RANK_SELECTS[idx];
@@ -241,208 +204,27 @@
     });
   }
 
-  // Início: carrega listas
   (async function initRoster(){
     await loadRanks();
     await loadOfficers();
     linkNameToRank();
   })();
 
-  // data/hora default
   (function(){
     const d=new Date(), z=n=>String(n).padStart(2,'0');
     $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
   })();
 
-  // campos dinâmicos
+  function mkItem(id,v,ph){const w=document.createElement('div');w.className='item';w.innerHTML=`<input placeholder=\"${ph}\" value=\"${v}\"><button class=\"btn btn-sec\" type=\"button\">remover</button>`;w.querySelector('button').onclick=()=>w.remove();$(id).appendChild(w);}
   function addIlicito(v=''){mkItem('list-ilicitos',v,'ex.: 02x Maconha');}
-  function addVeiculo(v=''){mkItem('list-veiculos',v,'ex.: BMW R1250 HP - Branca - 57URU265 - Apreendida');}
-  function addAbordado(v=''){mkItem('list-abordados',v,'ex.: Renato Cruz – 4910 – BOPM – Cb Ducati 20:14');}
-  function addOcorrencia(h='',t=''){const w=document.createElement('div');w.className='item-2';
-    w.innerHTML=`<input type="time" value="${h}"><input placeholder="Descreva a ocorrência" value="${t}"><button class="btn btn-sec" type="button">remover</button>`;
-    w.querySelector('button').onclick=()=>w.remove();$('list-ocorrencias').appendChild(w);}
-  function mkItem(id,v,ph){const w=document.createElement('div');w.className='item';
-    w.innerHTML=`<input placeholder="${ph}" value="${v}"><button class="btn btn-sec" type="button">remover</button>`;
-    w.querySelector('button').onclick=()=>w.remove();$(id).appendChild(w);}
+  function addVeiculo(v=''){mkItem('list-veiculos',v,'ex.: BMW R1250 HP - Branca - 57URU265');}
+  function addAbordado(v=''){mkItem('list-abordados',v,'ex.: Renato Cruz – 4910 – BOPM – Cb Ducati');}
+  function addOcorrencia(h='',t=''){const w=document.createElement('div');w.className='item-2';w.innerHTML=`<input type=\"time\" value=\"${h}\"><input placeholder=\"Descreva a ocorrência\" value=\"${t}\"><button class=\"btn btn-sec\" type=\"button\">remover</button>`;w.querySelector('button').onclick=()=>w.remove();$('list-ocorrencias').appendChild(w);}
   if(!$('list-ilicitos').children.length) addIlicito();
   if(!$('list-veiculos').children.length) addVeiculo();
   if(!$('list-ocorrencias').children.length) addOcorrencia();
   if(!$('list-abordados').children.length) addAbordado();
 
-  // coleta para impressão
   function collect(){
     const L=id=>[...$(id).querySelectorAll('input')].map(i=>i.value).filter(Boolean);
-    const O=[...$('list-ocorrencias').children].map(d=>{const [h,t]=d.querySelectorAll('input');return{h:h.value,t:t.value}}).filter(o=>o.t);
-
-    const officerById = id => OFFICERS.find(o => o.id === id)?.name || '';
-    const rankById = id => RANKS.find(r => String(r.id) === String(id))?.name || '';
-    const mName = officerById($('motorista_sel').value);
-    const eName = officerById($('encarregado_sel').value);
-    const sName = officerById($('seguranca_sel').value);
-    const aName = officerById($('auxiliares_sel').value);
-    const mRank = rankById($('motorista_rank').value);
-    const eRank = rankById($('encarregado_rank').value);
-    const sRank = rankById($('seguranca_rank').value);
-    const aRank = rankById($('auxiliares_rank').value);
-
-    return{
-      numero:$('numero').value,datahora:$('datahora').value,rota:$('rota').value,
-      motorista: mRank && mName ? `${mRank} ${mName}` : (mName || ''),
-      encarregado: eRank && eName ? `${eRank} ${eName}` : (eName || ''),
-      seguranca: sRank && sName ? `${sRank} ${sName}` : (sName || ''),
-      auxiliares: aRank && aName ? `${aRank} ${aName}` : (aName || ''),
-      ilicitos:L('list-ilicitos'),veiculos:L('list-veiculos'),
-      ocorrencias:O,abordados:L('list-abordados'),
-      resOc:+($('res-oc').value||0),resAp:+($('res-ap').value||0),resAc:+($('res-ac').value||0),
-
-      _ids: {
-        motorista: $('motorista_sel').value, encarregado: $('encarregado_sel').value,
-        seguranca: $('seguranca_sel').value, auxiliares: $('auxiliares_sel').value
-      },
-      _rank_ids: {
-        motorista: $('motorista_rank').value, encarregado: $('encarregado_rank').value,
-        seguranca: $('seguranca_rank').value, auxiliares: $('auxiliares_rank').value
-      }
-    };
-  }
-
-  // PDF preenchido
-  function fillSheet(d){
-    const dt=d.datahora?new Date(d.datahora):new Date();
-    const dd=`${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
-    $('meta-numero').textContent=`Nº: ${d.numero||'—'}`; $('meta-data').textContent=`Data/Hora: ${dd}`;
-    $('rota-out').textContent=d.rota||'—';
-    $('k-motorista').textContent=d.motorista||'—';
-    $('k-encarregado').textContent=d.encarregado||'—';
-    $('k-seguranca').textContent=d.seguranca||'—';
-    $('k-auxiliares').textContent=d.auxiliares||'—';
-    const setList=(id,a)=>{const u=$(id);u.innerHTML=''; if(!a||!a.length){u.innerHTML='<li>—</li>';return} a.forEach(v=>{const li=document.createElement('li'); li.innerHTML=esc(v); u.appendChild(li);});};
-    setList('ul-ilicitos',d.ilicitos); setList('ul-veiculos',d.veiculos); setList('ul-abordados',d.abordados);
-    const ulO=$('ul-ocorrencias'); ulO.innerHTML=''; if(!d.ocorrencias.length){ulO.innerHTML='<li>—</li>';} else { d.ocorrencias.sort((a,b)=>(a.h||'').localeCompare(b.h||'')).forEach(o=>{ const li=document.createElement('li'); li.innerHTML=esc(o.h?`ÀS ${o.h}: ${o.t}`:o.t); ulO.appendChild(li); }); }
-    $('ul-resultado').innerHTML=`<li>${d.resOc}x Ocorrência.</li><li>${d.resAp}x Apoio.</li><li>${d.resAc}x Ação.</li>`;
-    const now=new Date(); $('rodape-data').textContent=`Emitido em ${pad2(now.getDate())}/${pad2(now.getMonth()+1)}/${now.getFullYear()} ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
-  }
-  $('printBtn').addEventListener('click',()=>{fillSheet(collect());window.print();});
-  window.onbeforeprint=()=>fillSheet(collect());
-
-  /* ===== Parser de ilícitos ===== */
-  function parseIlicitosText(multiline){
-    const parts = (multiline||'').split(/\n|,|;/).map(s=>s.trim()).filter(Boolean);
-    const out=[];
-    for(const p of parts){
-      let m = p.match(/^(\d+)\s*[x×]?\s*(.+)$/i) || p.match(/^(\d+)\s+(.+)$/i);
-      if(m){ out.push({item:m[2].trim().toLowerCase(), qty:parseInt(m[1],10)}); continue; }
-      const m2 = p.match(/(\d+)/);
-      if(m2){ out.push({item:p.replace(m2[0],'').trim().toLowerCase()||'desconhecido', qty:parseInt(m2[1],10)}); }
-      else{ out.push({item:p.toLowerCase(), qty:1}); }
-    }
-    return out;
-  }
-
-  /* ==== Monta lista de {nome + patente} ==== */
-  function selectedOfficerAndRankPairs(){
-    const pairs = [];
-    const make = (selId, rankId) => {
-      const officerId = $(selId).value || '';
-      const rankSel = $(rankId).value || '';
-      if(!officerId || !rankSel) return;
-      const officer = OFFICERS.find(o => o.id === officerId);
-      const rankObj = RANKS.find(r => String(r.id) === String(rankSel));
-      pairs.push({ name: officer?.name || '', rank_name: rankObj?.name || '' });
-    };
-    make('motorista_sel','motorista_rank');
-    make('encarregado_sel','encarregado_rank');
-    make('seguranca_sel','seguranca_rank');
-    make('auxiliares_sel','auxiliares_rank');
-    return pairs.filter(p => p.name && p.rank_name);
-  }
-
-  /* ==== Salvar ilícitos ==== */
-  async function saveIllicitsToSupabase(){
-    const rota = ($('rota').value || '').trim() || null;
-    const lines = [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value).filter(Boolean).join('\n');
-    const items = parseIlicitosText(lines);
-    const pairs = selectedOfficerAndRankPairs();
-
-    if(!items.length){ alert('Preencha ao menos 1 ilícito.'); return; }
-    if(!pairs.length){ alert('Selecione Nome e Patente para a equipe.'); return; }
-
-    const rows = pairs.flatMap(({name, rank_name}) =>
-      items.map(({item, qty}) => ({
-        officer: name,
-        rank_at_time: rank_name,
-        rota,
-        item_type: item,
-        quantity: Number(qty)
-      }))
-    );
-
-    const btn = $('saveCloudBtn'); const old = btn.textContent;
-    btn.textContent = 'Salvando…'; btn.disabled = true;
-    try{
-      const { error } = await supa.from('rso_items').insert(rows);
-      if(error){ console.error(error); alert('Falha ao salvar no Supabase. Veja o console.'); return; }
-      btn.textContent = 'Salvo!';
-    }catch(e){
-      console.error(e); alert('Falha de rede/JS. Veja o console.');
-    }finally{
-      setTimeout(()=>{ btn.textContent = old; btn.disabled=false; }, 1200);
-    }
-  }
-  $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
-
-  /* ==== Totais 7 dias ==== */
-  async function showTotals7d(){
-    const cutoff = new Date(Date.now()-7*24*60*60*1000).toISOString();
-    const { data, error } = await supa
-      .from('rso_items')
-      .select('officer,item_type,quantity,recorded_at')
-      .gte('recorded_at', cutoff);
-
-    if(error){ console.error(error); alert('Erro ao buscar totais. Veja o console.'); return; }
-
-    const agg = {};
-    data.forEach(r=>{
-      const off = r.officer || '—';
-      if(!agg[off]) agg[off] = {};
-      agg[off][r.item_type] = (agg[off][r.item_type] || 0) + Number(r.quantity || 0);
-    });
-    renderTotals(agg);
-  }
-  function renderTotals(agg){
-    const c = $('totalsContent');
-    if(!agg || !Object.keys(agg).length){ c.innerHTML='<div class="muted">Sem dados nos últimos 7 dias.</div>'; $('totalsPanel').style.display='block'; return; }
-    let html = '';
-    Object.keys(agg).sort().forEach(off=>{
-      html += `<h4 style="margin:10px 0 6px">${esc(off)}</h4>`;
-      html += `<table class="tot"><thead><tr><th>Item</th><th>Quantidade</th></tr></thead><tbody>`;
-      const items = agg[off];
-      Object.keys(items).sort().forEach(it=>{
-        html += `<tr><td>${esc(it)}</td><td>${items[it]}</td></tr>`;
-      });
-      html += `</tbody></table>`;
-    });
-    c.innerHTML = html;
-    $('totalsPanel').style.display = 'block';
-    $('exportCsvBtn').onclick = ()=> exportTotalsCSV(agg);
-  }
-  function exportTotalsCSV(agg){
-    const rows = [['policial','item','total']];
-    Object.entries(agg).forEach(([off, items])=>{
-      Object.entries(items).forEach(([item, total])=>{
-        rows.push([off, item, total]);
-      });
-    });
-    const escape = s => /[",;\n]/.test(String(s)) ? `"${String(s).replace(/"/g,'""')}"` : s;
-    const csv = rows.map(r=>r.map(escape).join(';')).join('\n');
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
-    const url  = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href=url; a.download='RSO-totais-7dias.csv'; a.click(); URL.revokeObjectURL(url);
-  }
-
-  document.getElementById('totalsBtn').addEventListener('click', showTotals7d);
-  document.getElementById('printBtn').addEventListener('click', ()=>{ const d=collect(); fillSheet(d); window.print(); });
-  window.onbeforeprint = ()=> fillSheet(collect());
-</script>
-</body>
-</html>
+    const O=[...$('list-ocorrencias').children].map(d=>{const [h,t]=d.querySelectorAll('input');return{h:h.value,t:t.value}}).filter(o=>o.t
