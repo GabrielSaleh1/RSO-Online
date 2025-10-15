@@ -112,6 +112,7 @@
       <label>Abordados</label>
       <div id="list-abordados" class="list"></div>
       <div class="pill" onclick="addAbordado()">+ adicionar abordado</div>
+      <div class="muted">Preencha: <b>Nome</b> — <b>CPF/ID</b> — <b>Situação</b> (ex.: BOPM — Cb Ducati 20:40)</div>
     </div>
 
     <!-- ILÍCITOS (livre) -->
@@ -126,6 +127,7 @@
       <label>Veículos</label>
       <div id="list-veiculos" class="list"></div>
       <div class="pill" onclick="addVeiculo()">+ adicionar veículo</div>
+      <div class="muted">Preencha: <b>Modelo</b> — <b>Cor</b> — <b>Emplacamento</b> — <b>Situação</b></div>
     </div>
 
     <div class="panel">
@@ -140,7 +142,7 @@
         <div><label>Apoios (qtd)</label><input id="res-ap" type="number" min="0" value="0"></div>
       </div>
       <div class="row">
-        <div><label>Ações (Blipadas)</label><input id="res-ac" type="number" min="0" value="0"></div>
+        <div><label>Ações (qtd)</label><input id="res-ac" type="number" min="0" value="0"></div>
       </div>
     </div>
 
@@ -191,7 +193,7 @@
 <script>
   const $ = id => document.getElementById(id);
   const pad2 = n => String(n).padStart(2,'0');
-  const esc = s => (s||'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]));
+  const esc = s => (s||'').replace(/[&<>\\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\\"':'&quot;'}[m]));
 
   // === Supabase ===
   const SUPABASE_URL = 'https://ilonwkgtdszmpcjwlezc.supabase.co';
@@ -256,7 +258,7 @@
         <input placeholder="Modelo do veículo" value="${esc(modelo)}">
         <input placeholder="Cor" value="${esc(cor)}">
         <input placeholder="Emplacamento" value="${esc(placa)}">
-        <input placeholder="Situação (ex.: Apreendido)" value="${esc(sit)}">
+        <input placeholder="Situação" value="${esc(sit)}">
       </div>
       <button class="btn btn-sec" type="button">remover</button>`;
     w.querySelector('button').onclick=()=>w.remove();
@@ -422,7 +424,7 @@
   function exportTotalsCSV(agg){
     const rows = [['policial','item','total']];
     Object.entries(agg).forEach(([off, items])=>{ Object.entries(items).forEach(([item, total])=>{ rows.push([off, item, total]); }); });
-    const escapeCSV = s => /[",;\n]/.test(String(s)) ? `"${String(s).replace(/\"/g,'\"\"')}"` : s;
+    const escapeCSV = s => /[\",;\n]/.test(String(s)) ? `\"${String(s).replace(/\"/g,'\"\"')}\"` : s;
     const csv = rows.map(r=>r.map(escapeCSV).join(';')).join('\n');
     const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
     const url  = URL.createObjectURL(blob);
@@ -435,8 +437,20 @@
     const veiculos = [...$('list-veiculos').children];
     if(abordados.length===0){ alert('Adicione pelo menos 1 Abordado.'); return false; }
     if(veiculos.length===0){ alert('Adicione pelo menos 1 Veículo.'); return false; }
-    for(const w of abordados){ const ins=[...w.querySelectorAll('input')]; if(ins.some(i=>!i.value.trim())){ alert('Preencha todos os campos de Abordados (Nome, CPF/ID e Situação).'); return false; } }
-    for(const w of veiculos){ const ins=[...w.querySelectorAll('input')]; if(ins.some(i=>!i.value.trim())){ alert('Preencha todos os campos de Veículos (Modelo, Cor, Emplacamento e Situação).'); return false; } }
+    for(const w of abordados){
+      const ins=[...w.querySelectorAll('input')];
+      if(ins.some(i=>!i.value.trim())){
+        alert('Preencha todos os campos de Abordados (Nome, CPF/ID e Situação).');
+        return false;
+      }
+    }
+    for(const w of veiculos){
+      const ins=[...w.querySelectorAll('input')];
+      if(ins.some(i=>!i.value.trim())){
+        alert('Preencha todos os campos de Veículos (Modelo, Cor, Emplacamento e Situação).');
+        return false;
+      }
+    }
     return true;
   }
 
