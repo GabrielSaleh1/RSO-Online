@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b0f16" />
   <title>ROTA • Relatório de Serviço Operacional</title>
+
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase -->
+  <!-- Supabase (defer para carregar antes do DOMContentLoaded) -->
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -26,16 +27,12 @@
     html, body { background: var(--rota-bg); color: var(--rota-text); }
     .rota-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04)), var(--rota-card); border: 1px solid rgba(245,158,11,0.12); }
     .rota-soft { background: var(--rota-soft); }
-    .rota-divider { border-color: rgba(245,158,11,0.2); }
-    .rota-accent { color: var(--rota-gold); }
     .rota-chip  { background: rgba(245,158,11,0.12); color: var(--rota-text); border: 1px solid rgba(245,158,11,0.25); }
     .badge { font-size:.75rem; padding:.25rem .5rem; border-radius:.5rem; border:1px solid transparent; display:inline-block; }
-    .badge-ok    { background:rgba(16,185,129,.12); border-color:rgba(16,185,129,.35); color:#a7f3d0; }
-    .badge-leve  { background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.35); color:#fde68a; }
-    .badge-alta  { background:rgba(239,68,68,.12);  border-color:rgba(239,68,68,.35);  color:#fecaca; }
 
     /* Botões no estilo do index (4) */
-    .btn { display:inline-flex; align-items:center; gap:.5rem; font-weight:600; border-radius:.75rem; padding:.6rem 1rem; transition: transform .06s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease; border:1px solid transparent; }
+    .btn { display:inline-flex; align-items:center; gap:.5rem; font-weight:600; border-radius:.75rem; padding:.6rem 1rem;
+           transition: transform .06s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease; border:1px solid transparent; }
     .btn:active { transform: translateY(1px); }
     .btn-gold { background: var(--rota-gold); color: #0b0f16; border-color: var(--rota-gold-700); }
     .btn-gold:hover { background:#fbbf24; }
@@ -50,14 +47,14 @@
     .tactical-band { position: relative; overflow: hidden; background: linear-gradient(120deg, rgba(245,158,11,.16) 0%, rgba(245,158,11,.0) 60%), var(--rota-soft); border:1px solid rgba(245,158,11,0.2); }
     .tactical-band::after{ content:""; position:absolute; inset:-40% -30%; background: repeating-linear-gradient(135deg, rgba(239, 68, 68, .22) 0 10px, rgba(239, 68, 68, 0) 10px 22px); transform: rotate(-2deg); pointer-events:none; mix-blend-mode: overlay; }
 
-    /* Impressão da folha A4 do RSO */
+    /* Impressão A4 */
     @page{size:A4;margin:14mm}
     @media print{ body{background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact} #form-area{display:none!important} #sheet{display:block!important} }
   </style>
 </head>
 <body class="min-h-screen">
   <div class="max-w-6xl mx-auto p-6">
-    <!-- Header ROTA -->
+    <!-- Header -->
     <header class="tactical-band rounded-2xl p-5 mb-6">
       <div class="flex items-center gap-4 flex-wrap">
         <div class="h-10 w-10 rounded-xl flex items-center justify-center rota-card ring-1 ring-amber-500/30 text-xl font-black">R</div>
@@ -74,7 +71,7 @@
 
     <!-- Área de formulário -->
     <div id="form-area" class="space-y-4">
-      <!-- Bloco meta -->
+      <!-- Meta -->
       <section class="rota-card rounded-2xl p-5">
         <div class="grid sm:grid-cols-2 gap-4">
           <div>
@@ -89,7 +86,7 @@
         <p class="text-slate-400 text-xs mt-2">Identificador numérico descontinuado <span class="badge rota-chip align-middle">Nº RSO removido</span></p>
       </section>
 
-      <!-- Efetivo (um embaixo do outro, com seleção nome -> patente) -->
+      <!-- Efetivo (um embaixo do outro) -->
       <section class="rota-card rounded-2xl p-5">
         <h2 class="text-lg font-semibold mb-4">Efetivo</h2>
         <div class="space-y-4">
@@ -116,7 +113,7 @@
         </div>
       </section>
 
-      <!-- Blocos de listas (VERTICAL: um embaixo do outro) -->
+      <!-- Blocos (VERTICAL) -->
       <section class="space-y-4">
         <div class="rota-card rounded-2xl p-5">
           <label class="block text-lg font-semibold mb-3">Abordados</label>
@@ -143,7 +140,7 @@
         </div>
       </section>
 
-      <!-- Resumo numérico -->
+      <!-- Resultado -->
       <section class="rota-card rounded-2xl p-5">
         <h3 class="text-lg font-semibold mb-3">Resultado</h3>
         <div class="grid sm:grid-cols-3 gap-3">
@@ -162,11 +159,11 @@
         </div>
       </section>
 
-      <!-- Ações -->
-      <section class="rota-card rounded-2xl p-5 flex flex-col sm:flex-row gap-3">
-        <button class="btn btn-gold w-full sm:w-auto" id="saveCloudBtn" type="button">💾 Salvar ilícitos</button>
-        <button class="btn btn-red w-full sm:w-auto" id="printBtn" type="button">🧾 Imprimir / PDF</button>
-        <button class="btn btn-ghost w-full sm:w-auto" id="totalsBtn" type="button">Totais 7 dias</button>
+      <!-- Ações (VERTICAL) -->
+      <section class="rota-card rounded-2xl p-5 flex flex-col gap-3">
+        <button class="btn btn-gold w-full" id="saveCloudBtn" type="button">💾 Salvar ilícitos</button>
+        <button class="btn btn-red w-full" id="printBtn" type="button">🧾 Imprimir / PDF</button>
+        <button class="btn btn-ghost w-full" id="totalsBtn" type="button">📊 Totais 7 dias</button>
       </section>
 
       <!-- Totais painel -->
@@ -226,87 +223,69 @@
   </div>
 
   <script>
+    // ===== Helpers e estado global =====
     const $ = id => document.getElementById(id);
     const pad2 = n => String(n).padStart(2,'0');
-    const esc = s => (s||'').replace(/[&<>\\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\"':'&quot;'}[m]));
-
-    // === Supabase ===
-    const SUPABASE_URL = 'https://ilonwkgtdszmpcjwlezc.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlsb253a2d0ZHN6bXBjandsZXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NzQxMDIsImV4cCI6MjA3NTU1MDEwMn0.Cc-BtnHlXaGVCY6T6iXe0QA1tsfc17aX8lswEICvtw0';
-    const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // === Estado de “salvo” ===
+    const esc = s => (s||'').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+    let supa = null;                     // será criado após Supabase carregar
+    let RANKS = [], OFFICERS = [];       // vem do Supabase
     let lastSavedIllicitHash = '';
-    const getIllicitText = () =>
-      [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value.trim()).filter(Boolean).join('\n');
-    const hash = str => { let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; } return String(h); };
-
-    // === Ranks & Officers ===
-    let RANKS = [], OFFICERS = [];
     const ROLE_IDS = { motorista:'list-motorista', encarregado:'list-encarregado', seguranca:'list-seguranca', auxiliares:'list-auxiliares' };
 
-    async function loadRanks(){
-      const { data, error } = await supa.from('ranks').select('id,name,sort_order').order('sort_order',{ascending:true});
-      if(error){ console.error(error); alert('Erro ao carregar patentes.'); return; }
-      RANKS = data || [];
-    }
-    async function loadOfficers(){
-      const { data, error } = await supa.from('officers').select('id,name,current_rank_id').eq('active',true).order('name');
-      if(error){ console.error(error); alert('Erro ao carregar policiais.'); return; }
-      OFFICERS = data || [];
-    }
+    const SUPABASE_URL = 'https://ilonwkgtdszmpcjwlezc.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlsb253a2d0ZHN6bXBjandsZXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NzQxMDIsImV4cCI6MjA3NTU1MDEwMn0.Cc-BtnHlXaGVCY6T6iXe0QA1tsfc17aX8lswEICvtw0';
 
-    // ===== Helpers de itens =====
+    const getIllicitText = () =>
+      [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value.trim()).filter(Boolean).join('\\n');
+    const hash = str => { let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; } return String(h); };
+
+    // ===== CRUD de linhas =====
     function mkItem(id,v,ph){
       const w=document.createElement('div'); w.className='item';
-      w.innerHTML=`<input class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" placeholder="${ph}" value="${v}"> <button class="btn btn-ghost" type="button">remover</button>`;
+      w.innerHTML=\`<input class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" placeholder="\${ph}" value="\${v}">
+      <button class="btn btn-ghost mt-2" type="button">remover</button>\`;
       w.querySelector('button').onclick=()=>w.remove();
       $(id).appendChild(w);
     }
     function addIlicito(v=''){ mkItem('list-ilicitos',v,'ex.: 02x Maconha'); }
     function addOcorrencia(h='',t=''){
       const w=document.createElement('div'); w.className='item rota-card rounded-xl p-3';
-      w.innerHTML=`
+      w.innerHTML=\`
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <input type="time" value="${h}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Descreva a ocorrência" value="${t}" class="sm:col-span-2 px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input type="time" value="\${h}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Descreva a ocorrência" value="\${t}" class="sm:col-span-2 px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
         </div>
-        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>
-      `;
+        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>\`;
       w.querySelector('button').onclick=()=>w.remove();
       $('list-ocorrencias').appendChild(w);
     }
-
     function addAbordado(nome='',doc='',sit=''){
       const w=document.createElement('div'); w.className='item rota-card rounded-xl p-3';
-      w.innerHTML=`
+      w.innerHTML=\`
         <div class="grid md:grid-cols-3 gap-2 w-full">
-          <input placeholder="Nome do abordado" value="${esc(nome)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="CPF/ID do abordado" value="${esc(doc)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Situação (ex.: BOPM — Cb Ducati 20:40)" value="${esc(sit)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Nome do abordado" value="\${esc(nome)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="CPF/ID do abordado" value="\${esc(doc)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Situação (ex.: BOPM — Cb Ducati 20:40)" value="\${esc(sit)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
         </div>
-        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>
-      `;
+        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>\`;
       w.querySelector('button').onclick=()=>w.remove();
       $('list-abordados').appendChild(w);
     }
-
     function addVeiculo(modelo='',cor='',placa='',sit=''){
       const w=document.createElement('div'); w.className='item rota-card rounded-xl p-3';
-      w.innerHTML=`
+      w.innerHTML=\`
         <div class="grid md:grid-cols-4 gap-2 w-full">
-          <input placeholder="Modelo do veículo" value="${esc(modelo)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Cor" value="${esc(cor)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Emplacamento" value="${esc(placa)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Situação (ex.: Apreendido)" value="${esc(sit)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Modelo do veículo" value="\${esc(modelo)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Cor" value="\${esc(cor)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Emplacamento" value="\${esc(placa)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Situação (ex.: Apreendido)" value="\${esc(sit)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
         </div>
-        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>
-      `;
+        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>\`;
       w.querySelector('button').onclick=()=>w.remove();
       $('list-veiculos').appendChild(w);
     }
 
-    // ---- Efetivo: uma linha (cartão) com Nome -> Patente
+    // ---- Efetivo: Nome -> Patente (em cartões verticais)
     function addTeamItem(role){
       const containerId = ROLE_IDS[role];
       const wrap = document.createElement('div');
@@ -345,6 +324,7 @@
       $(containerId).appendChild(wrap);
     }
 
+    // ===== Coleta e impressão =====
     function collectRole(role){
       const container = $(ROLE_IDS[role]);
       const items = [...(container?.querySelectorAll('.item')||[])];
@@ -360,7 +340,6 @@
       });
       return res;
     }
-
     function collect(){
       const L=id=>[...$(id).querySelectorAll('input')].map(i=>i.value).filter(Boolean);
       const O=[...$('list-ocorrencias').children].map(d=>{const ins=d.querySelectorAll('input');return{h:ins[0]?.value,t:ins[1]?.value}}).filter(o=>o.t);
@@ -394,7 +373,6 @@
         resOc:+($('res-oc').value||0), resAp:+($('res-ap').value||0), resAc:+($('res-ac').value||0)
       };
     }
-
     function fillSheet(d){
       const dt=d.datahora?new Date(d.datahora):new Date();
       const dd=`${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
@@ -422,27 +400,27 @@
       const now=new Date(); $('rodape-data').textContent=`Emitido em ${pad2(now.getDate())}/${pad2(now.getMonth()+1)}/${now.getFullYear()} ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
     }
 
-    function parseIlicitosText(multiline){
-      const parts = (multiline||'').split(/\n|,|;/).map(s=>s.trim()).filter(Boolean);
-      const out=[];
-      for(const p of parts){
-        let m = p.match(/^(\d+)\s*[x×]?\s*(.+)$/i) || p.match(/^(\d+)\s+(.+)$/i);
-        if(m){ out.push({item:m[2].trim().toLowerCase(), qty:parseInt(m[1],10)}); continue; }
-        const m2 = p.match(/(\d+)/);
-        if(m2){ out.push({item:p.replace(m2[0],'').trim().toLowerCase()||'desconhecido', qty:parseInt(m2[1],10)}); }
-        else{ out.push({item:p.toLowerCase(), qty:1}); }
-      }
-      return out;
+    // ===== Supabase =====
+    async function loadRanks(){
+      if(!supa){ console.warn('Supabase ainda não carregou.'); return; }
+      const { data, error } = await supa.from('ranks').select('id,name,sort_order').order('sort_order',{ascending:true});
+      if(error){ console.error(error); alert('Erro ao carregar patentes.'); return; }
+      RANKS = data || [];
     }
-
+    async function loadOfficers(){
+      if(!supa){ console.warn('Supabase ainda não carregou.'); return; }
+      const { data, error } = await supa.from('officers').select('id,name,current_rank_id').eq('active',true).order('name');
+      if(error){ console.error(error); alert('Erro ao carregar policiais.'); return; }
+      OFFICERS = data || [];
+    }
     function selectedOfficerAndRankPairs(){
       const d = collect();
       return (d._pairs || []).map(p=>({ name: p.name, rank_name: p.rank_name }));
     }
-
     async function saveIllicitsToSupabase(){
+      if(!supa){ alert('Conexão com banco ainda não disponível. Tente novamente em 1–2 segundos.'); return; }
       const rota = ($('rota').value || '').trim() || null;
-      const lines = [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value).filter(Boolean).join('\n');
+      const lines = [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value).filter(Boolean).join('\\n');
       const items = parseIlicitosText(lines);
       const pairs = selectedOfficerAndRankPairs();
 
@@ -463,11 +441,24 @@
       }catch(e){ console.error(e); alert('Falha de rede/JS. Veja o console.'); }
       finally{ setTimeout(()=>{ btn.textContent = old; btn.disabled=false; }, 1200); }
     }
+    function parseIlicitosText(multiline){
+      const parts = (multiline||'').split(/\\n|,|;/).map(s=>s.trim()).filter(Boolean);
+      const out=[];
+      for(const p of parts){
+        let m = p.match(/^(\\d+)\\s*[x×]?\\s*(.+)$/i) || p.match(/^(\\d+)\\s+(.+)$/i);
+        if(m){ out.push({item:m[2].trim().toLowerCase(), qty:parseInt(m[1],10)}); continue; }
+        const m2 = p.match(/(\\d+)/);
+        if(m2){ out.push({item:p.replace(m2[0],'').trim().toLowerCase()||'desconhecido', qty:parseInt(m2[1],10)}); }
+        else{ out.push({item:p.toLowerCase(), qty:1}); }
+      }
+      return out;
+    }
 
     async function showTotals7d(){
+      if(!supa){ alert('Conexão com banco ainda não disponível. Tente novamente em 1–2 segundos.'); return; }
       const cutoff = new Date(Date.now()-7*24*60*60*1000).toISOString();
       const { data, error } = await supa.from('rso_items').select('officer,item_type,quantity,recorded_at').gte('recorded_at', cutoff);
-      if(error){ console.error(error); alert('Erro ao buscar totais. Veja o console.'); return; }
+      if(error){ console.error(error); alert('Erro ao buscar totais.'); return; }
       const agg = {};
       (data||[]).forEach(r=>{ const off = r.officer || '—'; if(!agg[off]) agg[off] = {}; agg[off][r.item_type] = (agg[off][r.item_type] || 0) + Number(r.quantity || 0); });
       renderTotals(agg);
@@ -482,8 +473,8 @@
     function exportTotalsCSV(agg){
       const rows = [['policial','item','total']];
       Object.entries(agg).forEach(([off, items])=>{ Object.entries(items).forEach(([item, total])=>{ rows.push([off, item, total]); }); });
-      const escapeCSV = s => /[\"",;\n]/.test(String(s)) ? `\"${String(s).replace(/\"/g,'\"\"')}\"` : s;
-      const csv = rows.map(r=>r.map(escapeCSV).join(';')).join('\n');
+      const escapeCSV = s => /[\\\"",;\\n]/.test(String(s)) ? `\"${String(s).replace(/\\\"/g,'\\\"\\\"')}\"` : s;
+      const csv = rows.map(r=>r.map(escapeCSV).join(';')).join('\\n');
       const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
       const url  = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href=url; a.download='RSO-totais-7dias.csv'; a.click(); URL.revokeObjectURL(url);
@@ -505,13 +496,25 @@
       return true;
     }
 
-    (async function init(){
+    // ===== Inicialização garantida após Supabase carregar =====
+    document.addEventListener('DOMContentLoaded', async () => {
+      // cria o client só quando a lib supabase já estiver disponível
+      if (window.supabase) {
+        supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } else {
+        // fallback: espera o evento 'load' se o navegador atrasar a execução do script defer
+        window.addEventListener('load', () => {
+          supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        });
+      }
+
       await loadRanks();
       await loadOfficers();
 
       const d=new Date(), z=n=>String(n).padStart(2,'0');
       $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
 
+      // itens iniciais
       if(!$('list-ilicitos').children.length) addIlicito();
       if(!$('list-ocorrencias').children.length) addOcorrencia();
 
@@ -523,21 +526,22 @@
       addAbordado();
       addVeiculo();
 
-      $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
-      $('totalsBtn').addEventListener('click', showTotals7d);
-
-      $('printBtn').addEventListener('click', ()=>{
+      // botões de ação
+      $('saveCloudBtn')?.addEventListener('click', saveIllicitsToSupabase);
+      $('totalsBtn')?.addEventListener('click', showTotals7d);
+      $('printBtn')?.addEventListener('click', ()=>{
         if(!validateStructured()) return;
         const currentHash = hash(getIllicitText());
         if(currentHash !== lastSavedIllicitHash){
-          const goOn = confirm('⚠️ Ilícitos parecem NÃO estar salvos.\nClique em “OK” para imprimir mesmo assim, ou “Cancelar” para voltar e salvar.');
+          const goOn = confirm('⚠️ Ilícitos parecem NÃO estar salvos.\\nClique em “OK” para imprimir mesmo assim, ou “Cancelar” para voltar e salvar.');
           if(!goOn) return;
         }
         const d=collect(); fillSheet(d); window.print();
       });
+    });
 
-      window.onbeforeprint = ()=> fillSheet(collect());
-    })();
+    // Expor funções usadas por onClick no HTML (garante que existam no escopo global)
+    Object.assign(window, { addTeamItem, addAbordado, addIlicito, addVeiculo, addOcorrencia });
   </script>
 </body>
 </html>
