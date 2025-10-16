@@ -1,494 +1,543 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>RSO • ROTA</title>
-<style>
-  :root{
-    --bg:#0b0d10;--panel:#0f1318;--muted:#a7adb7;--text:#e6e9ee;--line:#262e3a;--brand:#c9a227;--btn:#c9a227;--btnH:#a8881f;--btnDanger:#c62828;--btnDangerH:#a02020;--field:#0c1015;--chip:#131a22;--chipH:#18212c;--tbl-head:#18212c;--tbl-row:#0f1318;--tbl-row-alt:#0c1015;--tbl-border:#2f3947;--tbl-text:#e6e9ee;--tbl-muted:#b7c0cc
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
-  .wrap{max-width:1000px;margin:28px auto;padding:0 16px}
-  .brand{display:flex;align-items:center;gap:14px;justify-content:center;margin-bottom:18px}
-  .brand .mark{width:80px;height:80px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,#1b222d,#0e141b);border:2px solid var(--brand);box-shadow:0 0 18px rgba(201,162,39,.25);font-size:40px;color:var(--brand);font-weight:900}
-  .brand .mark::before{content:"⚡"}
-  h1{margin:0;text-align:center;font-weight:900;letter-spacing:.2px;font-size:1.7rem}
-  h1 .accent{color:var(--brand)}
-  .subtitle{margin:6px 0 0;text-align:center;color:var(--muted);font-size:.95rem}
-  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 10px 26px rgba(0,0,0,.32)}
-  .row{display:flex;flex-wrap:wrap;gap:12px}
-  .row>div{flex:1 1 260px;min-width:220px}
-  label{display:block;font-weight:700;font-size:.92rem;margin:6px 0}
-  input,textarea,select{width:100%;background:var(--field);border:1px solid var(--line);color:var(--text);padding:11px 12px;border-radius:12px}
-  textarea{min-height:72px;resize:vertical}
-  .list{display:grid;gap:10px}
-  .item,.item-2,.item-3,.item-4{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .item select{flex:1 1 240px;min-width:200px}
-  .item-2 input[type="time"]{width:110px}
-  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-  .grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
-  .pill{border:1px dashed var(--line);border-radius:12px;padding:10px 12px;text-align:center;cursor:pointer;color:#efe6c4;background:var(--chip);font-weight:800}
-  .pill:hover{background:var(--chipH)}
-  .muted{color:var(--muted);font-size:.85rem}
-  .btn{display:block;width:100%;text-align:center;background:var(--btn);color:#1a1a1a;border:none;border-radius:12px;padding:14px;font-weight:900;cursor:pointer;margin:6px 0}
-  .btn:hover{background:var(--btnH)}
-  .btn-danger{background:var(--btnDanger);color:#fff}
-  .btn-danger:hover{background:var(--btnDangerH)}
-  .btn-sec{background:var(--chip);border:1px solid var(--line);color:#f6e9b8}
-  @media (max-width:980px){.grid-4{grid-template-columns:1fr 1fr}}
-  @media (max-width:720px){ .row>div{flex:1 1 100%;min-width:unset} .grid-3{grid-template-columns:1fr} .grid-4{grid-template-columns:1fr} }
-  .tot-wrap h4{margin:10px 0 6px;color:var(--tbl-text)}
-  table.tot{width:100%;border-collapse:separate;border-spacing:0 6px;color:var(--tbl-text)}
-  .tot th{background:var(--tbl-head);border:1px solid var(--tbl-border);padding:10px 12px;text-align:left}
-  .tot td{background:var(--tbl-row);border:1px solid var(--tbl-border);padding:10px 12px}
-  .tot tr:nth-child(even) td{background:var(--tbl-row-alt)}
-  .tot .muted{color:var(--tbl-muted)}
-  @page{size:A4;margin:14mm}
-  @media print{ body{background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact} #form-area{display:none!important} #sheet{display:block!important} }
-  #sheet{display:none;background:#fff;color:#0b0b0b;border:1px solid #bfc8d6;border-radius:8px;padding:14mm;width:100%;font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial,sans-serif}
-  .doc-header{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:8px}
-  .doc-mark{width:48px;height:48px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(145deg,#1b222d,#0e141b);border:1px solid #c9d4e8;color:#d4b64c;font-weight:900;font-size:22px}
-  .doc-mark::before{content:"⚡"}
-  .doc-title{font-weight:900;font-size:20px;color:#0d2a5c;margin:0 0 2px;text-align:center}
-  .doc-sub{font-size:12px;color:#3b4a63;margin:0;text-align:center}
-  .doc-rule{height:1px;background:linear-gradient(90deg,#ccd6e4 0,#d4b64c 40%,#ccd6e4 100%);margin:10px 0 14px;border:none}
-  .kv{display:grid;grid-template-columns:140px 1fr;gap:4px 12px;font-size:13px}
-  ul.clean{margin:0;padding-left:16px;font-size:13px}
-  .footer-rule{height:1px;background:#ccd6e4;margin:12px 0 8px}
-  .doc-footer{display:flex;justify-content:space-between;font-size:11px;color:#506079}
-</style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0f16" />
+  <title>ROTA • Relatório de Serviço Operacional</title>
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* === Tema estilo Index (4) === */
+    :root{
+      --rota-bg: #0b0f16;
+      --rota-card: #121826;
+      --rota-soft: #1a2235;
+      --rota-gold: #f59e0b; /* amber-500 */
+      --rota-gold-700: #b45309;
+      --rota-red: #ef4444;  /* red-500 */
+      --rota-green: #10b981;/* emerald-500 */
+      --rota-text: #e5e7eb; /* slate-200 */
+      --rota-sub: #94a3b8;  /* slate-400 */
+    }
+    html, body { background: var(--rota-bg); color: var(--rota-text); }
+    .rota-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04)), var(--rota-card); border: 1px solid rgba(245,158,11,0.12); }
+    .rota-soft { background: var(--rota-soft); }
+    .rota-divider { border-color: rgba(245,158,11,0.2); }
+    .rota-accent { color: var(--rota-gold); }
+    .rota-chip  { background: rgba(245,158,11,0.12); color: var(--rota-text); border: 1px solid rgba(245,158,11,0.25); }
+    .badge { font-size:.75rem; padding:.25rem .5rem; border-radius:.5rem; border:1px solid transparent; display:inline-block; }
+    .badge-ok    { background:rgba(16,185,129,.12); border-color:rgba(16,185,129,.35); color:#a7f3d0; }
+    .badge-leve  { background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.35); color:#fde68a; }
+    .badge-alta  { background:rgba(239,68,68,.12);  border-color:rgba(239,68,68,.35);  color:#fecaca; }
+
+    /* Botões no estilo do index (4) */
+    .btn { display:inline-flex; align-items:center; gap:.5rem; font-weight:600; border-radius:.75rem; padding:.6rem 1rem; transition: transform .06s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease; border:1px solid transparent; }
+    .btn:active { transform: translateY(1px); }
+    .btn-gold { background: var(--rota-gold); color: #0b0f16; border-color: var(--rota-gold-700); }
+    .btn-gold:hover { background:#fbbf24; }
+    .btn-red  { background: var(--rota-red); color: #fff; border-color:#b91c1c; }
+    .btn-red:hover{ background:#f87171; }
+    .btn-green{ background: var(--rota-green); color:#042016; border-color:#065f46; }
+    .btn-green:hover{ background:#34d399; }
+    .btn-ghost{ background: transparent; color: var(--rota-text); border-color: rgba(148,163,184,.25); }
+    .btn-ghost:hover{ background: rgba(148,163,184,.08); }
+
+    /* Faixa diagonal tática */
+    .tactical-band { position: relative; overflow: hidden; background: linear-gradient(120deg, rgba(245,158,11,.16) 0%, rgba(245,158,11,.0) 60%), var(--rota-soft); border:1px solid rgba(245,158,11,0.2); }
+    .tactical-band::after{ content:""; position:absolute; inset:-40% -30%; background: repeating-linear-gradient(135deg, rgba(239, 68, 68, .22) 0 10px, rgba(239, 68, 68, 0) 10px 22px); transform: rotate(-2deg); pointer-events:none; mix-blend-mode: overlay; }
+
+    /* Impressão da folha A4 do RSO */
+    @page{size:A4;margin:14mm}
+    @media print{ body{background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact} #form-area{display:none!important} #sheet{display:block!important} }
+  </style>
 </head>
-<body>
-<div class="wrap">
-  <div class="brand">
-    <div class="mark" aria-hidden="true"></div>
-    <div>
-      <h1><span class="accent">ROTA</span> • Relatório de Serviço Operacional</h1>
-      <p class="subtitle">Batalhão de Polícia de Choque — Rondas Ostensivas Tobias de Aguiar</p>
+<body class="min-h-screen">
+  <div class="max-w-6xl mx-auto p-6">
+    <!-- Header ROTA -->
+    <header class="tactical-band rounded-2xl p-5 mb-6">
+      <div class="flex items-center gap-4 flex-wrap">
+        <div class="h-10 w-10 rounded-xl flex items-center justify-center rota-card ring-1 ring-amber-500/30 text-xl font-black">R</div>
+        <div>
+          <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide">ROTA • Relatório de Serviço Operacional</h1>
+          <p class="text-sm text-slate-400">Batalhão de Polícia de Choque — Documento interno</p>
+        </div>
+        <div class="ml-auto flex items-center gap-2">
+          <span class="badge rota-chip">Layout <b class="ml-1">Ponto-Online</b></span>
+          <span class="badge rota-chip">Foco: <b class="ml-1">RSO</b></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Área de formulário -->
+    <div id="form-area" class="space-y-4">
+      <!-- Bloco meta -->
+      <section class="rota-card rounded-2xl p-5">
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Data/Hora</label>
+            <input id="datahora" type="datetime-local" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Rota</label>
+            <input id="rota" placeholder="91136" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+          </div>
+        </div>
+        <p class="text-slate-400 text-xs mt-2">Identificador numérico descontinuado <span class="badge rota-chip align-middle">Nº RSO removido</span></p>
+      </section>
+
+      <!-- Efetivo (um embaixo do outro, com seleção nome -> patente) -->
+      <section class="rota-card rounded-2xl p-5">
+        <h2 class="text-lg font-semibold mb-4">Efetivo</h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Motorista(s)</label>
+            <div id="list-motorista" class="space-y-2"></div>
+            <button type="button" class="btn btn-ghost mt-2" onclick="addTeamItem('motorista')">+ adicionar motorista</button>
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Chefe de barca / Encarregado(s)</label>
+            <div id="list-encarregado" class="space-y-2"></div>
+            <button type="button" class="btn btn-ghost mt-2" onclick="addTeamItem('encarregado')">+ adicionar chefe de barca</button>
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Segurança(s)</label>
+            <div id="list-seguranca" class="space-y-2"></div>
+            <button type="button" class="btn btn-ghost mt-2" onclick="addTeamItem('seguranca')">+ adicionar segurança</button>
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Auxiliar(es)</label>
+            <div id="list-auxiliares" class="space-y-2"></div>
+            <button type="button" class="btn btn-ghost mt-2" onclick="addTeamItem('auxiliares')">+ adicionar auxiliar</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Blocos de listas (VERTICAL: um embaixo do outro) -->
+      <section class="space-y-4">
+        <div class="rota-card rounded-2xl p-5">
+          <label class="block text-lg font-semibold mb-3">Abordados</label>
+          <div id="list-abordados" class="space-y-2"></div>
+          <button type="button" class="btn btn-ghost w-full justify-center mt-2" onclick="addAbordado()">+ adicionar abordado</button>
+        </div>
+
+        <div class="rota-card rounded-2xl p-5">
+          <label class="block text-lg font-semibold mb-3">Ilícitos</label>
+          <div id="list-ilicitos" class="space-y-2"></div>
+          <button type="button" class="btn btn-ghost w-full justify-center mt-2" onclick="addIlicito()">+ adicionar ilícito</button>
+        </div>
+
+        <div class="rota-card rounded-2xl p-5">
+          <label class="block text-lg font-semibold mb-3">Veículos</label>
+          <div id="list-veiculos" class="space-y-2"></div>
+          <button type="button" class="btn btn-ghost w-full justify-center mt-2" onclick="addVeiculo()">+ adicionar veículo</button>
+        </div>
+
+        <div class="rota-card rounded-2xl p-5">
+          <label class="block text-lg font-semibold mb-3">Ocorrências</label>
+          <div id="list-ocorrencias" class="space-y-2"></div>
+          <button type="button" class="btn btn-ghost w-full justify-center mt-2" onclick="addOcorrencia()">+ adicionar ocorrência</button>
+        </div>
+      </section>
+
+      <!-- Resumo numérico -->
+      <section class="rota-card rounded-2xl p-5">
+        <h3 class="text-lg font-semibold mb-3">Resultado</h3>
+        <div class="grid sm:grid-cols-3 gap-3">
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Ocorrências (qtd)</label>
+            <input id="res-oc" type="number" min="0" value="0" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Apoios (qtd)</label>
+            <input id="res-ap" type="number" min="0" value="0" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+          </div>
+          <div>
+            <label class="block text-sm text-slate-400 mb-1">Ações (Blipadas)</label>
+            <input id="res-ac" type="number" min="0" value="0" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Ações -->
+      <section class="rota-card rounded-2xl p-5 flex flex-col sm:flex-row gap-3">
+        <button class="btn btn-gold w-full sm:w-auto" id="saveCloudBtn" type="button">💾 Salvar ilícitos</button>
+        <button class="btn btn-red w-full sm:w-auto" id="printBtn" type="button">🧾 Imprimir / PDF</button>
+        <button class="btn btn-ghost w-full sm:w-auto" id="totalsBtn" type="button">Totais 7 dias</button>
+      </section>
+
+      <!-- Totais painel -->
+      <section id="totalsPanel" class="rota-card rounded-2xl p-5 hidden">
+        <h3 class="text-lg font-semibold mb-3">Totais por policial (últimos 7 dias)</h3>
+        <div id="totalsContent" class="space-y-3"></div>
+        <div class="flex gap-3 mt-4">
+          <button class="btn btn-ghost" id="exportCsvBtn" type="button">Exportar CSV</button>
+          <button class="btn btn-ghost" type="button" onclick="document.getElementById('totalsPanel').classList.add('hidden')">Fechar</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- FOLHA A4 (print) -->
+    <div id="sheet" class="hidden bg-white text-slate-900 border border-slate-300 rounded-xl p-6">
+      <div class="flex items-center gap-3 justify-center mb-2">
+        <div class="w-12 h-12 rounded-lg grid place-items-center bg-slate-900/90 border border-slate-300 text-amber-400 font-black">R</div>
+        <div>
+          <h2 class="font-black text-lg text-slate-900">ROTA • Relatório de Serviço Operacional</h2>
+          <p class="text-xs text-slate-600">Documento gerado automaticamente</p>
+        </div>
+      </div>
+      <hr class="my-3 border-t border-slate-300" />
+      <div class="text-sm mb-2"><span id="meta-data">Data/Hora: —</span><span id="meta-rota"> | Rota: —</span></div>
+      <div class="mt-2">
+        <h3 class="font-semibold">EFETIVO</h3>
+        <div class="grid grid-cols-[140px_1fr] gap-x-3 gap-y-1 text-sm">
+          <b>Motorista(s):</b><span id="k-motorista">—</span>
+          <b>Encarregado(s):</b><span id="k-encarregado">—</span>
+          <b>Segurança(s):</b><span id="k-seguranca">—</span>
+          <b>Auxiliar(es):</b><span id="k-auxiliares">—</span>
+        </div>
+      </div>
+      <div class="mt-3">
+        <h3 class="font-semibold">ABORDADOS</h3>
+        <ul class="list-disc pl-5 text-sm" id="ul-abordados"><li>—</li></ul>
+      </div>
+      <div class="mt-3">
+        <h3 class="font-semibold">ILÍCITOS</h3>
+        <ul class="list-disc pl-5 text-sm" id="ul-ilicitos"><li>—</li></ul>
+      </div>
+      <div class="mt-3">
+        <h3 class="font-semibold">VEÍCULOS</h3>
+        <ul class="list-disc pl-5 text-sm" id="ul-veiculos"><li>—</li></ul>
+      </div>
+      <div class="mt-3">
+        <h3 class="font-semibold">OCORRÊNCIAS</h3>
+        <ul class="list-disc pl-5 text-sm" id="ul-ocorrencias"><li>—</li></ul>
+      </div>
+      <div class="mt-3">
+        <h3 class="font-semibold">RESULTADO</h3>
+        <ul class="list-disc pl-5 text-sm" id="ul-resultado"><li>0x Ocorrência.</li><li>0x Apoio.</li><li>0x Ação.</li></ul>
+      </div>
+      <hr class="my-3 border-t border-slate-300" />
+      <div class="flex justify-between text-xs text-slate-600"><div>RSO • ROTA</div><div id="rodape-data">—</div></div>
     </div>
   </div>
 
-  <div id="form-area">
-    <div class="panel">
-      <div class="row">
-        <div><label>Data/Hora</label><input id="datahora" type="datetime-local"></div>
-        <div><label>Rota</label><input id="rota" placeholder="91136"></div>
-      </div>
-      <div class="muted" style="margin-top:8px">Identificador numérico descontinuado <span class="flag">Nº RSO removido</span></div>
-    </div>
+  <script>
+    const $ = id => document.getElementById(id);
+    const pad2 = n => String(n).padStart(2,'0');
+    const esc = s => (s||'').replace(/[&<>\\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\"':'&quot;'}[m]));
 
-    <div class="panel">
-      <h3 style="margin:0 0 10px">Efetivo</h3>
-      <div>
-        <label>Motorista(s)</label>
-        <div id="list-motorista" class="list"></div>
-        <div class="pill" onclick="addTeamItem('motorista')">+ adicionar motorista</div>
-      </div>
-      <div style="height:10px"></div>
-      <div>
-        <label>Chefe de barca / Encarregado(s)</label>
-        <div id="list-encarregado" class="list"></div>
-        <div class="pill" onclick="addTeamItem('encarregado')">+ adicionar chefe de barca</div>
-      </div>
-      <div style="height:10px"></div>
-      <div>
-        <label>Segurança(s)</label>
-        <div id="list-seguranca" class="list"></div>
-        <div class="pill" onclick="addTeamItem('seguranca')">+ adicionar segurança</div>
-      </div>
-      <div style="height:10px"></div>
-      <div>
-        <label>Auxiliar(es)</label>
-        <div id="list-auxiliares" class="list"></div>
-        <div class="pill" onclick="addTeamItem('auxiliares')">+ adicionar auxiliar</div>
-      </div>
-    </div>
+    // === Supabase ===
+    const SUPABASE_URL = 'https://ilonwkgtdszmpcjwlezc.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlsb253a2d0ZHN6bXBjandsZXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NzQxMDIsImV4cCI6MjA3NTU1MDEwMn0.Cc-BtnHlXaGVCY6T6iXe0QA1tsfc17aX8lswEICvtw0';
+    const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    <!-- ABORDADOS (campos separados) -->
-    <div class="panel">
-      <label>Abordados</label>
-      <div id="list-abordados" class="list"></div>
-      <div class="pill" onclick="addAbordado()">+ adicionar abordado</div>
-    </div>
+    // === Estado de “salvo” ===
+    let lastSavedIllicitHash = '';
+    const getIllicitText = () =>
+      [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value.trim()).filter(Boolean).join('\n');
+    const hash = str => { let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; } return String(h); };
 
-    <!-- ILÍCITOS (livre) -->
-    <div class="panel">
-      <label>Ilícitos</label>
-      <div id="list-ilicitos" class="list"></div>
-      <div class="pill" onclick="addIlicito()">+ adicionar ilícito</div>
-    </div>
+    // === Ranks & Officers ===
+    let RANKS = [], OFFICERS = [];
+    const ROLE_IDS = { motorista:'list-motorista', encarregado:'list-encarregado', seguranca:'list-seguranca', auxiliares:'list-auxiliares' };
 
-    <!-- VEÍCULOS (campos separados) -->
-    <div class="panel">
-      <label>Veículos</label>
-      <div id="list-veiculos" class="list"></div>
-      <div class="pill" onclick="addVeiculo()">+ adicionar veículo</div>
-    </div>
-
-    <div class="panel">
-      <label>Ocorrências</label>
-      <div id="list-ocorrencias" class="list"></div>
-      <div class="pill" onclick="addOcorrencia()">+ adicionar ocorrência</div>
-    </div>
-
-    <div class="panel">
-      <div class="row">
-        <div><label>Ocorrências (qtd)</label><input id="res-oc" type="number" min="0" value="0"></div>
-        <div><label>Apoios (qtd)</label><input id="res-ap" type="number" min="0" value="0"></div>
-      </div>
-      <div class="row">
-        <div><label>Ações (Blipadas)</label><input id="res-ac" type="number" min="0" value="0"></div>
-      </div>
-    </div>
-
-    <div class="panel" style="display:flex;flex-direction:column;gap:8px;align-items:stretch">
-      <button class="btn" id="saveCloudBtn" type="button">💾 Salvar ilícitos</button>
-      <button class="btn btn-danger" id="printBtn" type="button">🧾 Imprimir / PDF</button>
-      <button class="btn btn-sec" id="totalsBtn" type="button">Totais 7 dias</button>
-    </div>
-
-    <div id="totalsPanel" class="panel" style="display:none">
-      <h3 style="margin:0 0 10px">Totais por policial (últimos 7 dias)</h3>
-      <div id="totalsContent" class="tot-wrap"></div>
-      <div style="margin-top:10px;display:flex;gap:8px">
-        <button class="btn btn-sec" id="exportCsvBtn" type="button">Exportar CSV</button>
-        <button class="btn btn-sec" type="button" onclick="document.getElementById('totalsPanel').style.display='none'">Fechar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- FOLHA A4 -->
-  <div id="sheet">
-    <div class="doc-header">
-      <div class="doc-mark" aria-hidden="true"></div>
-      <div>
-        <h2 class="doc-title">ROTA • Relatório de Serviço Operacional</h2>
-        <p class="doc-sub">Batalhão de Polícia de Choque — Documento gerado automaticamente</p>
-      </div>
-    </div>
-    <hr class="doc-rule">
-    <div class="meta"><span id="meta-data">Data/Hora: —</span><span id="meta-rota"> | Rota: —</span></div>
-    <div class="section"><h3>EFETIVO</h3>
-      <div class="kv">
-        <b>Motorista(s):</b><span id="k-motorista">—</span>
-        <b>Encarregado(s):</b><span id="k-encarregado">—</span>
-        <b>Segurança(s):</b><span id="k-seguranca">—</span>
-        <b>Auxiliar(es):</b><span id="k-auxiliares">—</span>
-      </div>
-    </div>
-    <div class="section"><h3>ABORDADOS</h3><ul class="clean" id="ul-abordados"><li>—</li></ul></div>
-    <div class="section"><h3>ILÍCITOS</h3><ul class="clean" id="ul-ilicitos"><li>—</li></ul></div>
-    <div class="section"><h3>VEÍCULOS</h3><ul class="clean" id="ul-veiculos"><li>—</li></ul></div>
-    <div class="section"><h3>OCORRÊNCIAS</h3><ul class="clean" id="ul-ocorrencias"><li>—</li></ul></div>
-    <div class="section"><h3>RESULTADO</h3><ul class="clean" id="ul-resultado"><li>0x Ocorrência.</li><li>0x Apoio.</li><li>0x Ação.</li></ul></div>
-    <hr class="footer-rule"><div class="doc-footer"><div>RSO • ROTA</div><div id="rodape-data">—</div></div>
-  </div>
-</div>
-
-<script>
-  const $ = id => document.getElementById(id);
-  const pad2 = n => String(n).padStart(2,'0');
-  const esc = s => (s||'').replace(/[&<>\\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\\"':'&quot;'}[m]));
-
-  // === Supabase ===
-  const SUPABASE_URL = 'https://ilonwkgtdszmpcjwlezc.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlsb253a2d0ZHN6bXBjandsZXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NzQxMDIsImV4cCI6MjA3NTU1MDEwMn0.Cc-BtnHlXaGVCY6T6iXe0QA1tsfc17aX8lswEICvtw0';
-  const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  // === Estado de “salvo” para alerta inteligente ===
-  let lastSavedIllicitHash = '';
-  const getIllicitText = () =>
-    [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value.trim()).filter(Boolean).join('\n');
-  const hash = str => { let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; } return String(h); };
-
-  // === Ranks & Officers ===
-  let RANKS = [], OFFICERS = [];
-  const ROLE_IDS = { motorista:'list-motorista', encarregado:'list-encarregado', seguranca:'list-seguranca', auxiliares:'list-auxiliares' };
-
-  async function loadRanks(){
-    const { data, error } = await supa.from('ranks').select('id,name,sort_order').order('sort_order',{ascending:true});
-    if(error){ console.error(error); alert('Erro ao carregar patentes.'); return; }
-    RANKS = data || [];
-  }
-  async function loadOfficers(){
-    const { data, error } = await supa.from('officers').select('id,name,current_rank_id').eq('active',true).order('name');
-    if(error){ console.error(error); alert('Erro ao carregar policiais.'); return; }
-    OFFICERS = data || [];
-  }
-
-  // ===== Campos dinâmicos simples =====
-  function mkItem(id,v,ph){
-    const w=document.createElement('div'); w.className='item';
-    w.innerHTML=`<input placeholder="${ph}" value="${v}"><button class="btn btn-sec" type="button">remover</button>`;
-    w.querySelector('button').onclick=()=>w.remove();
-    $(id).appendChild(w);
-  }
-  function addIlicito(v=''){ mkItem('list-ilicitos',v,'ex.: 02x Maconha'); }
-  function addOcorrencia(h='',t=''){
-    const w=document.createElement('div'); w.className='item-2';
-    w.innerHTML=`<input type="time" value="${h}"><input placeholder="Descreva a ocorrência" value="${t}"><button class="btn btn-sec" type="button">remover</button>`;
-    w.querySelector('button').onclick=()=>w.remove();
-    $('list-ocorrencias').appendChild(w);
-  }
-
-  // ===== ABORDADOS (3 campos) =====
-  function addAbordado(nome='',doc='',sit=''){
-    const w=document.createElement('div'); w.className='item-3';
-    w.innerHTML=`
-      <div class="grid-3" style="flex:1 1 100%">
-        <input placeholder="Nome do abordado" value="${esc(nome)}">
-        <input placeholder="CPF/ID do abordado" value="${esc(doc)}">
-        <input placeholder="Situação (ex.: BOPM — Cb Ducati 20:40)" value="${esc(sit)}">
-      </div>
-      <button class="btn btn-sec" type="button">remover</button>`;
-    w.querySelector('button').onclick=()=>w.remove();
-    $('list-abordados').appendChild(w);
-  }
-
-  // ===== VEÍCULOS (4 campos) =====
-  function addVeiculo(modelo='',cor='',placa='',sit=''){
-    const w=document.createElement('div'); w.className='item-4';
-    w.innerHTML=`
-      <div class="grid-4" style="flex:1 1 100%">
-        <input placeholder="Modelo do veículo" value="${esc(modelo)}">
-        <input placeholder="Cor" value="${esc(cor)}">
-        <input placeholder="Emplacamento" value="${esc(placa)}">
-        <input placeholder="Situação (ex.: Apreendido)" value="${esc(sit)}">
-      </div>
-      <button class="btn btn-sec" type="button">remover</button>`;
-    w.querySelector('button').onclick=()=>w.remove();
-    $('list-veiculos').appendChild(w);
-  }
-
-  // ===== Efetivo (múltiplos) =====
-  function addTeamItem(role){
-    const containerId = ROLE_IDS[role];
-    const wrap = document.createElement('div');
-    wrap.className = 'item';
-    const nameSel = document.createElement('select');
-    const rankSel = document.createElement('select');
-    nameSel.innerHTML = `<option value="">Selecione…</option>` + OFFICERS.map(o=>`<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');
-    rankSel.innerHTML = `<option value="">Selecione a patente…</option>` + RANKS.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
-    const delBtn = document.createElement('button'); delBtn.type='button'; delBtn.className='btn btn-sec'; delBtn.textContent='remover';
-    delBtn.onclick = ()=> wrap.remove();
-    nameSel.addEventListener('change', (e)=>{ const off = OFFICERS.find(o => o.id === e.target.value); rankSel.value = off?.current_rank_id || ''; });
-    wrap.appendChild(nameSel); wrap.appendChild(rankSel); wrap.appendChild(delBtn);
-    $(containerId).appendChild(wrap);
-  }
-
-  function collectRole(role){
-    const container = $(ROLE_IDS[role]);
-    const items = [...(container?.querySelectorAll('.item')||[])];
-    const res = [];
-    items.forEach(it=>{
-      const [nameSel, rankSel] = it.querySelectorAll('select');
-      const officerId = nameSel?.value || '';
-      const rankId = rankSel?.value || '';
-      if(!officerId) return;
-      const off = OFFICERS.find(o=>o.id===officerId);
-      const rankObj = RANKS.find(r=>String(r.id)===String(rankId));
-      res.push({ name: off?.name || '', rank_name: rankObj?.name || '', label: `${rankObj?.name?rankObj.name+' ':''}${off?.name||''}`.trim() });
-    });
-    return res;
-  }
-
-  // ===== Coleta
-  function collect(){
-    const L=id=>[...$(id).querySelectorAll('input')].map(i=>i.value).filter(Boolean);
-    const O=[...$('list-ocorrencias').children].map(d=>{const [h,t]=d.querySelectorAll('input');return{h:h.value,t:t.value}}).filter(o=>o.t);
-
-    const motoristaArr = collectRole('motorista');
-    const encarregadoArr = collectRole('encarregado');
-    const segurancaArr = collectRole('seguranca');
-    const auxiliaresArr = collectRole('auxiliares');
-
-    // Abordados formatados
-    const AB=[...$('list-abordados').children].map(w=>{
-      const [n,d,s] = w.querySelectorAll('input');
-      return { nome:n.value.trim(), doc:d.value.trim(), sit:s.value.trim() };
-    }).filter(x=>x.nome||x.doc||x.sit);
-    const abordadosFmt = AB.map(x=>`${x.nome} — ${x.doc} — ${x.sit}`);
-
-    // Veículos formatados
-    const VV=[...$('list-veiculos').children].map(w=>{
-      const [m,c,p,s] = w.querySelectorAll('input');
-      return { modelo:m.value.trim(), cor:c.value.trim(), placa:p.value.trim(), sit:s.value.trim() };
-    }).filter(x=>x.modelo||x.cor||x.placa||x.sit);
-    const veiculosFmt = VV.map(x=>`${x.modelo} — ${x.cor} — ${x.placa} — ${x.sit}`);
-
-    return{
-      datahora:$('datahora').value, rota:$('rota').value,
-      motorista: motoristaArr.map(x=>x.label),
-      encarregado: encarregadoArr.map(x=>x.label),
-      seguranca: segurancaArr.map(x=>x.label),
-      auxiliares: auxiliaresArr.map(x=>x.label),
-      _pairs: [...motoristaArr, ...encarregadoArr, ...segurancaArr, ...auxiliaresArr],
-      ilicitos:L('list-ilicitos'), veiculos:veiculosFmt,
-      ocorrencias:O, abordados:abordadosFmt,
-      resOc:+($('res-oc').value||0), resAp:+($('res-ap').value||0), resAc:+($('res-ac').value||0)
-    };
-  }
-
-  // ===== Impressão
-  function fillSheet(d){
-    const dt=d.datahora?new Date(d.datahora):new Date();
-    const dd=`${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
-    $('meta-data').textContent=`Data/Hora: ${dd}`;
-    $('meta-rota').textContent=` | Rota: ${d.rota||'—'}`;
-
-    const joinOrDash = arr => (arr && arr.length) ? esc(arr.join(' | ')) : '—';
-    $('k-motorista').innerHTML = joinOrDash(d.motorista);
-    $('k-encarregado').innerHTML = joinOrDash(d.encarregado);
-    $('k-seguranca').innerHTML = joinOrDash(d.seguranca);
-    $('k-auxiliares').innerHTML = joinOrDash(d.auxiliares);
-
-    const setList=(id,a)=>{ const u=$(id); u.innerHTML=''; if(!a||!a.length){u.innerHTML='<li>—</li>';return} a.forEach(v=>{const li=document.createElement('li'); li.innerHTML=esc(v); u.appendChild(li);}); };
-    setList('ul-abordados',d.abordados);
-    setList('ul-ilicitos',d.ilicitos);
-    setList('ul-veiculos',d.veiculos);
-
-    const ulO=$('ul-ocorrencias'); ulO.innerHTML='';
-    if(!d.ocorrencias.length){ulO.innerHTML='<li>—</li>';} else {
-      d.ocorrencias.sort((a,b)=>(a.h||'').localeCompare(b.h||''));
-      d.ocorrencias.forEach(o=>{ const li=document.createElement('li'); li.innerHTML=esc(o.h?`ÀS ${o.h}: ${o.t}`:o.t); ulO.appendChild(li); });
+    async function loadRanks(){
+      const { data, error } = await supa.from('ranks').select('id,name,sort_order').order('sort_order',{ascending:true});
+      if(error){ console.error(error); alert('Erro ao carregar patentes.'); return; }
+      RANKS = data || [];
     }
-    $('ul-resultado').innerHTML=`<li>${d.resOc}x Ocorrência.</li><li>${d.resAp}x Apoio.</li><li>${d.resAc}x Ação.</li>`;
-    const now=new Date(); $('rodape-data').textContent=`Emitido em ${pad2(now.getDate())}/${pad2(now.getMonth()+1)}/${now.getFullYear()} ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
-  }
-
-  // ===== Parser de ilícitos =====
-  function parseIlicitosText(multiline){
-    const parts = (multiline||'').split(/\n|,|;/).map(s=>s.trim()).filter(Boolean);
-    const out=[];
-    for(const p of parts){
-      let m = p.match(/^(\d+)\s*[x×]?\s*(.+)$/i) || p.match(/^(\d+)\s+(.+)$/i);
-      if(m){ out.push({item:m[2].trim().toLowerCase(), qty:parseInt(m[1],10)}); continue; }
-      const m2 = p.match(/(\d+)/);
-      if(m2){ out.push({item:p.replace(m2[0],'').trim().toLowerCase()||'desconhecido', qty:parseInt(m2[1],10)}); }
-      else{ out.push({item:p.toLowerCase(), qty:1}); }
+    async function loadOfficers(){
+      const { data, error } = await supa.from('officers').select('id,name,current_rank_id').eq('active',true).order('name');
+      if(error){ console.error(error); alert('Erro ao carregar policiais.'); return; }
+      OFFICERS = data || [];
     }
-    return out;
-  }
 
-  function selectedOfficerAndRankPairs(){
-    const d = collect();
-    return (d._pairs || []).map(p=>({ name: p.name, rank_name: p.rank_name }));
-  }
+    // ===== Helpers de itens =====
+    function mkItem(id,v,ph){
+      const w=document.createElement('div'); w.className='item';
+      w.innerHTML=`<input class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" placeholder="${ph}" value="${v}"> <button class="btn btn-ghost" type="button">remover</button>`;
+      w.querySelector('button').onclick=()=>w.remove();
+      $(id).appendChild(w);
+    }
+    function addIlicito(v=''){ mkItem('list-ilicitos',v,'ex.: 02x Maconha'); }
+    function addOcorrencia(h='',t=''){
+      const w=document.createElement('div'); w.className='item rota-card rounded-xl p-3';
+      w.innerHTML=`
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <input type="time" value="${h}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Descreva a ocorrência" value="${t}" class="sm:col-span-2 px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+        </div>
+        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>
+      `;
+      w.querySelector('button').onclick=()=>w.remove();
+      $('list-ocorrencias').appendChild(w);
+    }
 
-  // ===== Salvar ilícitos (Supabase) =====
-  async function saveIllicitsToSupabase(){
-    const rota = ($('rota').value || '').trim() || null;
-    const lines = [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value).filter(Boolean).join('\n');
-    const items = parseIlicitosText(lines);
-    const pairs = selectedOfficerAndRankPairs();
+    function addAbordado(nome='',doc='',sit=''){
+      const w=document.createElement('div'); w.className='item rota-card rounded-xl p-3';
+      w.innerHTML=`
+        <div class="grid md:grid-cols-3 gap-2 w-full">
+          <input placeholder="Nome do abordado" value="${esc(nome)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="CPF/ID do abordado" value="${esc(doc)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Situação (ex.: BOPM — Cb Ducati 20:40)" value="${esc(sit)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+        </div>
+        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>
+      `;
+      w.querySelector('button').onclick=()=>w.remove();
+      $('list-abordados').appendChild(w);
+    }
 
-    if(!items.length){ alert('Preencha ao menos 1 ilícito.'); return; }
-    if(!pairs.length){ alert('Selecione pelo menos 1 membro de equipe (nome e patente).'); return; }
+    function addVeiculo(modelo='',cor='',placa='',sit=''){
+      const w=document.createElement('div'); w.className='item rota-card rounded-xl p-3';
+      w.innerHTML=`
+        <div class="grid md:grid-cols-4 gap-2 w-full">
+          <input placeholder="Modelo do veículo" value="${esc(modelo)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Cor" value="${esc(cor)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Emplacamento" value="${esc(placa)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Situação (ex.: Apreendido)" value="${esc(sit)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+        </div>
+        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>
+      `;
+      w.querySelector('button').onclick=()=>w.remove();
+      $('list-veiculos').appendChild(w);
+    }
 
-    const rows = pairs.flatMap(({name, rank_name}) =>
-      items.map(({item, qty}) => ({ officer:name, rank_at_time:rank_name, rota, item_type:item, quantity:Number(qty) }))
-    );
+    // ---- Efetivo: uma linha (cartão) com Nome -> Patente
+    function addTeamItem(role){
+      const containerId = ROLE_IDS[role];
+      const wrap = document.createElement('div');
+      wrap.className = 'item rota-card rounded-xl p-3';
 
-    const btn = $('saveCloudBtn'); const old = btn.textContent;
-    btn.textContent = 'Salvando…'; btn.disabled = true;
-    try{
-      const { error } = await supa.from('rso_items').insert(rows);
-      if(error){ console.error(error); alert('Falha ao salvar no Supabase. Veja o console.'); return; }
-      btn.textContent = 'Salvo!';
-      lastSavedIllicitHash = hash(lines);
-    }catch(e){ console.error(e); alert('Falha de rede/JS. Veja o console.'); }
-    finally{ setTimeout(()=>{ btn.textContent = old; btn.disabled=false; }, 1200); }
-  }
+      const inner = document.createElement('div');
+      inner.className = 'grid grid-cols-1 gap-2';
 
-  // ===== Totais 7 dias =====
-  async function showTotals7d(){
-    const cutoff = new Date(Date.now()-7*24*60*60*1000).toISOString();
-    const { data, error } = await supa.from('rso_items').select('officer,item_type,quantity,recorded_at').gte('recorded_at', cutoff);
-    if(error){ console.error(error); alert('Erro ao buscar totais. Veja o console.'); return; }
-    const agg = {};
-    (data||[]).forEach(r=>{ const off = r.officer || '—'; if(!agg[off]) agg[off] = {}; agg[off][r.item_type] = (agg[off][r.item_type] || 0) + Number(r.quantity || 0); });
-    renderTotals(agg);
-  }
-  function renderTotals(agg){
-    const c = $('totalsContent');
-    if(!agg || !Object.keys(agg).length){ c.innerHTML='<div class="muted">Sem dados nos últimos 7 dias.</div>'; $('totalsPanel').style.display='block'; return; }
-    let html = '';
-    Object.keys(agg).sort().forEach(off=>{ html += `<h4>${esc(off)}</h4>`; html += `<table class="tot"><thead><tr><th>Item</th><th>Quantidade</th></tr></thead><tbody>`; const items = agg[off]; Object.keys(items).sort().forEach(it=>{ html += `<tr><td>${esc(it)}</td><td>${items[it]}</td></tr>`; }); html += `</tbody></table>`; });
-    c.innerHTML = html; $('totalsPanel').style.display = 'block'; $('exportCsvBtn').onclick = ()=> exportTotalsCSV(agg);
-  }
-  function exportTotalsCSV(agg){
-    const rows = [['policial','item','total']];
-    Object.entries(agg).forEach(([off, items])=>{ Object.entries(items).forEach(([item, total])=>{ rows.push([off, item, total]); }); });
-    const escapeCSV = s => /[\",;\n]/.test(String(s)) ? `\"${String(s).replace(/\"/g,'\"\"')}\"` : s;
-    const csv = rows.map(r=>r.map(escapeCSV).join(';')).join('\n');
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
-    const url  = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href=url; a.download='RSO-totais-7dias.csv'; a.click(); URL.revokeObjectURL(url);
-  }
+      const nameSel = document.createElement('select');
+      const rankSel = document.createElement('select');
+      nameSel.className = 'w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40';
+      rankSel.className = 'w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40';
 
-  // ===== Validação obrigatória (Abordados/Veículos) =====
-  function validateStructured(){
-    const abordados = [...$('list-abordados').children];
-    const veiculos = [...$('list-veiculos').children];
-    if(abordados.length===0){ alert('Adicione pelo menos 1 Abordado.'); return false; }
-    if(veiculos.length===0){ alert('Adicione pelo menos 1 Veículo.'); return false; }
-    for(const w of abordados){
-      const ins=[...w.querySelectorAll('input')];
-      if(ins.some(i=>!i.value.trim())){
-        alert('Preencha todos os campos de Abordados (Nome, CPF/ID e Situação).');
-        return false;
+      nameSel.innerHTML = `<option value="">Selecione o policial…</option>` + OFFICERS
+        .map(o=>`<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');
+      rankSel.innerHTML = `<option value="">Selecione a patente…</option>` + RANKS
+        .map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+
+      nameSel.addEventListener('change', (e)=>{
+        const off = OFFICERS.find(o => o.id === e.target.value);
+        rankSel.value = off?.current_rank_id || '';
+      });
+
+      inner.appendChild(nameSel);
+      inner.appendChild(rankSel);
+
+      const actions = document.createElement('div');
+      actions.className = 'mt-2 text-right';
+      const delBtn = document.createElement('button');
+      delBtn.type='button'; delBtn.className='btn btn-ghost'; delBtn.textContent='remover';
+      delBtn.onclick = ()=> wrap.remove();
+      actions.appendChild(delBtn);
+
+      wrap.appendChild(inner);
+      wrap.appendChild(actions);
+      $(containerId).appendChild(wrap);
+    }
+
+    function collectRole(role){
+      const container = $(ROLE_IDS[role]);
+      const items = [...(container?.querySelectorAll('.item')||[])];
+      const res = [];
+      items.forEach(it=>{
+        const [nameSel, rankSel] = it.querySelectorAll('select');
+        const officerId = nameSel?.value || '';
+        const rankId = rankSel?.value || '';
+        if(!officerId) return;
+        const off = OFFICERS.find(o=>o.id===officerId);
+        const rankObj = RANKS.find(r=>String(r.id)===String(rankId));
+        res.push({ name: off?.name || '', rank_name: rankObj?.name || '', label: `${rankObj?.name?rankObj.name+' ':''}${off?.name||''}`.trim() });
+      });
+      return res;
+    }
+
+    function collect(){
+      const L=id=>[...$(id).querySelectorAll('input')].map(i=>i.value).filter(Boolean);
+      const O=[...$('list-ocorrencias').children].map(d=>{const ins=d.querySelectorAll('input');return{h:ins[0]?.value,t:ins[1]?.value}}).filter(o=>o.t);
+
+      const motoristaArr = collectRole('motorista');
+      const encarregadoArr = collectRole('encarregado');
+      const segurancaArr = collectRole('seguranca');
+      const auxiliaresArr = collectRole('auxiliares');
+
+      const AB=[...$('list-abordados').children].map(w=>{
+        const [n,d,s] = w.querySelectorAll('input');
+        return { nome:n?.value.trim(), doc:d?.value.trim(), sit:s?.value.trim() };
+      }).filter(x=>x && (x.nome||x.doc||x.sit));
+      const abordadosFmt = AB.map(x=>`${x.nome} — ${x.doc} — ${x.sit}`);
+
+      const VV=[...$('list-veiculos').children].map(w=>{
+        const [m,c,p,s] = w.querySelectorAll('input');
+        return { modelo:m?.value.trim(), cor:c?.value.trim(), placa:p?.value.trim(), sit:s?.value.trim() };
+      }).filter(x=>x && (x.modelo||x.cor||x.placa||x.sit));
+      const veiculosFmt = VV.map(x=>`${x.modelo} — ${x.cor} — ${x.placa} — ${x.sit}`);
+
+      return{
+        datahora:$('datahora').value, rota:$('rota').value,
+        motorista: motoristaArr.map(x=>x.label),
+        encarregado: encarregadoArr.map(x=>x.label),
+        seguranca: segurancaArr.map(x=>x.label),
+        auxiliares: auxiliaresArr.map(x=>x.label),
+        _pairs: [...motoristaArr, ...encarregadoArr, ...segurancaArr, ...auxiliaresArr],
+        ilicitos:L('list-ilicitos'), veiculos:veiculosFmt,
+        ocorrencias:O, abordados:abordadosFmt,
+        resOc:+($('res-oc').value||0), resAp:+($('res-ap').value||0), resAc:+($('res-ac').value||0)
+      };
+    }
+
+    function fillSheet(d){
+      const dt=d.datahora?new Date(d.datahora):new Date();
+      const dd=`${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
+      $('meta-data').textContent=`Data/Hora: ${dd}`;
+      $('meta-rota').textContent=` | Rota: ${d.rota||'—'}`;
+
+      const joinOrDash = arr => (arr && arr.length) ? esc(arr.join(' | ')) : '—';
+      $('k-motorista').innerHTML = joinOrDash(d.motorista);
+      $('k-encarregado').innerHTML = joinOrDash(d.encarregado);
+      $('k-seguranca').innerHTML = joinOrDash(d.seguranca);
+      $('k-auxiliares').innerHTML = joinOrDash(d.auxiliares);
+
+      const setList=(id,a)=>{ const u=$(id); u.innerHTML=''; if(!a||!a.length){u.innerHTML='<li>—</li>';return} a.forEach(v=>{const li=document.createElement('li'); li.innerHTML=esc(v); u.appendChild(li);}); };
+      setList('ul-abordados',d.abordados);
+      setList('ul-ilicitos',d.ilicitos);
+      setList('ul-veiculos',d.veiculos);
+
+      const ulO=$('ul-ocorrencias'); ulO.innerHTML='';
+      if(!d.ocorrencias.length){ulO.innerHTML='<li>—</li>';}
+      else {
+        d.ocorrencias.sort((a,b)=>(a.h||'').localeCompare(b.h||''));
+        d.ocorrencias.forEach(o=>{ const li=document.createElement('li'); li.innerHTML=esc(o.h?`ÀS ${o.h}: ${o.t}`:o.t); ulO.appendChild(li); });
       }
+      $('ul-resultado').innerHTML=`<li>${d.resOc}x Ocorrência.</li><li>${d.resAp}x Apoio.</li><li>${d.resAc}x Ação.</li>`;
+      const now=new Date(); $('rodape-data').textContent=`Emitido em ${pad2(now.getDate())}/${pad2(now.getMonth()+1)}/${now.getFullYear()} ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
     }
-    for(const w of veiculos){
-      const ins=[...w.querySelectorAll('input')];
-      if(ins.some(i=>!i.value.trim())){
-        alert('Preencha todos os campos de Veículos (Modelo, Cor, Emplacamento e Situação).');
-        return false;
+
+    function parseIlicitosText(multiline){
+      const parts = (multiline||'').split(/\n|,|;/).map(s=>s.trim()).filter(Boolean);
+      const out=[];
+      for(const p of parts){
+        let m = p.match(/^(\d+)\s*[x×]?\s*(.+)$/i) || p.match(/^(\d+)\s+(.+)$/i);
+        if(m){ out.push({item:m[2].trim().toLowerCase(), qty:parseInt(m[1],10)}); continue; }
+        const m2 = p.match(/(\d+)/);
+        if(m2){ out.push({item:p.replace(m2[0],'').trim().toLowerCase()||'desconhecido', qty:parseInt(m2[1],10)}); }
+        else{ out.push({item:p.toLowerCase(), qty:1}); }
       }
+      return out;
     }
-    return true;
-  }
 
-  // ===== Inicialização =====
-  (async function init(){
-    await loadRanks();
-    await loadOfficers();
+    function selectedOfficerAndRankPairs(){
+      const d = collect();
+      return (d._pairs || []).map(p=>({ name: p.name, rank_name: p.rank_name }));
+    }
 
-    const d=new Date(), z=n=>String(n).padStart(2,'0');
-    $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
+    async function saveIllicitsToSupabase(){
+      const rota = ($('rota').value || '').trim() || null;
+      const lines = [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value).filter(Boolean).join('\n');
+      const items = parseIlicitosText(lines);
+      const pairs = selectedOfficerAndRankPairs();
 
-    if(!$('list-ilicitos').children.length) addIlicito();
-    if(!$('list-ocorrencias').children.length) addOcorrencia();
+      if(!items.length){ alert('Preencha ao menos 1 ilícito.'); return; }
+      if(!pairs.length){ alert('Selecione pelo menos 1 membro de equipe (nome e patente).'); return; }
 
-    // Efetivo default
-    addTeamItem('motorista');
-    addTeamItem('encarregado');
-    addTeamItem('seguranca');
-    addTeamItem('auxiliares');
+      const rows = pairs.flatMap(({name, rank_name}) =>
+        items.map(({item, qty}) => ({ officer:name, rank_at_time:rank_name, rota, item_type:item, quantity:Number(qty) }))
+      );
 
-    // Abordado/Veículo default (1 linha cada)
-    addAbordado();
-    addVeiculo();
+      const btn = $('saveCloudBtn'); const old = btn.textContent;
+      btn.textContent = 'Salvando…'; btn.disabled = true;
+      try{
+        const { error } = await supa.from('rso_items').insert(rows);
+        if(error){ console.error(error); alert('Falha ao salvar no Supabase. Veja o console.'); return; }
+        btn.textContent = 'Salvo!';
+        lastSavedIllicitHash = hash(lines);
+      }catch(e){ console.error(e); alert('Falha de rede/JS. Veja o console.'); }
+      finally{ setTimeout(()=>{ btn.textContent = old; btn.disabled=false; }, 1200); }
+    }
 
-    // eventos
-    $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
-    $('totalsBtn').addEventListener('click', showTotals7d);
+    async function showTotals7d(){
+      const cutoff = new Date(Date.now()-7*24*60*60*1000).toISOString();
+      const { data, error } = await supa.from('rso_items').select('officer,item_type,quantity,recorded_at').gte('recorded_at', cutoff);
+      if(error){ console.error(error); alert('Erro ao buscar totais. Veja o console.'); return; }
+      const agg = {};
+      (data||[]).forEach(r=>{ const off = r.officer || '—'; if(!agg[off]) agg[off] = {}; agg[off][r.item_type] = (agg[off][r.item_type] || 0) + Number(r.quantity || 0); });
+      renderTotals(agg);
+    }
+    function renderTotals(agg){
+      const c = $('totalsContent');
+      if(!agg || !Object.keys(agg).length){ c.innerHTML='<div class="text-slate-400 text-sm">Sem dados nos últimos 7 dias.</div>'; $('totalsPanel').classList.remove('hidden'); return; }
+      let html = '';
+      Object.keys(agg).sort().forEach(off=>{ html += `<h4 class="font-semibold mb-1">${esc(off)}</h4>`; html += `<table class="w-full text-sm"><thead><tr class="bg-slate-100/70 text-slate-900"><th class="text-left p-2">Item</th><th class="text-left p-2">Quantidade</th></tr></thead><tbody>`; const items = agg[off]; Object.keys(items).sort().forEach(it=>{ html += `<tr class="odd:bg-slate-800/20"><td class="p-2">${esc(it)}</td><td class="p-2">${items[it]}</td></tr>`; }); html += `</tbody></table>`; });
+      c.innerHTML = html; $('totalsPanel').classList.remove('hidden'); $('exportCsvBtn').onclick = ()=> exportTotalsCSV(agg);
+    }
+    function exportTotalsCSV(agg){
+      const rows = [['policial','item','total']];
+      Object.entries(agg).forEach(([off, items])=>{ Object.entries(items).forEach(([item, total])=>{ rows.push([off, item, total]); }); });
+      const escapeCSV = s => /[\"",;\n]/.test(String(s)) ? `\"${String(s).replace(/\"/g,'\"\"')}\"` : s;
+      const csv = rows.map(r=>r.map(escapeCSV).join(';')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+      const url  = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='RSO-totais-7dias.csv'; a.click(); URL.revokeObjectURL(url);
+    }
 
-    $('printBtn').addEventListener('click', ()=>{
-      if(!validateStructured()) return;
-      const currentHash = hash(getIllicitText());
-      if(currentHash !== lastSavedIllicitHash){
-        const goOn = confirm('⚠️ Ilícitos parecem NÃO estar salvos.\nClique em “OK” para imprimir mesmo assim, ou “Cancelar” para voltar e salvar.');
-        if(!goOn) return;
+    function validateStructured(){
+      const abordados = [...$('list-abordados').children];
+      const veiculos = [...$('list-veiculos').children];
+      if(abordados.length===0){ alert('Adicione pelo menos 1 Abordado.'); return false; }
+      if(veiculos.length===0){ alert('Adicione pelo menos 1 Veículo.'); return false; }
+      for(const w of abordados){
+        const ins=[...w.querySelectorAll('input')];
+        if(ins.some(i=>!i.value.trim())){ alert('Preencha todos os campos de Abordados (Nome, CPF/ID e Situação).'); return false; }
       }
-      const d=collect(); fillSheet(d); window.print();
-    });
+      for(const w of veiculos){
+        const ins=[...w.querySelectorAll('input')];
+        if(ins.some(i=>!i.value.trim())){ alert('Preencha todos os campos de Veículos (Modelo, Cor, Emplacamento e Situação).'); return false; }
+      }
+      return true;
+    }
 
-    window.onbeforeprint = ()=> fillSheet(collect());
-  })();
-</script>
+    (async function init(){
+      await loadRanks();
+      await loadOfficers();
+
+      const d=new Date(), z=n=>String(n).padStart(2,'0');
+      $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
+
+      if(!$('list-ilicitos').children.length) addIlicito();
+      if(!$('list-ocorrencias').children.length) addOcorrencia();
+
+      addTeamItem('motorista');
+      addTeamItem('encarregado');
+      addTeamItem('seguranca');
+      addTeamItem('auxiliares');
+
+      addAbordado();
+      addVeiculo();
+
+      $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
+      $('totalsBtn').addEventListener('click', showTotals7d);
+
+      $('printBtn').addEventListener('click', ()=>{
+        if(!validateStructured()) return;
+        const currentHash = hash(getIllicitText());
+        if(currentHash !== lastSavedIllicitHash){
+          const goOn = confirm('⚠️ Ilícitos parecem NÃO estar salvos.\nClique em “OK” para imprimir mesmo assim, ou “Cancelar” para voltar e salvar.');
+          if(!goOn) return;
+        }
+        const d=collect(); fillSheet(d); window.print();
+      });
+
+      window.onbeforeprint = ()=> fillSheet(collect());
+    })();
+  </script>
 </body>
 </html>
