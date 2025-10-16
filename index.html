@@ -29,30 +29,80 @@
     .btn-ghost{background:transparent;color:var(--rota-text);border-color:rgba(148,163,184,.25)}
     .btn-ghost:hover{background:rgba(148,163,184,.08)}
 
-    /* === Impressão A4 – limpeza total (folha clara) === */
+    /* === IMPRESSÃO A4 – tema claro, cards e tipografia refinada === */
     @page { size: A4; margin: 14mm }
     @media print {
-      html, body {
-        background: #fff !important;
-        color: #000 !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      /* Esconder UI e header escuro, mostrar apenas a folha */
+      :root { --ink:#0b1220; --ink-soft:#334155; --line:#dbe3ee; --bg:#ffffff; --bg-soft:#f8fafc; --chip:#eef2ff; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      html, body { background: var(--bg) !important; color: var(--ink) !important; }
+
+      /* mostrar só a folha branca */
       #form-area, .tactical-band, .badge { display: none !important; }
+
       #sheet {
         display: block !important;
         width: 190mm; max-width: 190mm; margin: 0 auto;
-        background: #fff !important; color: #0f172a !important;
-        border: 1px solid #cbd5e1 !important; box-shadow: none !important;
-        font-size: 13px; line-height: 1.35;
+        background: var(--bg) !important; color: var(--ink) !important;
+        border: 1px solid var(--line) !important; border-radius: 10px;
+        box-shadow: none !important;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        font-size: 13.25px; line-height: 1.38;
+        padding: 18mm 16mm;
       }
-      #sheet h2, #sheet h3 { color: #111827 !important; }
-      #sheet hr { border-color: #cbd5e1 !important; }
+
+      /* cabeçalho do documento */
+      #sheet .doc-head {
+        display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center;
+        margin-bottom: 8px;
+      }
+      #sheet .logo {
+        width: 44px; height: 44px; display: grid; place-items: center;
+        border-radius: 10px; border: 1px solid var(--ink-soft); color: var(--ink);
+        font-weight: 800;
+      }
+      #sheet .title { font-size: 17px; font-weight: 800; color: var(--ink); margin: 0; }
+      #sheet .subtitle { font-size: 11px; color: var(--ink-soft); margin-top: 1px; }
+
+      /* chips/meta */
+      #sheet .meta { display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0 12px; }
+      #sheet .chip {
+        border: 1px solid var(--line); background: var(--bg-soft); color: var(--ink-soft);
+        font-size: 11px; padding: 4px 8px; border-radius: 999px;
+      }
+
+      /* divisores e seções */
+      #sheet .divider { height: 1px; background: var(--line); margin: 10px 0 14px; }
+      #sheet .section {
+        background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+        padding: 10px 12px; margin-bottom: 10px;
+      }
+      #sheet .section h3 {
+        font-size: 13.5px; margin: 0 0 6px; color: var(--ink); font-weight: 700;
+        border-bottom: 1px solid var(--line); padding-bottom: 6px;
+      }
+
+      /* efetivo em duas colunas: label / valor */
+      #sheet .kgrid {
+        display: grid; grid-template-columns: 130px 1fr; column-gap: 10px; row-gap: 4px;
+        font-size: 12.75px;
+      }
+      #sheet .kgrid b { color: var(--ink-soft); }
+
+      /* listas */
       #sheet ul { list-style: disc; padding-left: 18px; margin: 6px 0; }
-      #sheet li { line-height: 1.3; }
-      /* “Logo” clara na impressão */
-      #sheet .logo { background:#fff !important; border:1px solid #334155 !important; color:#111827 !important; }
+      #sheet li { line-height: 1.32; }
+
+      /* resultado com marcadores alinhados */
+      #sheet .result ul { list-style: none; padding: 0; margin: 0; }
+      #sheet .result li { display:flex; gap:8px; }
+      #sheet .result li::before { content:"•"; color: var(--ink-soft); }
+
+      /* rodapé */
+      #sheet .foot {
+        margin-top: 12px; display:flex; justify-content:space-between; align-items:center;
+        font-size: 11px; color: var(--ink-soft);
+        border-top: 1px solid var(--line); padding-top: 8px;
+      }
     }
   </style>
 </head>
@@ -182,33 +232,66 @@
       </section>
     </div>
 
-    <!-- FOLHA A4 (print) -->
-    <div id="sheet" class="hidden bg-white text-slate-900 border border-slate-300 rounded-xl p-6">
-      <div class="flex items-center gap-3 justify-center mb-2">
-        <div class="logo w-12 h-12 rounded-lg grid place-items-center border text-amber-400 font-black">R</div>
+    <!-- FOLHA A4 (print bonita) -->
+    <div id="sheet" class="hidden">
+      <div class="doc-head">
+        <div class="logo">R</div>
         <div>
-          <h2 class="font-black text-lg text-slate-900">ROTA • Relatório de Serviço Operacional</h2>
-          <p class="text-xs text-slate-600">Documento gerado automaticamente</p>
+          <h2 class="title">ROTA • Relatório de Serviço Operacional</h2>
+          <div class="subtitle">Documento gerado automaticamente</div>
         </div>
       </div>
-      <hr class="my-3 border-t border-slate-300"/>
-      <div class="text-sm mb-2"><span id="meta-data">Data/Hora: —</span><span id="meta-rota"> | Rota: —</span></div>
-      <div class="mt-2">
-        <h3 class="font-semibold">EFETIVO</h3>
-        <div class="grid grid-cols-[140px_1fr] gap-x-3 gap-y-1 text-sm">
+
+      <div class="meta">
+        <span class="chip" id="meta-data">Data/Hora: —</span>
+        <span class="chip" id="meta-rota">Rota: —</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h3>Efetivo</h3>
+        <div class="kgrid">
           <b>Motorista(s):</b><span id="k-motorista">—</span>
           <b>Encarregado(s):</b><span id="k-encarregado">—</span>
           <b>Segurança(s):</b><span id="k-seguranca">—</span>
           <b>Auxiliar(es):</b><span id="k-auxiliares">—</span>
         </div>
       </div>
-      <div class="mt-3"><h3 class="font-semibold">ABORDADOS</h3><ul class="list-disc pl-5 text-sm" id="ul-abordados"><li>—</li></ul></div>
-      <div class="mt-3"><h3 class="font-semibold">ILÍCITOS</h3><ul class="list-disc pl-5 text-sm" id="ul-ilicitos"><li>—</li></ul></div>
-      <div class="mt-3"><h3 class="font-semibold">VEÍCULOS</h3><ul class="list-disc pl-5 text-sm" id="ul-veiculos"><li>—</li></ul></div>
-      <div class="mt-3"><h3 class="font-semibold">OCORRÊNCIAS</h3><ul class="list-disc pl-5 text-sm" id="ul-ocorrencias"><li>—</li></ul></div>
-      <div class="mt-3"><h3 class="font-semibold">RESULTADO</h3><ul class="list-disc pl-5 text-sm" id="ul-resultado"><li>0x Ocorrência.</li><li>0x Apoio.</li><li>0x Ação.</li></ul></div>
-      <hr class="my-3 border-t border-slate-300"/>
-      <div class="flex justify-between text-xs text-slate-600"><div>RSO • ROTA</div><div id="rodape-data">—</div></div>
+
+      <div class="section">
+        <h3>Abordados</h3>
+        <ul id="ul-abordados"><li>—</li></ul>
+      </div>
+
+      <div class="section">
+        <h3>Ilícitos</h3>
+        <ul id="ul-ilicitos"><li>—</li></ul>
+      </div>
+
+      <div class="section">
+        <h3>Veículos</h3>
+        <ul id="ul-veiculos"><li>—</li></ul>
+      </div>
+
+      <div class="section">
+        <h3>Ocorrências</h3>
+        <ul id="ul-ocorrencias"><li>—</li></ul>
+      </div>
+
+      <div class="section result">
+        <h3>Resultado</h3>
+        <ul id="ul-resultado">
+          <li>0x Ocorrência.</li>
+          <li>0x Apoio.</li>
+          <li>0x Ação.</li>
+        </ul>
+      </div>
+
+      <div class="foot">
+        <div>RSO • ROTA</div>
+        <div id="rodape-data">—</div>
+      </div>
     </div>
   </div>
 
@@ -348,7 +431,11 @@
     function fillSheet(d){
       const dt=d.datahora?new Date(d.datahora):new Date();
       const dd=`${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
-      $('meta-data').textContent=`Data/Hora: ${dd}`; $('meta-rota').textContent=` | Rota: ${d.rota||'—'}`;
+      // meta chips
+      const metaData = document.getElementById('meta-data');
+      const metaRota = document.getElementById('meta-rota');
+      if(metaData) metaData.textContent = `Data/Hora: ${dd}`;
+      if(metaRota) metaRota.textContent = `Rota: ${d.rota || '—'}`;
 
       const joinOrDash = a => (a&&a.length)?esc(a.join(' | ')):'—';
       $('k-motorista').innerHTML=joinOrDash(d.motorista);
@@ -482,7 +569,6 @@
       $('totalsBtn').addEventListener('click', showTotals7d);
       $('closeTotalsBtn').addEventListener('click', ()=> $('totalsPanel').classList.add('hidden'));
       $('exportCsvBtn').addEventListener('click', ()=>{
-        // recria o agg a partir do DOM atual
         const agg = {};
         [...$('totalsContent').children].forEach(group=>{
           const officer = group.querySelector('h4')?.textContent?.trim() || '—';
@@ -503,9 +589,6 @@
       // Expor funções usadas por onclick
       Object.assign(window,{ addTeamItem, addAbordado, addIlicito, addVeiculo, addOcorrencia });
     });
-  </script>
-</body>
-</html>
   </script>
 </body>
 </html>
