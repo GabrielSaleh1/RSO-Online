@@ -29,17 +29,30 @@
     .btn-ghost{background:transparent;color:var(--rota-text);border-color:rgba(148,163,184,.25)}
     .btn-ghost:hover{background:rgba(148,163,184,.08)}
 
-    /* Tabela do painel de totais */
-    table.totals{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:.75rem;border:1px solid rgba(148,163,184,.25)}
-    table.totals thead th{background:rgba(241,245,249,.9);color:#0b1220;padding:.6rem .75rem;font-weight:700;font-size:.85rem}
-    table.totals tbody td{padding:.6rem .75rem;border-top:1px solid rgba(148,163,184,.25)}
-    table.totals tbody tr:nth-child(odd){background:rgba(148,163,184,.06)}
-
-    /* Print A4 */
-    @page{size:A4;margin:14mm}
-    @media print{
-      body{background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-      #form-area{display:none!important} #sheet{display:block!important}
+    /* === Impressão A4 – limpeza total (folha clara) === */
+    @page { size: A4; margin: 14mm }
+    @media print {
+      html, body {
+        background: #fff !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      /* Esconder UI e header escuro, mostrar apenas a folha */
+      #form-area, .tactical-band, .badge { display: none !important; }
+      #sheet {
+        display: block !important;
+        width: 190mm; max-width: 190mm; margin: 0 auto;
+        background: #fff !important; color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important; box-shadow: none !important;
+        font-size: 13px; line-height: 1.35;
+      }
+      #sheet h2, #sheet h3 { color: #111827 !important; }
+      #sheet hr { border-color: #cbd5e1 !important; }
+      #sheet ul { list-style: disc; padding-left: 18px; margin: 6px 0; }
+      #sheet li { line-height: 1.3; }
+      /* “Logo” clara na impressão */
+      #sheet .logo { background:#fff !important; border:1px solid #334155 !important; color:#111827 !important; }
     }
   </style>
 </head>
@@ -172,7 +185,7 @@
     <!-- FOLHA A4 (print) -->
     <div id="sheet" class="hidden bg-white text-slate-900 border border-slate-300 rounded-xl p-6">
       <div class="flex items-center gap-3 justify-center mb-2">
-        <div class="w-12 h-12 rounded-lg grid place-items-center bg-slate-900/90 border border-slate-300 text-amber-400 font-black">R</div>
+        <div class="logo w-12 h-12 rounded-lg grid place-items-center border text-amber-400 font-black">R</div>
         <div>
           <h2 class="font-black text-lg text-slate-900">ROTA • Relatório de Serviço Operacional</h2>
           <p class="text-xs text-slate-600">Documento gerado automaticamente</p>
@@ -399,14 +412,12 @@
 
       if(error){ alert('Erro ao buscar totais.'); return; }
 
-      // agrega por policial -> item
       const agg = {};
       (data||[]).forEach(r=>{
         const off = r.officer || '—';
         if(!agg[off]) agg[off] = {};
         agg[off][r.item_type] = (agg[off][r.item_type] || 0) + Number(r.quantity || 0);
       });
-
       renderTotals(agg);
     }
 
@@ -418,19 +429,16 @@
         panel.classList.remove('hidden');
         return;
       }
-
-      // monta uma tabela por policial
       let html = '';
       Object.keys(agg).sort().forEach(off=>{
         html += `<div><h4 class="font-semibold mb-2">${esc(off)}</h4>`;
-        html += `<table class="totals"><thead><tr><th class="text-left">Item</th><th class="text-right">Quantidade</th></tr></thead><tbody>`;
+        html += `<table class="w-full text-sm border border-slate-300/40 rounded-lg overflow-hidden"><thead><tr class="bg-slate-100/80 text-slate-900"><th class="text-left p-2">Item</th><th class="text-right p-2">Quantidade</th></tr></thead><tbody>`;
         const items = agg[off];
         Object.keys(items).sort().forEach(it=>{
-          html += `<tr><td>${esc(it)}</td><td class="text-right">${items[it]}</td></tr>`;
+          html += `<tr class="odd:bg-slate-800/10"><td class="p-2">${esc(it)}</td><td class="p-2 text-right">${items[it]}</td></tr>`;
         });
         html += `</tbody></table></div>`;
       });
-
       content.innerHTML = html;
       panel.classList.remove('hidden');
     }
@@ -462,7 +470,7 @@
       const d=new Date(), z=n=>String(n).padStart(2,'0');
       $('datahora').value=`${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
 
-      // Carregar dados do banco para selects
+      // Carregar selects
       await Promise.all([loadRanks(), loadOfficers()]);
 
       // Itens iniciais
@@ -472,37 +480,32 @@
       // Botões de ação
       $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
       $('totalsBtn').addEventListener('click', showTotals7d);
+      $('closeTotalsBtn').addEventListener('click', ()=> $('totalsPanel').classList.add('hidden'));
+      $('exportCsvBtn').addEventListener('click', ()=>{
+        // recria o agg a partir do DOM atual
+        const agg = {};
+        [...$('totalsContent').children].forEach(group=>{
+          const officer = group.querySelector('h4')?.textContent?.trim() || '—';
+          agg[officer] = {};
+          group.querySelectorAll('tbody tr').forEach(tr=>{
+            const [tdItem, tdQty] = tr.querySelectorAll('td');
+            if(tdItem && tdQty) agg[officer][tdItem.textContent.trim()] = Number(tdQty.textContent.trim())||0;
+          });
+        });
+        exportTotalsCSVFromAgg(agg);
+      });
+
       $('printBtn').addEventListener('click', ()=>{
         if(!validateStructured()) return;
         const d=collect(); fillSheet(d); window.print();
       });
 
-      // Fechar painel de totais
-      $('closeTotalsBtn').addEventListener('click', ()=> $('totalsPanel').classList.add('hidden'));
-
-      // Export CSV: gera novamente o agg a partir do DOM
-      $('exportCsvBtn').addEventListener('click', ()=>{
-        const blocks = [...$('totalsContent').querySelectorAll('h4')];
-        if(!blocks.length){ alert('Nada para exportar.'); return; }
-        // reconstruir agg a partir da tabela renderizada
-        const agg = {};
-        const groups = $('totalsContent').children;
-        for(const g of groups){
-          const officer = g.querySelector('h4')?.textContent?.trim() || '—';
-          agg[officer] = {};
-          g.querySelectorAll('tbody tr').forEach(tr=>{
-            const tds = tr.querySelectorAll('td');
-            const item = (tds[0]?.textContent||'').trim();
-            const qty  = Number((tds[1]?.textContent||'0').trim())||0;
-            if(item) agg[officer][item] = qty;
-          });
-        }
-        exportTotalsCSVFromAgg(agg);
-      });
-
-      // Expor no escopo global para os onclicks do HTML
+      // Expor funções usadas por onclick
       Object.assign(window,{ addTeamItem, addAbordado, addIlicito, addVeiculo, addOcorrencia });
     });
+  </script>
+</body>
+</html>
   </script>
 </body>
 </html>
