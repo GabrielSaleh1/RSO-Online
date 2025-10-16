@@ -28,6 +28,13 @@
     .btn-red:hover{background:#f87171}
     .btn-ghost{background:transparent;color:var(--rota-text);border-color:rgba(148,163,184,.25)}
     .btn-ghost:hover{background:rgba(148,163,184,.08)}
+
+    /* Tabela do painel de totais */
+    table.totals{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:.75rem;border:1px solid rgba(148,163,184,.25)}
+    table.totals thead th{background:rgba(241,245,249,.9);color:#0b1220;padding:.6rem .75rem;font-weight:700;font-size:.85rem}
+    table.totals tbody td{padding:.6rem .75rem;border-top:1px solid rgba(148,163,184,.25)}
+    table.totals tbody tr:nth-child(odd){background:rgba(148,163,184,.06)}
+
     /* Print A4 */
     @page{size:A4;margin:14mm}
     @media print{
@@ -96,7 +103,7 @@
         </div>
       </section>
 
-      <!-- Listas (vertical) -->
+      <!-- Blocos (vertical) -->
       <section class="space-y-4">
         <div class="rota-card p-5">
           <label class="block text-lg font-semibold mb-3">Abordados</label>
@@ -148,6 +155,18 @@
         <button class="btn btn-red w-full" id="printBtn" type="button">🧾 Imprimir / PDF</button>
         <button class="btn btn-ghost w-full" id="totalsBtn" type="button">📊 Totais 7 dias</button>
       </section>
+
+      <!-- Painel de totais -->
+      <section id="totalsPanel" class="rota-card p-5 hidden">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold">Totais por policial (últimos 7 dias)</h3>
+          <div class="flex gap-2">
+            <button class="btn btn-ghost" id="exportCsvBtn" type="button">Exportar CSV</button>
+            <button class="btn btn-ghost" id="closeTotalsBtn" type="button">Fechar</button>
+          </div>
+        </div>
+        <div id="totalsContent" class="space-y-4"></div>
+      </section>
     </div>
 
     <!-- FOLHA A4 (print) -->
@@ -180,7 +199,7 @@
     </div>
   </div>
 
-  <!-- Supabase: carregado ANTES do script principal e no final do body -->
+  <!-- Supabase no final (antes do script principal) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -374,9 +393,58 @@
 
     async function showTotals7d(){
       const cutoff = new Date(Date.now()-7*24*60*60*1000).toISOString();
-      const { data, error } = await supa.from('rso_items').select('officer,item_type,quantity,recorded_at').gte('recorded_at', cutoff);
+      const { data, error } = await supa.from('rso_items')
+        .select('officer,item_type,quantity,recorded_at')
+        .gte('recorded_at', cutoff);
+
       if(error){ alert('Erro ao buscar totais.'); return; }
-      alert('Totais (últimos 7 dias):\\n' + JSON.stringify(data||[], null, 2));
+
+      // agrega por policial -> item
+      const agg = {};
+      (data||[]).forEach(r=>{
+        const off = r.officer || '—';
+        if(!agg[off]) agg[off] = {};
+        agg[off][r.item_type] = (agg[off][r.item_type] || 0) + Number(r.quantity || 0);
+      });
+
+      renderTotals(agg);
+    }
+
+    function renderTotals(agg){
+      const panel = $('totalsPanel');
+      const content = $('totalsContent');
+      if(!agg || !Object.keys(agg).length){
+        content.innerHTML = '<div class="text-slate-400 text-sm">Sem dados nos últimos 7 dias.</div>';
+        panel.classList.remove('hidden');
+        return;
+      }
+
+      // monta uma tabela por policial
+      let html = '';
+      Object.keys(agg).sort().forEach(off=>{
+        html += `<div><h4 class="font-semibold mb-2">${esc(off)}</h4>`;
+        html += `<table class="totals"><thead><tr><th class="text-left">Item</th><th class="text-right">Quantidade</th></tr></thead><tbody>`;
+        const items = agg[off];
+        Object.keys(items).sort().forEach(it=>{
+          html += `<tr><td>${esc(it)}</td><td class="text-right">${items[it]}</td></tr>`;
+        });
+        html += `</tbody></table></div>`;
+      });
+
+      content.innerHTML = html;
+      panel.classList.remove('hidden');
+    }
+
+    function exportTotalsCSVFromAgg(agg){
+      const rows = [['policial','item','total']];
+      Object.entries(agg).forEach(([off, items])=>{
+        Object.entries(items).forEach(([item, total])=> rows.push([off,item,total]));
+      });
+      const escCSV = s => /[\"",;\n]/.test(String(s)) ? `"${String(s).replace(/"/g,'""')}"` : s;
+      const csv = rows.map(r=>r.map(escCSV).join(';')).join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='RSO-totais-7dias.csv'; a.click(); URL.revokeObjectURL(url);
     }
 
     function validateStructured(){
@@ -409,8 +477,28 @@
         const d=collect(); fillSheet(d); window.print();
       });
 
-      // On print always refresh sheet
-      window.onbeforeprint = ()=> fillSheet(collect());
+      // Fechar painel de totais
+      $('closeTotalsBtn').addEventListener('click', ()=> $('totalsPanel').classList.add('hidden'));
+
+      // Export CSV: gera novamente o agg a partir do DOM
+      $('exportCsvBtn').addEventListener('click', ()=>{
+        const blocks = [...$('totalsContent').querySelectorAll('h4')];
+        if(!blocks.length){ alert('Nada para exportar.'); return; }
+        // reconstruir agg a partir da tabela renderizada
+        const agg = {};
+        const groups = $('totalsContent').children;
+        for(const g of groups){
+          const officer = g.querySelector('h4')?.textContent?.trim() || '—';
+          agg[officer] = {};
+          g.querySelectorAll('tbody tr').forEach(tr=>{
+            const tds = tr.querySelectorAll('td');
+            const item = (tds[0]?.textContent||'').trim();
+            const qty  = Number((tds[1]?.textContent||'0').trim())||0;
+            if(item) agg[officer][item] = qty;
+          });
+        }
+        exportTotalsCSVFromAgg(agg);
+      });
 
       // Expor no escopo global para os onclicks do HTML
       Object.assign(window,{ addTeamItem, addAbordado, addIlicito, addVeiculo, addOcorrencia });
