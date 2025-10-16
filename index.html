@@ -6,50 +6,34 @@
   <meta name="theme-color" content="#0b0f16" />
   <title>ROTA • Relatório de Serviço Operacional</title>
 
-  <!-- Tailwind -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase (defer para carregar antes do DOMContentLoaded) -->
-  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    /* === Tema estilo Index (4) === */
     :root{
-      --rota-bg: #0b0f16;
-      --rota-card: #121826;
-      --rota-soft: #1a2235;
-      --rota-gold: #f59e0b; /* amber-500 */
-      --rota-gold-700: #b45309;
-      --rota-red: #ef4444;  /* red-500 */
-      --rota-green: #10b981;/* emerald-500 */
-      --rota-text: #e5e7eb; /* slate-200 */
-      --rota-sub: #94a3b8;  /* slate-400 */
+      --rota-bg:#0b0f16; --rota-card:#121826; --rota-soft:#1a2235;
+      --rota-gold:#f59e0b; --rota-gold-700:#b45309; --rota-red:#ef4444;
+      --rota-green:#10b981; --rota-text:#e5e7eb; --rota-sub:#94a3b8;
     }
-    html, body { background: var(--rota-bg); color: var(--rota-text); }
-    .rota-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04)), var(--rota-card); border: 1px solid rgba(245,158,11,0.12); }
-    .rota-soft { background: var(--rota-soft); }
-    .rota-chip  { background: rgba(245,158,11,0.12); color: var(--rota-text); border: 1px solid rgba(245,158,11,0.25); }
-    .badge { font-size:.75rem; padding:.25rem .5rem; border-radius:.5rem; border:1px solid transparent; display:inline-block; }
-
-    /* Botões no estilo do index (4) */
-    .btn { display:inline-flex; align-items:center; gap:.5rem; font-weight:600; border-radius:.75rem; padding:.6rem 1rem;
-           transition: transform .06s ease, box-shadow .2s ease, background-color .2s ease, border-color .2s ease; border:1px solid transparent; }
-    .btn:active { transform: translateY(1px); }
-    .btn-gold { background: var(--rota-gold); color: #0b0f16; border-color: var(--rota-gold-700); }
-    .btn-gold:hover { background:#fbbf24; }
-    .btn-red  { background: var(--rota-red); color: #fff; border-color:#b91c1c; }
-    .btn-red:hover{ background:#f87171; }
-    .btn-green{ background: var(--rota-green); color:#042016; border-color:#065f46; }
-    .btn-green:hover{ background:#34d399; }
-    .btn-ghost{ background: transparent; color: var(--rota-text); border-color: rgba(148,163,184,.25); }
-    .btn-ghost:hover{ background: rgba(148,163,184,.08); }
-
-    /* Faixa diagonal tática */
-    .tactical-band { position: relative; overflow: hidden; background: linear-gradient(120deg, rgba(245,158,11,.16) 0%, rgba(245,158,11,.0) 60%), var(--rota-soft); border:1px solid rgba(245,158,11,0.2); }
-    .tactical-band::after{ content:""; position:absolute; inset:-40% -30%; background: repeating-linear-gradient(135deg, rgba(239, 68, 68, .22) 0 10px, rgba(239, 68, 68, 0) 10px 22px); transform: rotate(-2deg); pointer-events:none; mix-blend-mode: overlay; }
-
-    /* Impressão A4 */
+    html,body{background:var(--rota-bg);color:var(--rota-text)}
+    .rota-card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.04)),var(--rota-card);border:1px solid rgba(245,158,11,.12);border-radius:1rem}
+    .tactical-band{position:relative;overflow:hidden;background:linear-gradient(120deg,rgba(245,158,11,.16) 0,rgba(245,158,11,0) 60%),var(--rota-soft);border:1px solid rgba(245,158,11,.2)}
+    .tactical-band:after{content:"";position:absolute;inset:-40% -30%;background:repeating-linear-gradient(135deg,rgba(239,68,68,.22) 0 10px,rgba(239,68,68,0) 10px 22px);transform:rotate(-2deg);pointer-events:none;mix-blend-mode:overlay}
+    .badge{font-size:.75rem;padding:.25rem .5rem;border-radius:.5rem;border:1px solid rgba(245,158,11,.25);background:rgba(245,158,11,.12);display:inline-block}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-weight:600;border-radius:.75rem;padding:.65rem 1rem;border:1px solid transparent;transition:.2s}
+    .btn:active{transform:translateY(1px)}
+    .btn-gold{background:var(--rota-gold);color:#0b0f16;border-color:var(--rota-gold-700)}
+    .btn-gold:hover{background:#fbbf24}
+    .btn-red{background:var(--rota-red);color:#fff;border-color:#b91c1c}
+    .btn-red:hover{background:#f87171}
+    .btn-ghost{background:transparent;color:var(--rota-text);border-color:rgba(148,163,184,.25)}
+    .btn-ghost:hover{background:rgba(148,163,184,.08)}
+    /* Print A4 */
     @page{size:A4;margin:14mm}
-    @media print{ body{background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact} #form-area{display:none!important} #sheet{display:block!important} }
+    @media print{
+      body{background:#fff;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      #form-area{display:none!important} #sheet{display:block!important}
+    }
   </style>
 </head>
 <body class="min-h-screen">
@@ -63,31 +47,30 @@
           <p class="text-sm text-slate-400">Batalhão de Polícia de Choque — Documento interno</p>
         </div>
         <div class="ml-auto flex items-center gap-2">
-          <span class="badge rota-chip">Layout <b class="ml-1">Ponto-Online</b></span>
-          <span class="badge rota-chip">Foco: <b class="ml-1">RSO</b></span>
+          <span class="badge">Layout Ponto-Online</span>
+          <span class="badge">RSO</span>
         </div>
       </div>
     </header>
 
-    <!-- Área de formulário -->
+    <!-- Formulário -->
     <div id="form-area" class="space-y-4">
       <!-- Meta -->
-      <section class="rota-card rounded-2xl p-5">
+      <section class="rota-card p-5">
         <div class="grid sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm text-slate-400 mb-1">Data/Hora</label>
-            <input id="datahora" type="datetime-local" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+            <input id="datahora" type="datetime-local" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40"/>
           </div>
           <div>
             <label class="block text-sm text-slate-400 mb-1">Rota</label>
-            <input id="rota" placeholder="91136" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+            <input id="rota" placeholder="91136" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40"/>
           </div>
         </div>
-        <p class="text-slate-400 text-xs mt-2">Identificador numérico descontinuado <span class="badge rota-chip align-middle">Nº RSO removido</span></p>
       </section>
 
-      <!-- Efetivo (um embaixo do outro) -->
-      <section class="rota-card rounded-2xl p-5">
+      <!-- Efetivo -->
+      <section class="rota-card p-5">
         <h2 class="text-lg font-semibold mb-4">Efetivo</h2>
         <div class="space-y-4">
           <div>
@@ -113,27 +96,27 @@
         </div>
       </section>
 
-      <!-- Blocos (VERTICAL) -->
+      <!-- Listas (vertical) -->
       <section class="space-y-4">
-        <div class="rota-card rounded-2xl p-5">
+        <div class="rota-card p-5">
           <label class="block text-lg font-semibold mb-3">Abordados</label>
           <div id="list-abordados" class="space-y-2"></div>
           <button type="button" class="btn btn-ghost w-full justify-center mt-2" onclick="addAbordado()">+ adicionar abordado</button>
         </div>
 
-        <div class="rota-card rounded-2xl p-5">
+        <div class="rota-card p-5">
           <label class="block text-lg font-semibold mb-3">Ilícitos</label>
           <div id="list-ilicitos" class="space-y-2"></div>
           <button type="button" class="btn btn-ghost w-full justify-center mt-2" onclick="addIlicito()">+ adicionar ilícito</button>
         </div>
 
-        <div class="rota-card rounded-2xl p-5">
+        <div class="rota-card p-5">
           <label class="block text-lg font-semibold mb-3">Veículos</label>
           <div id="list-veiculos" class="space-y-2"></div>
           <button type="button" class="btn btn-ghost w-full justify-center mt-2" onclick="addVeiculo()">+ adicionar veículo</button>
         </div>
 
-        <div class="rota-card rounded-2xl p-5">
+        <div class="rota-card p-5">
           <label class="block text-lg font-semibold mb-3">Ocorrências</label>
           <div id="list-ocorrencias" class="space-y-2"></div>
           <button type="button" class="btn btn-ghost w-full justify-center mt-2" onclick="addOcorrencia()">+ adicionar ocorrência</button>
@@ -141,39 +124,29 @@
       </section>
 
       <!-- Resultado -->
-      <section class="rota-card rounded-2xl p-5">
+      <section class="rota-card p-5">
         <h3 class="text-lg font-semibold mb-3">Resultado</h3>
         <div class="grid sm:grid-cols-3 gap-3">
           <div>
             <label class="block text-sm text-slate-400 mb-1">Ocorrências (qtd)</label>
-            <input id="res-oc" type="number" min="0" value="0" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+            <input id="res-oc" type="number" min="0" value="0" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40"/>
           </div>
           <div>
             <label class="block text-sm text-slate-400 mb-1">Apoios (qtd)</label>
-            <input id="res-ap" type="number" min="0" value="0" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+            <input id="res-ap" type="number" min="0" value="0" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40"/>
           </div>
           <div>
             <label class="block text-sm text-slate-400 mb-1">Ações (Blipadas)</label>
-            <input id="res-ac" type="number" min="0" value="0" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+            <input id="res-ac" type="number" min="0" value="0" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40"/>
           </div>
         </div>
       </section>
 
-      <!-- Ações (VERTICAL) -->
-      <section class="rota-card rounded-2xl p-5 flex flex-col gap-3">
+      <!-- Ações (vertical) -->
+      <section class="rota-card p-5 flex flex-col gap-3">
         <button class="btn btn-gold w-full" id="saveCloudBtn" type="button">💾 Salvar ilícitos</button>
         <button class="btn btn-red w-full" id="printBtn" type="button">🧾 Imprimir / PDF</button>
         <button class="btn btn-ghost w-full" id="totalsBtn" type="button">📊 Totais 7 dias</button>
-      </section>
-
-      <!-- Totais painel -->
-      <section id="totalsPanel" class="rota-card rounded-2xl p-5 hidden">
-        <h3 class="text-lg font-semibold mb-3">Totais por policial (últimos 7 dias)</h3>
-        <div id="totalsContent" class="space-y-3"></div>
-        <div class="flex gap-3 mt-4">
-          <button class="btn btn-ghost" id="exportCsvBtn" type="button">Exportar CSV</button>
-          <button class="btn btn-ghost" type="button" onclick="document.getElementById('totalsPanel').classList.add('hidden')">Fechar</button>
-        </div>
       </section>
     </div>
 
@@ -186,7 +159,7 @@
           <p class="text-xs text-slate-600">Documento gerado automaticamente</p>
         </div>
       </div>
-      <hr class="my-3 border-t border-slate-300" />
+      <hr class="my-3 border-t border-slate-300"/>
       <div class="text-sm mb-2"><span id="meta-data">Data/Hora: —</span><span id="meta-rota"> | Rota: —</span></div>
       <div class="mt-2">
         <h3 class="font-semibold">EFETIVO</h3>
@@ -197,351 +170,251 @@
           <b>Auxiliar(es):</b><span id="k-auxiliares">—</span>
         </div>
       </div>
-      <div class="mt-3">
-        <h3 class="font-semibold">ABORDADOS</h3>
-        <ul class="list-disc pl-5 text-sm" id="ul-abordados"><li>—</li></ul>
-      </div>
-      <div class="mt-3">
-        <h3 class="font-semibold">ILÍCITOS</h3>
-        <ul class="list-disc pl-5 text-sm" id="ul-ilicitos"><li>—</li></ul>
-      </div>
-      <div class="mt-3">
-        <h3 class="font-semibold">VEÍCULOS</h3>
-        <ul class="list-disc pl-5 text-sm" id="ul-veiculos"><li>—</li></ul>
-      </div>
-      <div class="mt-3">
-        <h3 class="font-semibold">OCORRÊNCIAS</h3>
-        <ul class="list-disc pl-5 text-sm" id="ul-ocorrencias"><li>—</li></ul>
-      </div>
-      <div class="mt-3">
-        <h3 class="font-semibold">RESULTADO</h3>
-        <ul class="list-disc pl-5 text-sm" id="ul-resultado"><li>0x Ocorrência.</li><li>0x Apoio.</li><li>0x Ação.</li></ul>
-      </div>
-      <hr class="my-3 border-t border-slate-300" />
+      <div class="mt-3"><h3 class="font-semibold">ABORDADOS</h3><ul class="list-disc pl-5 text-sm" id="ul-abordados"><li>—</li></ul></div>
+      <div class="mt-3"><h3 class="font-semibold">ILÍCITOS</h3><ul class="list-disc pl-5 text-sm" id="ul-ilicitos"><li>—</li></ul></div>
+      <div class="mt-3"><h3 class="font-semibold">VEÍCULOS</h3><ul class="list-disc pl-5 text-sm" id="ul-veiculos"><li>—</li></ul></div>
+      <div class="mt-3"><h3 class="font-semibold">OCORRÊNCIAS</h3><ul class="list-disc pl-5 text-sm" id="ul-ocorrencias"><li>—</li></ul></div>
+      <div class="mt-3"><h3 class="font-semibold">RESULTADO</h3><ul class="list-disc pl-5 text-sm" id="ul-resultado"><li>0x Ocorrência.</li><li>0x Apoio.</li><li>0x Ação.</li></ul></div>
+      <hr class="my-3 border-t border-slate-300"/>
       <div class="flex justify-between text-xs text-slate-600"><div>RSO • ROTA</div><div id="rodape-data">—</div></div>
     </div>
   </div>
 
+  <!-- Supabase: carregado ANTES do script principal e no final do body -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
-    // ===== Helpers e estado global =====
+    /********** Helpers **********/
     const $ = id => document.getElementById(id);
     const pad2 = n => String(n).padStart(2,'0');
     const esc = s => (s||'').replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
-    let supa = null;                     // será criado após Supabase carregar
-    let RANKS = [], OFFICERS = [];       // vem do Supabase
-    let lastSavedIllicitHash = '';
-    const ROLE_IDS = { motorista:'list-motorista', encarregado:'list-encarregado', seguranca:'list-seguranca', auxiliares:'list-auxiliares' };
 
     const SUPABASE_URL = 'https://ilonwkgtdszmpcjwlezc.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlsb253a2d0ZHN6bXBjandsZXpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NzQxMDIsImV4cCI6MjA3NTU1MDEwMn0.Cc-BtnHlXaGVCY6T6iXe0QA1tsfc17aX8lswEICvtw0';
+    const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const getIllicitText = () =>
-      [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value.trim()).filter(Boolean).join('\\n');
-    const hash = str => { let h=5381; for(let i=0;i<str.length;i++){ h=((h<<5)+h)+str.charCodeAt(i); h|=0; } return String(h); };
+    let RANKS = [], OFFICERS = [];
+    let lastSavedIllicitHash = '';
+    const ROLE_IDS = { motorista:'list-motorista', encarregado:'list-encarregado', seguranca:'list-seguranca', auxiliares:'list-auxiliares' };
 
-    // ===== CRUD de linhas =====
+    /********** UI builders **********/
     function mkItem(id,v,ph){
       const w=document.createElement('div'); w.className='item';
-      w.innerHTML=\`<input class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" placeholder="\${ph}" value="\${v}">
-      <button class="btn btn-ghost mt-2" type="button">remover</button>\`;
+      w.innerHTML=`<input class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" placeholder="${ph}" value="${v}">
+      <button class="btn btn-ghost mt-2" type="button">remover</button>`;
       w.querySelector('button').onclick=()=>w.remove();
       $(id).appendChild(w);
     }
     function addIlicito(v=''){ mkItem('list-ilicitos',v,'ex.: 02x Maconha'); }
+
     function addOcorrencia(h='',t=''){
-      const w=document.createElement('div'); w.className='item rota-card rounded-xl p-3';
-      w.innerHTML=\`
+      const w=document.createElement('div'); w.className='item rota-card p-3';
+      w.innerHTML=`
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <input type="time" value="\${h}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Descreva a ocorrência" value="\${t}" class="sm:col-span-2 px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input type="time" value="${h}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Descreva a ocorrência" value="${t}" class="sm:col-span-2 px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
         </div>
-        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>\`;
+        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>`;
       w.querySelector('button').onclick=()=>w.remove();
       $('list-ocorrencias').appendChild(w);
     }
+
     function addAbordado(nome='',doc='',sit=''){
-      const w=document.createElement('div'); w.className='item rota-card rounded-xl p-3';
-      w.innerHTML=\`
+      const w=document.createElement('div'); w.className='item rota-card p-3';
+      w.innerHTML=`
         <div class="grid md:grid-cols-3 gap-2 w-full">
-          <input placeholder="Nome do abordado" value="\${esc(nome)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="CPF/ID do abordado" value="\${esc(doc)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Situação (ex.: BOPM — Cb Ducati 20:40)" value="\${esc(sit)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Nome do abordado" value="${esc(nome)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="CPF/ID do abordado" value="${esc(doc)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Situação (ex.: BOPM — Cb Ducati 20:40)" value="${esc(sit)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
         </div>
-        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>\`;
+        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>`;
       w.querySelector('button').onclick=()=>w.remove();
       $('list-abordados').appendChild(w);
     }
+
     function addVeiculo(modelo='',cor='',placa='',sit=''){
-      const w=document.createElement('div'); w.className='item rota-card rounded-xl p-3';
-      w.innerHTML=\`
+      const w=document.createElement('div'); w.className='item rota-card p-3';
+      w.innerHTML=`
         <div class="grid md:grid-cols-4 gap-2 w-full">
-          <input placeholder="Modelo do veículo" value="\${esc(modelo)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Cor" value="\${esc(cor)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Emplacamento" value="\${esc(placa)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Situação (ex.: Apreendido)" value="\${esc(sit)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Modelo do veículo" value="${esc(modelo)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Cor" value="${esc(cor)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Emplacamento" value="${esc(placa)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+          <input placeholder="Situação (ex.: Apreendido)" value="${esc(sit)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
         </div>
-        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>\`;
+        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>`;
       w.querySelector('button').onclick=()=>w.remove();
       $('list-veiculos').appendChild(w);
     }
 
-    // ---- Efetivo: Nome -> Patente (em cartões verticais)
+    // Efetivo: select nome -> select patente
     function addTeamItem(role){
       const containerId = ROLE_IDS[role];
-      const wrap = document.createElement('div');
-      wrap.className = 'item rota-card rounded-xl p-3';
+      const wrap = document.createElement('div'); wrap.className='item rota-card p-3';
+      const inner=document.createElement('div'); inner.className='grid grid-cols-1 gap-2';
 
-      const inner = document.createElement('div');
-      inner.className = 'grid grid-cols-1 gap-2';
-
-      const nameSel = document.createElement('select');
-      const rankSel = document.createElement('select');
-      nameSel.className = 'w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40';
-      rankSel.className = 'w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40';
-
-      nameSel.innerHTML = `<option value="">Selecione o policial…</option>` + OFFICERS
-        .map(o=>`<option value="${esc(o.id)}">${esc(o.name)}</option>`).join('');
-      rankSel.innerHTML = `<option value="">Selecione a patente…</option>` + RANKS
-        .map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
-
-      nameSel.addEventListener('change', (e)=>{
-        const off = OFFICERS.find(o => o.id === e.target.value);
-        rankSel.value = off?.current_rank_id || '';
+      const nameSel=document.createElement('select');
+      const rankSel=document.createElement('select');
+      nameSel.className='w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40';
+      rankSel.className='w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40';
+      nameSel.innerHTML = `<option value="">Selecione o policial…</option>` + OFFICERS.map(o=>`<option value="${o.id}">${esc(o.name)}</option>`).join('');
+      rankSel.innerHTML = `<option value="">Selecione a patente…</option>` + RANKS.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
+      nameSel.addEventListener('change', e=>{
+        const off = OFFICERS.find(o=>o.id===e.target.value);
+        if(off) rankSel.value = off.current_rank_id ?? '';
       });
 
-      inner.appendChild(nameSel);
-      inner.appendChild(rankSel);
+      inner.appendChild(nameSel); inner.appendChild(rankSel);
+      const actions=document.createElement('div'); actions.className='mt-2 text-right';
+      const del=document.createElement('button'); del.type='button'; del.className='btn btn-ghost'; del.textContent='remover';
+      del.onclick=()=>wrap.remove(); actions.appendChild(del);
 
-      const actions = document.createElement('div');
-      actions.className = 'mt-2 text-right';
-      const delBtn = document.createElement('button');
-      delBtn.type='button'; delBtn.className='btn btn-ghost'; delBtn.textContent='remover';
-      delBtn.onclick = ()=> wrap.remove();
-      actions.appendChild(delBtn);
-
-      wrap.appendChild(inner);
-      wrap.appendChild(actions);
+      wrap.appendChild(inner); wrap.appendChild(actions);
       $(containerId).appendChild(wrap);
     }
 
-    // ===== Coleta e impressão =====
+    /********** Coleta/Impressão **********/
     function collectRole(role){
-      const container = $(ROLE_IDS[role]);
-      const items = [...(container?.querySelectorAll('.item')||[])];
-      const res = [];
+      const items=[...($(ROLE_IDS[role])?.querySelectorAll('.item')||[])], out=[];
       items.forEach(it=>{
         const [nameSel, rankSel] = it.querySelectorAll('select');
-        const officerId = nameSel?.value || '';
-        const rankId = rankSel?.value || '';
+        const officerId = nameSel?.value || ''; const rankId = rankSel?.value || '';
         if(!officerId) return;
         const off = OFFICERS.find(o=>o.id===officerId);
-        const rankObj = RANKS.find(r=>String(r.id)===String(rankId));
-        res.push({ name: off?.name || '', rank_name: rankObj?.name || '', label: `${rankObj?.name?rankObj.name+' ':''}${off?.name||''}`.trim() });
+        const rk  = RANKS.find(r=>String(r.id)===String(rankId));
+        out.push({name: off?.name || '', rank_name: rk?.name || '', label:`${rk?.name?rk.name+' ':''}${off?.name||''}`.trim()});
       });
-      return res;
+      return out;
     }
     function collect(){
       const L=id=>[...$(id).querySelectorAll('input')].map(i=>i.value).filter(Boolean);
       const O=[...$('list-ocorrencias').children].map(d=>{const ins=d.querySelectorAll('input');return{h:ins[0]?.value,t:ins[1]?.value}}).filter(o=>o.t);
 
-      const motoristaArr = collectRole('motorista');
-      const encarregadoArr = collectRole('encarregado');
-      const segurancaArr = collectRole('seguranca');
-      const auxiliaresArr = collectRole('auxiliares');
+      const motoristaArr=collectRole('motorista'), encarregadoArr=collectRole('encarregado'),
+            segurancaArr=collectRole('seguranca'), auxiliaresArr=collectRole('auxiliares');
 
       const AB=[...$('list-abordados').children].map(w=>{
-        const [n,d,s] = w.querySelectorAll('input');
-        return { nome:n?.value.trim(), doc:d?.value.trim(), sit:s?.value.trim() };
+        const [n,d,s]=w.querySelectorAll('input'); return {nome:n?.value.trim(),doc:d?.value.trim(),sit:s?.value.trim()};
       }).filter(x=>x && (x.nome||x.doc||x.sit));
       const abordadosFmt = AB.map(x=>`${x.nome} — ${x.doc} — ${x.sit}`);
 
       const VV=[...$('list-veiculos').children].map(w=>{
-        const [m,c,p,s] = w.querySelectorAll('input');
-        return { modelo:m?.value.trim(), cor:c?.value.trim(), placa:p?.value.trim(), sit:s?.value.trim() };
+        const [m,c,p,s]=w.querySelectorAll('input'); return {modelo:m?.value.trim(),cor:c?.value.trim(),placa:p?.value.trim(),sit:s?.value.trim()};
       }).filter(x=>x && (x.modelo||x.cor||x.placa||x.sit));
       const veiculosFmt = VV.map(x=>`${x.modelo} — ${x.cor} — ${x.placa} — ${x.sit}`);
 
-      return{
+      return {
         datahora:$('datahora').value, rota:$('rota').value,
-        motorista: motoristaArr.map(x=>x.label),
-        encarregado: encarregadoArr.map(x=>x.label),
-        seguranca: segurancaArr.map(x=>x.label),
-        auxiliares: auxiliaresArr.map(x=>x.label),
-        _pairs: [...motoristaArr, ...encarregadoArr, ...segurancaArr, ...auxiliaresArr],
-        ilicitos:L('list-ilicitos'), veiculos:veiculosFmt,
-        ocorrencias:O, abordados:abordadosFmt,
+        motorista:motoristaArr.map(x=>x.label),
+        encarregado:encarregadoArr.map(x=>x.label),
+        seguranca:segurancaArr.map(x=>x.label),
+        auxiliares:auxiliaresArr.map(x=>x.label),
+        _pairs:[...motoristaArr,...encarregadoArr,...segurancaArr,...auxiliaresArr],
+        ilicitos:L('list-ilicitos'), veiculos:veiculosFmt, ocorrencias:O, abordados:abordadosFmt,
         resOc:+($('res-oc').value||0), resAp:+($('res-ap').value||0), resAc:+($('res-ac').value||0)
       };
     }
     function fillSheet(d){
       const dt=d.datahora?new Date(d.datahora):new Date();
       const dd=`${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
-      $('meta-data').textContent=`Data/Hora: ${dd}`;
-      $('meta-rota').textContent=` | Rota: ${d.rota||'—'}`;
+      $('meta-data').textContent=`Data/Hora: ${dd}`; $('meta-rota').textContent=` | Rota: ${d.rota||'—'}`;
 
-      const joinOrDash = arr => (arr && arr.length) ? esc(arr.join(' | ')) : '—';
-      $('k-motorista').innerHTML = joinOrDash(d.motorista);
-      $('k-encarregado').innerHTML = joinOrDash(d.encarregado);
-      $('k-seguranca').innerHTML = joinOrDash(d.seguranca);
-      $('k-auxiliares').innerHTML = joinOrDash(d.auxiliares);
+      const joinOrDash = a => (a&&a.length)?esc(a.join(' | ')):'—';
+      $('k-motorista').innerHTML=joinOrDash(d.motorista);
+      $('k-encarregado').innerHTML=joinOrDash(d.encarregado);
+      $('k-seguranca').innerHTML=joinOrDash(d.seguranca);
+      $('k-auxiliares').innerHTML=joinOrDash(d.auxiliares);
 
-      const setList=(id,a)=>{ const u=$(id); u.innerHTML=''; if(!a||!a.length){u.innerHTML='<li>—</li>';return} a.forEach(v=>{const li=document.createElement('li'); li.innerHTML=esc(v); u.appendChild(li);}); };
-      setList('ul-abordados',d.abordados);
-      setList('ul-ilicitos',d.ilicitos);
-      setList('ul-veiculos',d.veiculos);
+      const setList=(id,a)=>{const u=$(id); u.innerHTML=''; if(!a||!a.length){u.innerHTML='<li>—</li>';return} a.forEach(v=>{const li=document.createElement('li'); li.innerHTML=esc(v); u.appendChild(li);});};
+      setList('ul-abordados',d.abordados); setList('ul-ilicitos',d.ilicitos); setList('ul-veiculos',d.veiculos);
 
       const ulO=$('ul-ocorrencias'); ulO.innerHTML='';
-      if(!d.ocorrencias.length){ulO.innerHTML='<li>—</li>';}
-      else {
-        d.ocorrencias.sort((a,b)=>(a.h||'').localeCompare(b.h||''));
-        d.ocorrencias.forEach(o=>{ const li=document.createElement('li'); li.innerHTML=esc(o.h?`ÀS ${o.h}: ${o.t}`:o.t); ulO.appendChild(li); });
-      }
+      if(!d.ocorrencias.length) ulO.innerHTML='<li>—</li>';
+      else { d.ocorrencias.sort((a,b)=>(a.h||'').localeCompare(b.h||'')); d.ocorrencias.forEach(o=>{const li=document.createElement('li'); li.innerHTML=esc(o.h?`ÀS ${o.h}: ${o.t}`:o.t); ulO.appendChild(li);}); }
+
       $('ul-resultado').innerHTML=`<li>${d.resOc}x Ocorrência.</li><li>${d.resAp}x Apoio.</li><li>${d.resAc}x Ação.</li>`;
       const now=new Date(); $('rodape-data').textContent=`Emitido em ${pad2(now.getDate())}/${pad2(now.getMonth()+1)}/${now.getFullYear()} ${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
     }
 
-    // ===== Supabase =====
-    async function loadRanks(){
-      if(!supa){ console.warn('Supabase ainda não carregou.'); return; }
-      const { data, error } = await supa.from('ranks').select('id,name,sort_order').order('sort_order',{ascending:true});
-      if(error){ console.error(error); alert('Erro ao carregar patentes.'); return; }
-      RANKS = data || [];
-    }
-    async function loadOfficers(){
-      if(!supa){ console.warn('Supabase ainda não carregou.'); return; }
-      const { data, error } = await supa.from('officers').select('id,name,current_rank_id').eq('active',true).order('name');
-      if(error){ console.error(error); alert('Erro ao carregar policiais.'); return; }
-      OFFICERS = data || [];
-    }
-    function selectedOfficerAndRankPairs(){
-      const d = collect();
-      return (d._pairs || []).map(p=>({ name: p.name, rank_name: p.rank_name }));
-    }
-    async function saveIllicitsToSupabase(){
-      if(!supa){ alert('Conexão com banco ainda não disponível. Tente novamente em 1–2 segundos.'); return; }
-      const rota = ($('rota').value || '').trim() || null;
-      const lines = [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value).filter(Boolean).join('\\n');
-      const items = parseIlicitosText(lines);
-      const pairs = selectedOfficerAndRankPairs();
+    /********** Supabase I/O **********/
+    async function loadRanks(){ const {data,error}=await supa.from('ranks').select('id,name,sort_order').order('sort_order'); if(!error) RANKS=data||[]; }
+    async function loadOfficers(){ const {data,error}=await supa.from('officers').select('id,name,current_rank_id').eq('active',true).order('name'); if(!error) OFFICERS=data||[]; }
 
-      if(!items.length){ alert('Preencha ao menos 1 ilícito.'); return; }
-      if(!pairs.length){ alert('Selecione pelo menos 1 membro de equipe (nome e patente).'); return; }
-
-      const rows = pairs.flatMap(({name, rank_name}) =>
-        items.map(({item, qty}) => ({ officer:name, rank_at_time:rank_name, rota, item_type:item, quantity:Number(qty) }))
-      );
-
-      const btn = $('saveCloudBtn'); const old = btn.textContent;
-      btn.textContent = 'Salvando…'; btn.disabled = true;
-      try{
-        const { error } = await supa.from('rso_items').insert(rows);
-        if(error){ console.error(error); alert('Falha ao salvar no Supabase. Veja o console.'); return; }
-        btn.textContent = 'Salvo!';
-        lastSavedIllicitHash = hash(lines);
-      }catch(e){ console.error(e); alert('Falha de rede/JS. Veja o console.'); }
-      finally{ setTimeout(()=>{ btn.textContent = old; btn.disabled=false; }, 1200); }
-    }
     function parseIlicitosText(multiline){
-      const parts = (multiline||'').split(/\\n|,|;/).map(s=>s.trim()).filter(Boolean);
-      const out=[];
+      const parts=(multiline||'').split(/\n|,|;/).map(s=>s.trim()).filter(Boolean), out=[];
       for(const p of parts){
-        let m = p.match(/^(\\d+)\\s*[x×]?\\s*(.+)$/i) || p.match(/^(\\d+)\\s+(.+)$/i);
+        let m=p.match(/^(\d+)\s*[x×]?\s*(.+)$/i)||p.match(/^(\d+)\s+(.+)$/i);
         if(m){ out.push({item:m[2].trim().toLowerCase(), qty:parseInt(m[1],10)}); continue; }
-        const m2 = p.match(/(\\d+)/);
-        if(m2){ out.push({item:p.replace(m2[0],'').trim().toLowerCase()||'desconhecido', qty:parseInt(m2[1],10)}); }
-        else{ out.push({item:p.toLowerCase(), qty:1}); }
+        const m2=p.match(/(\d+)/); if(m2){ out.push({item:p.replace(m2[0],'').trim().toLowerCase()||'desconhecido', qty:parseInt(m2[1],10)}); }
+        else out.push({item:p.toLowerCase(), qty:1});
       }
       return out;
     }
+    function selectedOfficerAndRankPairs(){ const d=collect(); return (d._pairs||[]).map(p=>({name:p.name, rank_name:p.rank_name})); }
+
+    async function saveIllicitsToSupabase(){
+      const rota = ($('rota').value||'').trim()||null;
+      const lines = [...document.querySelectorAll('#list-ilicitos input')].map(i=>i.value).filter(Boolean).join('\n');
+      const items = parseIlicitosText(lines);
+      const pairs = selectedOfficerAndRankPairs();
+      if(!items.length){ alert('Preencha ao menos 1 ilícito.'); return; }
+      if(!pairs.length){ alert('Selecione pelo menos 1 membro de equipe (nome e patente).'); return; }
+
+      const rows = pairs.flatMap(({name,rank_name})=> items.map(({item,qty})=>({
+        officer:name, rank_at_time:rank_name, rota, item_type:item, quantity:Number(qty)
+      })));
+
+      const btn=$('saveCloudBtn'); const old=btn.textContent; btn.textContent='Salvando…'; btn.disabled=true;
+      try{
+        const { error } = await supa.from('rso_items').insert(rows);
+        if(error) throw error;
+        btn.textContent='Salvo!'; lastSavedIllicitHash = String(lines);
+      }catch(e){ console.error(e); alert('Falha ao salvar no Supabase.'); }
+      finally{ setTimeout(()=>{ btn.textContent=old; btn.disabled=false; }, 1200); }
+    }
 
     async function showTotals7d(){
-      if(!supa){ alert('Conexão com banco ainda não disponível. Tente novamente em 1–2 segundos.'); return; }
       const cutoff = new Date(Date.now()-7*24*60*60*1000).toISOString();
       const { data, error } = await supa.from('rso_items').select('officer,item_type,quantity,recorded_at').gte('recorded_at', cutoff);
-      if(error){ console.error(error); alert('Erro ao buscar totais.'); return; }
-      const agg = {};
-      (data||[]).forEach(r=>{ const off = r.officer || '—'; if(!agg[off]) agg[off] = {}; agg[off][r.item_type] = (agg[off][r.item_type] || 0) + Number(r.quantity || 0); });
-      renderTotals(agg);
-    }
-    function renderTotals(agg){
-      const c = $('totalsContent');
-      if(!agg || !Object.keys(agg).length){ c.innerHTML='<div class="text-slate-400 text-sm">Sem dados nos últimos 7 dias.</div>'; $('totalsPanel').classList.remove('hidden'); return; }
-      let html = '';
-      Object.keys(agg).sort().forEach(off=>{ html += `<h4 class="font-semibold mb-1">${esc(off)}</h4>`; html += `<table class="w-full text-sm"><thead><tr class="bg-slate-100/70 text-slate-900"><th class="text-left p-2">Item</th><th class="text-left p-2">Quantidade</th></tr></thead><tbody>`; const items = agg[off]; Object.keys(items).sort().forEach(it=>{ html += `<tr class="odd:bg-slate-800/20"><td class="p-2">${esc(it)}</td><td class="p-2">${items[it]}</td></tr>`; }); html += `</tbody></table>`; });
-      c.innerHTML = html; $('totalsPanel').classList.remove('hidden'); $('exportCsvBtn').onclick = ()=> exportTotalsCSV(agg);
-    }
-    function exportTotalsCSV(agg){
-      const rows = [['policial','item','total']];
-      Object.entries(agg).forEach(([off, items])=>{ Object.entries(items).forEach(([item, total])=>{ rows.push([off, item, total]); }); });
-      const escapeCSV = s => /[\\\"",;\\n]/.test(String(s)) ? `\"${String(s).replace(/\\\"/g,'\\\"\\\"')}\"` : s;
-      const csv = rows.map(r=>r.map(escapeCSV).join(';')).join('\\n');
-      const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
-      const url  = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href=url; a.download='RSO-totais-7dias.csv'; a.click(); URL.revokeObjectURL(url);
+      if(error){ alert('Erro ao buscar totais.'); return; }
+      alert('Totais (últimos 7 dias):\\n' + JSON.stringify(data||[], null, 2));
     }
 
     function validateStructured(){
-      const abordados = [...$('list-abordados').children];
-      const veiculos = [...$('list-veiculos').children];
-      if(abordados.length===0){ alert('Adicione pelo menos 1 Abordado.'); return false; }
-      if(veiculos.length===0){ alert('Adicione pelo menos 1 Veículo.'); return false; }
-      for(const w of abordados){
-        const ins=[...w.querySelectorAll('input')];
-        if(ins.some(i=>!i.value.trim())){ alert('Preencha todos os campos de Abordados (Nome, CPF/ID e Situação).'); return false; }
-      }
-      for(const w of veiculos){
-        const ins=[...w.querySelectorAll('input')];
-        if(ins.some(i=>!i.value.trim())){ alert('Preencha todos os campos de Veículos (Modelo, Cor, Emplacamento e Situação).'); return false; }
-      }
+      const abordados=[...$('list-abordados').children], veiculos=[...$('list-veiculos').children];
+      if(!abordados.length){ alert('Adicione pelo menos 1 Abordado.'); return false; }
+      if(!veiculos.length){ alert('Adicione pelo menos 1 Veículo.'); return false; }
+      for(const w of abordados){ const ins=[...w.querySelectorAll('input')]; if(ins.some(i=>!i.value.trim())){ alert('Preencha todos os campos de Abordados.'); return false; } }
+      for(const w of veiculos){ const ins=[...w.querySelectorAll('input')]; if(ins.some(i=>!i.value.trim())){ alert('Preencha todos os campos de Veículos.'); return false; } }
       return true;
     }
 
-    // ===== Inicialização garantida após Supabase carregar =====
-    document.addEventListener('DOMContentLoaded', async () => {
-      // cria o client só quando a lib supabase já estiver disponível
-      if (window.supabase) {
-        supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      } else {
-        // fallback: espera o evento 'load' se o navegador atrasar a execução do script defer
-        window.addEventListener('load', () => {
-          supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        });
-      }
-
-      await loadRanks();
-      await loadOfficers();
-
+    /********** Init **********/
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      // Data default
       const d=new Date(), z=n=>String(n).padStart(2,'0');
-      $('datahora').value = `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
+      $('datahora').value=`${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}`;
 
-      // itens iniciais
-      if(!$('list-ilicitos').children.length) addIlicito();
-      if(!$('list-ocorrencias').children.length) addOcorrencia();
+      // Carregar dados do banco para selects
+      await Promise.all([loadRanks(), loadOfficers()]);
 
-      addTeamItem('motorista');
-      addTeamItem('encarregado');
-      addTeamItem('seguranca');
-      addTeamItem('auxiliares');
+      // Itens iniciais
+      addTeamItem('motorista'); addTeamItem('encarregado'); addTeamItem('seguranca'); addTeamItem('auxiliares');
+      addAbordado(); addVeiculo(); addIlicito(); addOcorrencia();
 
-      addAbordado();
-      addVeiculo();
-
-      // botões de ação
-      $('saveCloudBtn')?.addEventListener('click', saveIllicitsToSupabase);
-      $('totalsBtn')?.addEventListener('click', showTotals7d);
-      $('printBtn')?.addEventListener('click', ()=>{
+      // Botões de ação
+      $('saveCloudBtn').addEventListener('click', saveIllicitsToSupabase);
+      $('totalsBtn').addEventListener('click', showTotals7d);
+      $('printBtn').addEventListener('click', ()=>{
         if(!validateStructured()) return;
-        const currentHash = hash(getIllicitText());
-        if(currentHash !== lastSavedIllicitHash){
-          const goOn = confirm('⚠️ Ilícitos parecem NÃO estar salvos.\\nClique em “OK” para imprimir mesmo assim, ou “Cancelar” para voltar e salvar.');
-          if(!goOn) return;
-        }
         const d=collect(); fillSheet(d); window.print();
       });
-    });
 
-    // Expor funções usadas por onClick no HTML (garante que existam no escopo global)
-    Object.assign(window, { addTeamItem, addAbordado, addIlicito, addVeiculo, addOcorrencia });
+      // On print always refresh sheet
+      window.onbeforeprint = ()=> fillSheet(collect());
+
+      // Expor no escopo global para os onclicks do HTML
+      Object.assign(window,{ addTeamItem, addAbordado, addIlicito, addVeiculo, addOcorrencia });
+    });
   </script>
 </body>
 </html>
