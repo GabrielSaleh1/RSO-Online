@@ -11,33 +11,140 @@
 
   <style>
     :root{
-      --rota-bg:#0b0f16; --rota-card:#121826; --rota-soft:#1a2235;
-      --rota-gold:#f59e0b; --rota-gold-700:#b45309; --rota-red:#ef4444;
-      --rota-green:#10b981; --rota-text:#e5e7eb; --rota-sub:#94a3b8;
-    }
-    html,body{background:var(--rota-bg);color:var(--rota-text)}
-    .rota-card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(0,0,0,.04)),var(--rota-card);border:1px solid rgba(245,158,11,.12);border-radius:1rem}
-    .tactical-band{position:relative;overflow:hidden;background:linear-gradient(120deg,rgba(245,158,11,.16) 0,rgba(245,158,11,0) 60%),var(--rota-soft);border:1px solid rgba(245,158,11,.2)}
-    .tactical-band:after{content:"";position:absolute;inset:-40% -30%;background:repeating-linear-gradient(135deg,rgba(239,68,68,.22) 0 10px,rgba(239,68,68,0) 10px 22px);transform:rotate(-2deg);pointer-events:none;mix-blend-mode:overlay}
-    .badge{font-size:.75rem;padding:.25rem .5rem;border-radius:.5rem;border:1px solid rgba(245,158,11,.25);background:rgba(245,158,11,.12);display:inline-block}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-weight:600;border-radius:.75rem;padding:.65rem 1rem;border:1px solid transparent;transition:.2s}
-    .btn:active{transform:translateY(1px)}
-    .btn-gold{background:var(--rota-gold);color:#0b0f16;border-color:var(--rota-gold-700)}
-    .btn-gold:hover{background:#fbbf24}
-    .btn-red{background:var(--rota-red);color:#fff;border-color:#b91c1c}
-    .btn-red:hover{background:#f87171}
-    .btn-ghost{background:transparent;color:var(--rota-text);border-color:rgba(148,163,184,.25)}
-    .btn-ghost:hover{background:rgba(148,163,184,.08)}
+      --bg0:#070a10;
+      --bg1:#0b0f16;
+      --card:#111827;
+      --card2:#0f172a;
+      --stroke:rgba(148,163,184,.18);
 
-    /* === IMPRESSÃO A4 – tema claro, cards e tipografia refinada === */
+      --gold:#f59e0b;
+      --gold2:#fbbf24;
+      --gold700:#b45309;
+
+      --red:#ef4444;
+      --green:#10b981;
+
+      --text:#e5e7eb;
+      --sub:#94a3b8;
+    }
+
+    html,body{min-height:100%; color:var(--text); background:
+      radial-gradient(1200px 900px at 15% 10%, rgba(245,158,11,.10), transparent 55%),
+      radial-gradient(1100px 800px at 85% 20%, rgba(239,68,68,.07), transparent 58%),
+      radial-gradient(900px 700px at 70% 95%, rgba(16,185,129,.06), transparent 55%),
+      linear-gradient(180deg, var(--bg0), var(--bg1));
+    }
+
+    /* grid suave (sem máscara pra não “cortar”) */
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.22;
+      background-image:
+        linear-gradient(rgba(148,163,184,.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148,163,184,.10) 1px, transparent 1px);
+      background-size: 72px 72px;
+      z-index:0;
+    }
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background: radial-gradient(closest-side at 50% 35%, transparent 0%, rgba(0,0,0,.35) 70%, rgba(0,0,0,.55) 100%);
+      z-index:0;
+    }
+    #appRoot{ position:relative; z-index:1; }
+
+    .glass{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--stroke);
+      box-shadow: 0 20px 60px rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+    }
+
+    .rota-card{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.14)), var(--card);
+      border:1px solid rgba(245,158,11,.14);
+      border-radius: 1.25rem;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+    }
+
+    .soft{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.10)), var(--card2);
+      border:1px solid var(--stroke);
+      border-radius: 1.25rem;
+    }
+
+    .badge{
+      font-size:.75rem;
+      padding:.28rem .6rem;
+      border-radius: 999px;
+      border:1px solid rgba(245,158,11,.25);
+      background: rgba(245,158,11,.12);
+      display:inline-flex;
+      align-items:center;
+      gap:.45rem;
+      white-space:nowrap;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.55rem;
+      font-weight:800;
+      border-radius: 1rem;
+      padding:.72rem 1.05rem;
+      border:1px solid transparent;
+      transition: transform .06s ease, background-color .2s ease, border-color .2s ease, opacity .2s ease;
+      user-select:none;
+      will-change: transform;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn[disabled]{ opacity:.55; cursor:not-allowed; }
+
+    .btn-gold{ background: var(--gold); color:#081018; border-color: rgba(180,83,9,.85); }
+    .btn-gold:hover{ background: var(--gold2); }
+    .btn-red{ background: var(--red); color:#fff; border-color: rgba(185,28,28,.9); }
+    .btn-red:hover{ background: #f87171; }
+    .btn-ghost{ background: rgba(148,163,184,.06); color: var(--text); border-color: rgba(148,163,184,.22); }
+    .btn-ghost:hover{ background: rgba(148,163,184,.10); }
+    .btn-outline{ background: transparent; color: var(--text); border-color: rgba(148,163,184,.30); }
+    .btn-outline:hover{ background: rgba(148,163,184,.08); }
+
+    input, select{
+      background: rgba(2,6,23,.55) !important;
+      border: 1px solid rgba(148,163,184,.30) !important;
+      border-radius: 1rem !important;
+      padding: .70rem .95rem !important;
+      color: var(--text) !important;
+      outline: none !important;
+    }
+    input::placeholder{ color: rgba(148,163,184,.85) !important; }
+    input:focus, select:focus{
+      box-shadow: 0 0 0 3px rgba(245,158,11,.22) !important;
+      border-color: rgba(245,158,11,.55) !important;
+    }
+
+    .section-title{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      margin-bottom: .85rem;
+    }
+    .section-title h2, .section-title h3{
+      margin:0;
+    }
+
+    /* === IMPRESSÃO A4 (mantido do seu original) === */
     @page { size: A4; margin: 14mm }
     @media print {
       :root { --ink:#0b1220; --ink-soft:#334155; --line:#dbe3ee; --bg:#ffffff; --bg-soft:#f8fafc; --chip:#eef2ff; }
       * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       html, body { background: var(--bg) !important; color: var(--ink) !important; }
 
-      /* mostrar só a folha branca */
-      #form-area, .tactical-band, .badge { display: none !important; }
+      body::before, body::after, #appRoot header, #form-area { display:none !important; }
 
       #sheet {
         display: block !important;
@@ -50,186 +157,229 @@
         padding: 18mm 16mm;
       }
 
-      /* cabeçalho do documento */
-      #sheet .doc-head {
-        display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center;
-        margin-bottom: 8px;
-      }
-      #sheet .logo {
-        width: 44px; height: 44px; display: grid; place-items: center;
-        border-radius: 10px; border: 1px solid var(--ink-soft); color: var(--ink);
-        font-weight: 800;
-      }
+      #sheet .doc-head { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; margin-bottom: 8px; }
+      #sheet .logo { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 10px; border: 1px solid var(--ink-soft); color: var(--ink); font-weight: 800; }
       #sheet .title { font-size: 17px; font-weight: 800; color: var(--ink); margin: 0; }
       #sheet .subtitle { font-size: 11px; color: var(--ink-soft); margin-top: 1px; }
 
-      /* chips/meta */
       #sheet .meta { display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0 12px; }
-      #sheet .chip {
-        border: 1px solid var(--line); background: var(--bg-soft); color: var(--ink-soft);
-        font-size: 11px; padding: 4px 8px; border-radius: 999px;
-      }
+      #sheet .chip { border: 1px solid var(--line); background: var(--bg-soft); color: var(--ink-soft); font-size: 11px; padding: 4px 8px; border-radius: 999px; }
 
-      /* divisores e seções */
       #sheet .divider { height: 1px; background: var(--line); margin: 10px 0 14px; }
-      #sheet .section {
-        background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
-        padding: 10px 12px; margin-bottom: 10px;
-      }
-      #sheet .section h3 {
-        font-size: 13.5px; margin: 0 0 6px; color: var(--ink); font-weight: 700;
-        border-bottom: 1px solid var(--line); padding-bottom: 6px;
-      }
+      #sheet .section { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+      #sheet .section h3 { font-size: 13.5px; margin: 0 0 6px; color: var(--ink); font-weight: 700; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
 
-      /* efetivo em duas colunas: label / valor */
-      #sheet .kgrid {
-        display: grid; grid-template-columns: 130px 1fr; column-gap: 10px; row-gap: 4px;
-        font-size: 12.75px;
-      }
+      #sheet .kgrid { display: grid; grid-template-columns: 130px 1fr; column-gap: 10px; row-gap: 4px; font-size: 12.75px; }
       #sheet .kgrid b { color: var(--ink-soft); }
 
-      /* listas */
       #sheet ul { list-style: disc; padding-left: 18px; margin: 6px 0; }
       #sheet li { line-height: 1.32; }
 
-      /* resultado com marcadores alinhados */
       #sheet .result ul { list-style: none; padding: 0; margin: 0; }
       #sheet .result li { display:flex; gap:8px; }
       #sheet .result li::before { content:"•"; color: var(--ink-soft); }
 
-      /* rodapé */
-      #sheet .foot {
-        margin-top: 12px; display:flex; justify-content:space-between; align-items:center;
-        font-size: 11px; color: var(--ink-soft);
-        border-top: 1px solid var(--line); padding-top: 8px;
-      }
+      #sheet .foot { margin-top: 12px; display:flex; justify-content:space-between; align-items:center; font-size: 11px; color: var(--ink-soft); border-top: 1px solid var(--line); padding-top: 8px; }
     }
   </style>
 </head>
+
 <body class="min-h-screen">
-  <div class="max-w-6xl mx-auto p-6">
+  <div id="appRoot" class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
     <!-- Header -->
-    <header class="tactical-band rounded-2xl p-5 mb-6">
+    <header class="glass rounded-3xl p-5 sm:p-6 mb-6">
       <div class="flex items-center gap-4 flex-wrap">
-        <div class="h-10 w-10 rounded-xl flex items-center justify-center rota-card ring-1 ring-amber-500/30 text-xl font-black">R</div>
-        <div>
-          <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide">ROTA • Relatório de Serviço Operacional</h1>
-          <p class="text-sm text-slate-400">Batalhão de Polícia de Choque — Documento interno</p>
+        <div class="relative">
+          <div class="h-11 w-11 rounded-2xl grid place-items-center rota-card text-xl font-black">R</div>
+          <span class="absolute -right-1 -bottom-1 h-4 w-4 rounded-full bg-amber-500 ring-2 ring-black/50"></span>
         </div>
-        <div class="ml-auto flex items-center gap-2">
-          <span class="badge">Layout Ponto-Online</span>
-          <span class="badge">RSO</span>
+
+        <div class="min-w-[240px]">
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-wide">ROTA • Relatório de Serviço Operacional</h1>
+          <p class="text-sm text-slate-300/75">Batalhão de Polícia de Choque — Documento interno</p>
+        </div>
+
+        <div class="ml-auto flex items-center gap-2 flex-wrap">
+          <span class="badge">📄 RSO</span>
+          <span class="badge">🧾 PDF/A4</span>
+          <span class="badge">☁️ Supabase</span>
+        </div>
+      </div>
+
+      <div class="mt-4 flex flex-wrap items-center gap-3">
+        <div class="badge" style="border-color:rgba(148,163,184,.25); background:rgba(148,163,184,.06)">
+          ✅ Layout atualizado (mais limpo e rápido)
+        </div>
+        <div class="ml-auto text-xs text-slate-300/70">
+          Dica: preencha e clique em <b>Imprimir / PDF</b> para gerar a folha A4.
         </div>
       </div>
     </header>
 
-    <!-- Formulário -->
-    <div id="form-area" class="space-y-4">
-      <!-- Meta -->
-      <section class="rota-card p-5">
-        <div class="grid sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm text-slate-400 mb-1">Data/Hora</label>
-            <input id="datahora" type="datetime-local" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40"/>
-          </div>
-          <div>
-            <label class="block text-sm text-slate-400 mb-1">Rota</label>
-            <input id="rota" placeholder="91136" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40"/>
-          </div>
-        </div>
-      </section>
+    <!-- Formulário (com layout melhor no desktop) -->
+    <div id="form-area" class="grid gap-6 lg:grid-cols-12 items-start">
 
-      <!-- Efetivo -->
-      <section class="rota-card p-5">
-        <h2 class="text-lg font-semibold mb-4">Efetivo</h2>
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm text-slate-400 mb-1">Motorista(s)</label>
-            <div id="list-motorista" class="space-y-2"></div>
-            <button type="button" class="btn btn-ghost mt-2" onclick="addTeamItem('motorista')">+ adicionar motorista</button>
-          </div>
-          <div>
-            <label class="block text-sm text-slate-400 mb-1">Chefe de barca / Encarregado(s)</label>
-            <div id="list-encarregado" class="space-y-2"></div>
-            <button type="button" class="btn btn-ghost mt-2" onclick="addTeamItem('encarregado')">+ adicionar chefe de barca</button>
-          </div>
-          <div>
-            <label class="block text-sm text-slate-400 mb-1">Segurança(s)</label>
-            <div id="list-seguranca" class="space-y-2"></div>
-            <button type="button" class="btn btn-ghost mt-2" onclick="addTeamItem('seguranca')">+ adicionar segurança</button>
-          </div>
-          <div>
-            <label class="block text-sm text-slate-400 mb-1">Auxiliar(es)</label>
-            <div id="list-auxiliares" class="space-y-2"></div>
-            <button type="button" class="btn btn-ghost mt-2" onclick="addTeamItem('auxiliares')">+ adicionar auxiliar</button>
-          </div>
-        </div>
-      </section>
+      <!-- Coluna principal -->
+      <div class="lg:col-span-8 space-y-6">
 
-      <!-- Blocos (vertical) -->
-      <section class="space-y-4">
-        <div class="rota-card p-5">
-          <label class="block text-lg font-semibold mb-3">Abordados</label>
-          <div id="list-abordados" class="space-y-2"></div>
-          <button type="button" class="btn btn-ghost w-full justify-center mt-2" onclick="addAbordado()">+ adicionar abordado</button>
-        </div>
-
-        <div class="rota-card p-5">
-          <label class="block text-lg font-semibold mb-3">Ilícitos</label>
-          <div id="list-ilicitos" class="space-y-2"></div>
-          <button type="button" class="btn btn-ghost w-full justify-center mt-2" onclick="addIlicito()">+ adicionar ilícito</button>
-        </div>
-
-        <div class="rota-card p-5">
-          <label class="block text-lg font-semibold mb-3">Veículos</label>
-          <div id="list-veiculos" class="space-y-2"></div>
-          <button type="button" class="btn btn-ghost w-full justify-center mt-2" onclick="addVeiculo()">+ adicionar veículo</button>
-        </div>
-
-        <div class="rota-card p-5">
-          <label class="block text-lg font-semibold mb-3">Ocorrências</label>
-          <div id="list-ocorrencias" class="space-y-2"></div>
-          <button type="button" class="btn btn-ghost w-full justify-center mt-2" onclick="addOcorrencia()">+ adicionar ocorrência</button>
-        </div>
-      </section>
-
-      <!-- Resultado -->
-      <section class="rota-card p-5">
-        <h3 class="text-lg font-semibold mb-3">Resultado</h3>
-        <div class="grid sm:grid-cols-3 gap-3">
-          <div>
-            <label class="block text-sm text-slate-400 mb-1">Ocorrências (qtd)</label>
-            <input id="res-oc" type="number" min="0" value="0" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40"/>
+        <!-- Meta -->
+        <section class="rota-card p-5 sm:p-6">
+          <div class="section-title">
+            <h2 class="text-lg sm:text-xl font-extrabold">🗓️ Identificação</h2>
+            <span class="badge" style="background:rgba(148,163,184,.06);border-color:rgba(148,163,184,.22)">Campos obrigatórios</span>
           </div>
-          <div>
-            <label class="block text-sm text-slate-400 mb-1">Apoios (qtd)</label>
-            <input id="res-ap" type="number" min="0" value="0" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40"/>
-          </div>
-          <div>
-            <label class="block text-sm text-slate-400 mb-1">Ações (Blipadas)</label>
-            <input id="res-ac" type="number" min="0" value="0" class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40"/>
-          </div>
-        </div>
-      </section>
 
-      <!-- Ações (vertical) -->
-      <section class="rota-card p-5 flex flex-col gap-3">
-        <button class="btn btn-gold w-full" id="saveCloudBtn" type="button">💾 Salvar ilícitos</button>
-        <button class="btn btn-red w-full" id="printBtn" type="button">🧾 Imprimir / PDF</button>
-        <button class="btn btn-ghost w-full" id="totalsBtn" type="button">📊 Totais 7 dias</button>
-      </section>
-
-      <!-- Painel de totais -->
-      <section id="totalsPanel" class="rota-card p-5 hidden">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-lg font-semibold">Totais por policial (últimos 7 dias)</h3>
-          <div class="flex gap-2">
-            <button class="btn btn-ghost" id="exportCsvBtn" type="button">Exportar CSV</button>
-            <button class="btn btn-ghost" id="closeTotalsBtn" type="button">Fechar</button>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm text-slate-300/80 mb-1">Data/Hora</label>
+              <input id="datahora" type="datetime-local" class="w-full" />
+            </div>
+            <div>
+              <label class="block text-sm text-slate-300/80 mb-1">Rota</label>
+              <input id="rota" placeholder="91136" class="w-full" />
+            </div>
           </div>
-        </div>
-        <div id="totalsContent" class="space-y-4"></div>
-      </section>
+        </section>
+
+        <!-- Efetivo -->
+        <section class="rota-card p-5 sm:p-6">
+          <div class="section-title">
+            <h2 class="text-lg sm:text-xl font-extrabold">🧑‍✈️ Efetivo</h2>
+            <span class="badge" style="background:rgba(245,158,11,.10)">Selecione policial + patente</span>
+          </div>
+
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm text-slate-300/80 mb-2">Motorista(s)</label>
+              <div id="list-motorista" class="space-y-3"></div>
+              <button type="button" class="btn btn-ghost mt-3" onclick="addTeamItem('motorista')">➕ adicionar motorista</button>
+            </div>
+
+            <div>
+              <label class="block text-sm text-slate-300/80 mb-2">Chefe de barca / Encarregado(s)</label>
+              <div id="list-encarregado" class="space-y-3"></div>
+              <button type="button" class="btn btn-ghost mt-3" onclick="addTeamItem('encarregado')">➕ adicionar chefe de barca</button>
+            </div>
+
+            <div>
+              <label class="block text-sm text-slate-300/80 mb-2">Segurança(s)</label>
+              <div id="list-seguranca" class="space-y-3"></div>
+              <button type="button" class="btn btn-ghost mt-3" onclick="addTeamItem('seguranca')">➕ adicionar segurança</button>
+            </div>
+
+            <div>
+              <label class="block text-sm text-slate-300/80 mb-2">Auxiliar(es)</label>
+              <div id="list-auxiliares" class="space-y-3"></div>
+              <button type="button" class="btn btn-ghost mt-3" onclick="addTeamItem('auxiliares')">➕ adicionar auxiliar</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Blocos -->
+        <section class="grid gap-6">
+          <div class="rota-card p-5 sm:p-6">
+            <div class="section-title">
+              <h3 class="text-lg font-extrabold">🧍 Abordados</h3>
+              <span class="text-xs text-slate-300/70">Nome • CPF/ID • Situação</span>
+            </div>
+            <div id="list-abordados" class="space-y-3"></div>
+            <button type="button" class="btn btn-ghost w-full justify-center mt-3" onclick="addAbordado()">➕ adicionar abordado</button>
+          </div>
+
+          <div class="rota-card p-5 sm:p-6">
+            <div class="section-title">
+              <h3 class="text-lg font-extrabold">🚫 Ilícitos</h3>
+              <span class="text-xs text-slate-300/70">ex.: 02x Maconha</span>
+            </div>
+            <div id="list-ilicitos" class="space-y-3"></div>
+            <button type="button" class="btn btn-ghost w-full justify-center mt-3" onclick="addIlicito()">➕ adicionar ilícito</button>
+          </div>
+
+          <div class="rota-card p-5 sm:p-6">
+            <div class="section-title">
+              <h3 class="text-lg font-extrabold">🚗 Veículos</h3>
+              <span class="text-xs text-slate-300/70">Modelo • Cor • Placa • Situação</span>
+            </div>
+            <div id="list-veiculos" class="space-y-3"></div>
+            <button type="button" class="btn btn-ghost w-full justify-center mt-3" onclick="addVeiculo()">➕ adicionar veículo</button>
+          </div>
+
+          <div class="rota-card p-5 sm:p-6">
+            <div class="section-title">
+              <h3 class="text-lg font-extrabold">📌 Ocorrências</h3>
+              <span class="text-xs text-slate-300/70">Hora + descrição</span>
+            </div>
+            <div id="list-ocorrencias" class="space-y-3"></div>
+            <button type="button" class="btn btn-ghost w-full justify-center mt-3" onclick="addOcorrencia()">➕ adicionar ocorrência</button>
+          </div>
+        </section>
+
+        <!-- Resultado -->
+        <section class="rota-card p-5 sm:p-6">
+          <div class="section-title">
+            <h3 class="text-lg font-extrabold">📈 Resultado</h3>
+            <span class="badge" style="background:rgba(148,163,184,.06);border-color:rgba(148,163,184,.22)">Somatório</span>
+          </div>
+
+          <div class="grid sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm text-slate-300/80 mb-1">Ocorrências (qtd)</label>
+              <input id="res-oc" type="number" min="0" value="0" class="w-full" />
+            </div>
+            <div>
+              <label class="block text-sm text-slate-300/80 mb-1">Apoios (qtd)</label>
+              <input id="res-ap" type="number" min="0" value="0" class="w-full" />
+            </div>
+            <div>
+              <label class="block text-sm text-slate-300/80 mb-1">Ações (Blipadas)</label>
+              <input id="res-ac" type="number" min="0" value="0" class="w-full" />
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Coluna lateral -->
+      <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-6">
+
+        <!-- Ações -->
+        <section class="rota-card p-5 sm:p-6">
+          <div class="section-title">
+            <h3 class="text-lg font-extrabold">⚙️ Ações</h3>
+            <span class="badge" style="background:rgba(148,163,184,.06);border-color:rgba(148,163,184,.22)">Atalhos</span>
+          </div>
+
+          <div class="grid gap-3">
+            <button class="btn btn-gold w-full" id="saveCloudBtn" type="button">💾 Salvar ilícitos</button>
+            <button class="btn btn-red w-full" id="printBtn" type="button">🧾 Imprimir / PDF</button>
+            <button class="btn btn-ghost w-full" id="totalsBtn" type="button">📊 Totais 7 dias</button>
+          </div>
+
+          <div class="mt-4 soft p-4">
+            <div class="text-xs text-slate-300/70">
+              <b>Regras rápidas:</b>
+              <ul class="list-disc pl-5 mt-2 space-y-1">
+                <li>Preencha pelo menos 1 <b>Abordado</b> e 1 <b>Veículo</b> para imprimir.</li>
+                <li>Para salvar no Supabase, selecione pelo menos 1 membro do <b>Efetivo</b>.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Totais -->
+        <section id="totalsPanel" class="rota-card p-5 sm:p-6 hidden">
+          <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+            <h3 class="text-lg font-extrabold">📊 Totais (7 dias)</h3>
+            <div class="flex gap-2">
+              <button class="btn btn-ghost" id="exportCsvBtn" type="button">Exportar CSV</button>
+              <button class="btn btn-ghost" id="closeTotalsBtn" type="button">Fechar</button>
+            </div>
+          </div>
+          <div id="totalsContent" class="space-y-4"></div>
+        </section>
+
+      </aside>
     </div>
 
     <!-- FOLHA A4 (print bonita) -->
@@ -293,9 +443,10 @@
         <div id="rodape-data">—</div>
       </div>
     </div>
+
   </div>
 
-  <!-- Supabase no final (antes do script principal) -->
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
@@ -314,49 +465,54 @@
 
     /********** UI builders **********/
     function mkItem(id,v,ph){
-      const w=document.createElement('div'); w.className='item';
-      w.innerHTML=`<input class="w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40" placeholder="${ph}" value="${v}">
-      <button class="btn btn-ghost mt-2" type="button">remover</button>`;
+      const w=document.createElement('div'); w.className='item soft p-4';
+      w.innerHTML=`
+        <div class="grid gap-2">
+          <input class="w-full" placeholder="${ph}" value="${v}">
+          <div class="text-right">
+            <button class="btn btn-ghost" type="button">remover</button>
+          </div>
+        </div>`;
       w.querySelector('button').onclick=()=>w.remove();
       $(id).appendChild(w);
     }
     function addIlicito(v=''){ mkItem('list-ilicitos',v,'ex.: 02x Maconha'); }
 
     function addOcorrencia(h='',t=''){
-      const w=document.createElement('div'); w.className='item rota-card p-3';
+      const w=document.createElement('div'); w.className='item soft p-4';
       w.innerHTML=`
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          <input type="time" value="${h}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Descreva a ocorrência" value="${t}" class="sm:col-span-2 px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <input type="time" value="${h}">
+          <input placeholder="Descreva a ocorrência" value="${t}" class="sm:col-span-2">
         </div>
-        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>`;
+        <div class="mt-3 text-right"><button class="btn btn-ghost" type="button">remover</button></div>`;
       w.querySelector('button').onclick=()=>w.remove();
       $('list-ocorrencias').appendChild(w);
     }
 
     function addAbordado(nome='',doc='',sit=''){
-      const w=document.createElement('div'); w.className='item rota-card p-3';
+      const w=document.createElement('div'); w.className='item soft p-4';
       w.innerHTML=`
-        <div class="grid md:grid-cols-3 gap-2 w-full">
-          <input placeholder="Nome do abordado" value="${esc(nome)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="CPF/ID do abordado" value="${esc(doc)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Situação (ex.: BOPM — Cb Ducati 20:40)" value="${esc(sit)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+        <div class="grid md:grid-cols-3 gap-3 w-full">
+          <input placeholder="Nome do abordado" value="${esc(nome)}">
+          <input placeholder="CPF/ID do abordado" value="${esc(doc)}">
+          <input placeholder="Situação (ex.: BOPM — Cb Ducati 20:40)" value="${esc(sit)}">
         </div>
-        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>`;
+        <div class="mt-3 text-right"><button class="btn btn-ghost" type="button">remover</button></div>`;
       w.querySelector('button').onclick=()=>w.remove();
       $('list-abordados').appendChild(w);
     }
 
     function addVeiculo(modelo='',cor='',placa='',sit=''){
-      const w=document.createElement('div'); w.className='item rota-card p-3';
+      const w=document.createElement('div'); w.className='item soft p-4';
       w.innerHTML=`
-        <div class="grid md:grid-cols-4 gap-2 w-full">
-          <input placeholder="Modelo do veículo" value="${esc(modelo)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Cor" value="${esc(cor)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Emplacamento" value="${esc(placa)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
-          <input placeholder="Situação (ex.: Apreendido)" value="${esc(sit)}" class="px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+        <div class="grid md:grid-cols-4 gap-3 w-full">
+          <input placeholder="Modelo do veículo" value="${esc(modelo)}">
+          <input placeholder="Cor" value="${esc(cor)}">
+          <input placeholder="Emplacamento" value="${esc(placa)}">
+          <input placeholder="Situação (ex.: Apreendido)" value="${esc(sit)}">
         </div>
-        <div class="mt-2 text-right"><button class="btn btn-ghost" type="button">remover</button></div>`;
+        <div class="mt-3 text-right"><button class="btn btn-ghost" type="button">remover</button></div>`;
       w.querySelector('button').onclick=()=>w.remove();
       $('list-veiculos').appendChild(w);
     }
@@ -364,21 +520,24 @@
     // Efetivo: select nome -> select patente
     function addTeamItem(role){
       const containerId = ROLE_IDS[role];
-      const wrap = document.createElement('div'); wrap.className='item rota-card p-3';
-      const inner=document.createElement('div'); inner.className='grid grid-cols-1 gap-2';
+      const wrap = document.createElement('div'); wrap.className='item soft p-4';
+      const inner=document.createElement('div'); inner.className='grid grid-cols-1 gap-3';
 
       const nameSel=document.createElement('select');
       const rankSel=document.createElement('select');
-      nameSel.className='w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40';
-      rankSel.className='w-full px-4 py-2 rounded-xl border border-slate-600/40 bg-slate-900/40 focus:outline-none focus:ring-2 focus:ring-amber-500/40';
+      nameSel.className='w-full';
+      rankSel.className='w-full';
+
       nameSel.innerHTML = `<option value="">Selecione o policial…</option>` + OFFICERS.map(o=>`<option value="${o.id}">${esc(o.name)}</option>`).join('');
       rankSel.innerHTML = `<option value="">Selecione a patente…</option>` + RANKS.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
+
       nameSel.addEventListener('change', e=>{
         const off = OFFICERS.find(o=>o.id===e.target.value);
         if(off) rankSel.value = off.current_rank_id ?? '';
       });
 
       inner.appendChild(nameSel); inner.appendChild(rankSel);
+
       const actions=document.createElement('div'); actions.className='mt-2 text-right';
       const del=document.createElement('button'); del.type='button'; del.className='btn btn-ghost'; del.textContent='remover';
       del.onclick=()=>wrap.remove(); actions.appendChild(del);
@@ -431,7 +590,6 @@
     function fillSheet(d){
       const dt=d.datahora?new Date(d.datahora):new Date();
       const dd=`${pad2(dt.getDate())}/${pad2(dt.getMonth()+1)}/${dt.getFullYear()} ${pad2(dt.getHours())}:${pad2(dt.getMinutes())}`;
-      // meta chips
       const metaData = document.getElementById('meta-data');
       const metaRota = document.getElementById('meta-rota');
       if(metaData) metaData.textContent = `Data/Hora: ${dd}`;
@@ -512,19 +670,31 @@
       const panel = $('totalsPanel');
       const content = $('totalsContent');
       if(!agg || !Object.keys(agg).length){
-        content.innerHTML = '<div class="text-slate-400 text-sm">Sem dados nos últimos 7 dias.</div>';
+        content.innerHTML = '<div class="text-slate-300/70 text-sm">Sem dados nos últimos 7 dias.</div>';
         panel.classList.remove('hidden');
         return;
       }
       let html = '';
       Object.keys(agg).sort().forEach(off=>{
-        html += `<div><h4 class="font-semibold mb-2">${esc(off)}</h4>`;
-        html += `<table class="w-full text-sm border border-slate-300/40 rounded-lg overflow-hidden"><thead><tr class="bg-slate-100/80 text-slate-900"><th class="text-left p-2">Item</th><th class="text-right p-2">Quantidade</th></tr></thead><tbody>`;
+        html += `<div class="soft p-4">
+          <h4 class="font-extrabold mb-3">${esc(off)}</h4>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border border-slate-300/20 rounded-xl overflow-hidden">
+              <thead>
+                <tr class="bg-white/5">
+                  <th class="text-left p-2.5 text-slate-200/90">Item</th>
+                  <th class="text-right p-2.5 text-slate-200/90">Quantidade</th>
+                </tr>
+              </thead>
+              <tbody>`;
         const items = agg[off];
         Object.keys(items).sort().forEach(it=>{
-          html += `<tr class="odd:bg-slate-800/10"><td class="p-2">${esc(it)}</td><td class="p-2 text-right">${items[it]}</td></tr>`;
+          html += `<tr class="odd:bg-white/0 even:bg-white/5">
+            <td class="p-2.5">${esc(it)}</td>
+            <td class="p-2.5 text-right font-bold text-amber-300">${items[it]}</td>
+          </tr>`;
         });
-        html += `</tbody></table></div>`;
+        html += `</tbody></table></div></div>`;
       });
       content.innerHTML = html;
       panel.classList.remove('hidden');
